@@ -2,24 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SpaceMeteor</title>
+  <title>SpaceMeteor Tribute</title>
   <style>
-    body {
-      margin: 0;
-      height: 100vh;
+    /* Reset */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      scroll-behavior: smooth;
       background-color: black;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    section {
+      height: 100vh;
+      scroll-snap-align: start;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
-      font-family: Arial, sans-serif;
+      flex-direction: column;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 4vw;
       font-weight: bold;
-      font-size: 5vw;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.15em;
+      max-width: 90vw;
+    }
+
+    h1.smaller {
+      font-size: 3vw;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 2vw;
+      max-width: 80vw;
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Scroll down arrow */
+    .scroll-down {
+      position: absolute;
+      bottom: 20px;
+      font-size: 2rem;
+      animation: bounce 2s infinite;
+      cursor: default;
+      user-select: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+
+    /* Emoji styles */
+    .emoji {
+      font-size: 1.5em;
+      margin-left: 0.3em;
     }
   </style>
 </head>
 <body>
-  Hai I love SpaceMeteor
+
+  <section id="slide1">
+    <h1 class="smaller">Hai I love SpaceMeteor<span class="emoji">❤️</span></h1>
+    <div class="scroll-down">⬇️ Scroll down</div>
+  </section>
+
+  <section id="slide2">
+    <p>We met in Minecraft in the server <a href="https://efil.minehut.gg" style="color: #4fc3f7; text-decoration: none;">efil.minehut.gg</a></p>
+  </section>
+
+  <section id="slide3">
+    <p>How did we fall in love? I asked her to be my wife and she agreed.</p>
+  </section>
+
+  <section id="slide4">
+    <p>How we got to meet each other better? We pvped for some hours.</p>
+  </section>
+
+  <section id="slide5">
+    <p>Thank you for reading and thank you Space for agreeing to be my wife <span class="emoji">🙏</span></p>
+  </section>
+
 </body>
 </html>

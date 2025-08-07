@@ -16,69 +16,69 @@
       height: 100%;
       scroll-behavior: smooth;
       font-family: 'Press Start 2P', monospace;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
+      overflow-x: hidden;
       color: white;
-    }
-
-    body {
-      position: relative;
       background: black;
     }
 
-    /* Minecraft blocky background */
+    /* Parallax Minecraft background */
     .mc-bg {
       position: fixed;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      z-index: -2;
+      width: 110vw;
+      height: 110vh;
       top: 0;
       left: 0;
+      background: url('https://i.imgur.com/w6mXWok.png') repeat-x; /* Minecraft plains screenshot */
+      background-size: cover;
+      animation: pan 60s linear infinite;
+      filter: brightness(0.5);
+      z-index: -3;
     }
 
-    .mc-bg::before {
-      content: '';
+    @keyframes pan {
+      0% { background-position: 0 0; }
+      100% { background-position: -100vw 0; }
+    }
+
+    /* Pixelated drifting hearts */
+    .heart {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      background: url('https://i.imgur.com/p3oQkpY.png') repeat; /* Minecraft grass block texture */
-      background-size: 128px 128px;
-      filter: brightness(0.4); /* dark overlay for readability */
+      width: 16px;
+      height: 16px;
+      background: url('https://i.imgur.com/0a6vFvF.png') no-repeat center / contain;
+      animation: float 6s linear infinite;
+      opacity: 0.8;
       z-index: -1;
     }
 
-    /* Pixel-style falling particles (like Minecraft falling snow) */
-    .pixel {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #fff;
-      animation: fall 4s linear infinite;
-      opacity: 0.8;
+    @keyframes float {
+      0% { transform: translateY(-10vh) scale(1); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(110vh) scale(1.2); opacity: 0; }
     }
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-10vh);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(110vh);
-        opacity: 0;
-      }
-    }
-
+    /* Sections with fade-in text */
     section {
-      height: 100vh;
-      scroll-snap-align: start;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
       padding: 2rem;
       text-align: center;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 1.5s ease forwards;
+      opacity: 0;
+    }
+
+    section.visible {
+      opacity: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
@@ -127,27 +127,33 @@
     <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
+
+  <!-- Optional: Ambient Minecraft sounds -->
+  <audio id="ambient" autoplay loop>
+    <source src="https://files.catbox.moe/f1w6mr.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
   <script>
     document.addEventListener('click', () => {
-      const audio = document.getElementById('bg-music');
-      if (audio.paused) {
-        audio.play().catch(() => {});
-      }
+      document.querySelectorAll("audio").forEach(audio => {
+        if (audio.paused) audio.play().catch(() => {});
+      });
     });
   </script>
 
-  <!-- Minecraft background -->
+  <!-- Parallax Background -->
   <div class="mc-bg"></div>
 
-  <!-- Pixel "snow" particles -->
+  <!-- Heart particles -->
   <script>
-    for (let i = 0; i < 50; i++) {
-      const pixel = document.createElement('div');
-      pixel.className = 'pixel';
-      pixel.style.left = `${Math.random() * 100}vw`;
-      pixel.style.animationDuration = `${3 + Math.random() * 3}s`;
-      pixel.style.animationDelay = `${Math.random() * 5}s`;
-      document.body.appendChild(pixel);
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = `${Math.random() * 100}vw`;
+      heart.style.animationDuration = `${4 + Math.random() * 4}s`;
+      heart.style.animationDelay = `${Math.random() * 5}s`;
+      document.body.appendChild(heart);
     }
   </script>
 
@@ -184,6 +190,20 @@
       May our love be stronger than bedrock and never be griefed.
     </p>
   </section>
+
+  <script>
+    // Reveal sections with fade effect
+    const sections = document.querySelectorAll("section");
+    const revealOnScroll = () => {
+      const trigger = window.innerHeight * 0.85;
+      sections.forEach(sec => {
+        const top = sec.getBoundingClientRect().top;
+        if (top < trigger) sec.classList.add("visible");
+      });
+    };
+    window.addEventListener("scroll", revealOnScroll);
+    revealOnScroll();
+  </script>
 
 </body>
 </html>

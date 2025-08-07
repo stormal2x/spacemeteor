@@ -26,8 +26,8 @@
       background: black;
     }
 
-    /* Animated starry background */
-    .space-bg {
+    /* Minecraft blocky background */
+    .mc-bg {
       position: fixed;
       width: 100vw;
       height: 100vh;
@@ -37,32 +37,34 @@
       left: 0;
     }
 
-    .space-bg::before {
+    .mc-bg::before {
       content: '';
       position: absolute;
       width: 100%;
       height: 100%;
-      background: url('https://i.imgur.com/2A3gR4y.jpg') center center / cover no-repeat; /* Space bg */
-      filter: brightness(0.25); /* dark overlay */
+      background: url('https://i.imgur.com/p3oQkpY.png') repeat; /* Minecraft grass block texture */
+      background-size: 128px 128px;
+      filter: brightness(0.4); /* dark overlay for readability */
       z-index: -1;
     }
 
-    .meteor {
+    /* Pixel-style falling particles (like Minecraft falling snow) */
+    .pixel {
       position: absolute;
       width: 4px;
-      height: 20px;
-      background: linear-gradient(to bottom, white, transparent);
+      height: 4px;
+      background: #fff;
       animation: fall 4s linear infinite;
       opacity: 0.8;
     }
 
     @keyframes fall {
       0% {
-        transform: translateY(-50vh) translateX(0) rotate(45deg);
+        transform: translateY(-10vh);
         opacity: 1;
       }
       100% {
-        transform: translateY(120vh) translateX(30vw) rotate(45deg);
+        transform: translateY(110vh);
         opacity: 0;
       }
     }
@@ -76,7 +78,7 @@
       flex-direction: column;
       padding: 2rem;
       text-align: center;
-      background-color: rgba(0, 0, 0, 0.5); /* keeps it readable */
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     h1 {
@@ -120,9 +122,9 @@
 </head>
 <body>
 
-  <!-- Background music -->
+  <!-- Background music (C418 - Sweden) -->
   <audio id="bg-music" autoplay loop>
-    <source src="https://files.catbox.moe/iyk4s5.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
   <script>
@@ -134,18 +136,18 @@
     });
   </script>
 
-  <!-- Space background container -->
-  <div class="space-bg"></div>
+  <!-- Minecraft background -->
+  <div class="mc-bg"></div>
 
-  <!-- Create multiple meteors -->
+  <!-- Pixel "snow" particles -->
   <script>
-    for (let i = 0; i < 20; i++) {
-      const meteor = document.createElement('div');
-      meteor.className = 'meteor';
-      meteor.style.left = `${Math.random() * 100}vw`;
-      meteor.style.animationDuration = `${2 + Math.random() * 3}s`;
-      meteor.style.animationDelay = `${Math.random() * 5}s`;
-      document.body.appendChild(meteor);
+    for (let i = 0; i < 50; i++) {
+      const pixel = document.createElement('div');
+      pixel.className = 'pixel';
+      pixel.style.left = `${Math.random() * 100}vw`;
+      pixel.style.animationDuration = `${3 + Math.random() * 3}s`;
+      pixel.style.animationDelay = `${Math.random() * 5}s`;
+      document.body.appendChild(pixel);
     }
   </script>
 

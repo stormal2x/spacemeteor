@@ -1,75 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>StormalSpace Cinematic</title>
+  <meta charset="UTF-8">
+  <title>Space Aesthetic</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Press Start 2P', monospace; background: black; color: white; }
-
-    .scene {
-      position: absolute;
-      width: 100%;
+    html, body {
+      margin: 0;
+      padding: 0;
       height: 100%;
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
-      transition: opacity 2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-      font-size: 2vw;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      overflow: hidden;
+      background-color: black;
     }
 
-    .scene.visible { opacity: 1; }
+    #slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-    .final-text {
-      font-size: 3vw;
+    #slideshow img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 2s ease-in-out; /* fade effect */
+    }
+
+    #slideshow img.active {
+      opacity: 1;
+    }
+
+    /* Black fade overlay for cinematic effect */
+    #fade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2s ease-in-out;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <audio id="bg-music" autoplay loop>
-    <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
-  </audio>
-  <script>
-    document.addEventListener('click', () => {
-      const audio = document.getElementById('bg-music');
-      if (audio.paused) audio.play().catch(() => {});
-    });
-  </script>
 
-  <!-- Cinematic Scenes -->
-  <div id="scene1" class="scene" style="background-image: url('https://i.pinimg.com/1200x/85/fe/40/85fe40b0f29481e26fa0666bb5087781.jpg');">
-    <div>Hai, I love SpaceMeteor ❤️</div>
-  </div>
-  <div id="scene2" class="scene" style="background-image: url('https://i.pinimg.com/1200x/ac/ec/29/acec2924163567893e876fa0d20f1247.jpg');">
-    <div>We met in Minecraft... like all legendary couples do.</div>
-  </div>
-  <div id="scene3" class="scene" style="background-image: url('https://i.pinimg.com/1200x/3a/3a/99/3a3a99e48e68349cf4a6b742a4692b4c.jpg');">
-    <div>It all started in a random server called efil.minehut.gg</div>
-  </div>
-  <div id="scene4" class="scene" style="background-image: url('https://i.pinimg.com/1200x/e9/03/fe/e903fe8892bb53d562d4bc57f3ee907b.jpg');">
-    <div>I popped the most romantic question a blocky man can ask: “Wanna be my wife?”</div>
-  </div>
-  <div id="scene5" class="scene" style="background-image: url('https://i.pinimg.com/1200x/c9/2f/25/c92f25ecc530424e4f27c438b10b7d30.jpg');">
-    <div>Space said yes. We battled in PvP, lava buckets, sharpness V.</div>
-  </div>
-  <div id="scene6" class="scene" style="background: #000;">
-    <div class="final-text">Thanks for watching ❤️</div>
-  </div>
+<div id="slideshow">
+  <img src="https://i.pinimg.com/1200x/85/fe/40/85fe40b0f29481e26fa0666bb5087781.jpg" class="active">
+  <img src="https://i.pinimg.com/1200x/ac/ec/29/acec2924163567893e876fa0d20f1247.jpg">
+  <img src="https://i.pinimg.com/1200x/3a/3a/99/3a3a99e48e68349cf4a6b742a4692b4c.jpg">
+  <img src="https://i.pinimg.com/1200x/e9/03/fe/e903fe8892bb53d562d4bc57f3ee907b.jpg">
+  <img src="https://i.pinimg.com/1200x/c9/2f/25/c92f25ecc530424e4f27c438b10b7d30.jpg">
+  <img src="https://i.pinimg.com/1200x/61/0d/8e/610d8e4b798e680a7f1406b615b46ede.jpg">
+</div>
 
-  <script>
-    const scenes = ['scene1','scene2','scene3','scene4','scene5','scene6'];
-    scenes.forEach((id, idx) => {
-      setTimeout(() => {
-        scenes.forEach(other => document.getElementById(other).classList.remove('visible'));
-        document.getElementById(id).classList.add('visible');
-      }, idx * 5000); // 5 seconds per scene
-    });
-  </script>
+<div id="fade"></div>
+
+<audio id="bg-music" loop>
+  <source src="your-music-file.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const slides = document.querySelectorAll('#slideshow img');
+  const fadeOverlay = document.getElementById('fade');
+  const music = document.getElementById('bg-music');
+
+  let current = 0;
+  const displayTime = 6000; // 6 seconds per image
+
+  // Music autoplay fix: wait for any click/tap
+  document.body.addEventListener('click', () => {
+    music.play().catch(err => console.log('Autoplay blocked:', err));
+  }, { once: true });
+
+  function changeSlide() {
+    // fade to black
+    fadeOverlay.style.opacity = 1;
+
+    setTimeout(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+
+      // fade back in
+      fadeOverlay.style.opacity = 0;
+    }, 2000); // matches fade duration
+  }
+
+  setInterval(changeSlide, displayTime);
+</script>
+
 </body>
 </html>

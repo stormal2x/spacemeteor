@@ -2,21 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SpaceMeteor Tribute</title>
+  <title>The StormalSpace History</title>
   <style>
-    /* Reset */
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     * {
-      margin: 0; padding: 0; box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     html, body {
       height: 100%;
       scroll-behavior: smooth;
-      background-color: black;
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1d1d1d;
+      color: #d7f7be;
+      font-family: 'Press Start 2P', monospace;
       overflow-y: scroll;
       scroll-snap-type: y mandatory;
+      background-image: url('https://i.imgur.com/vsZRv3v.png'); /* Optional Minecraft dirt background */
+      background-size: cover;
+      background-attachment: fixed;
     }
 
     section {
@@ -28,35 +34,37 @@
       flex-direction: column;
       padding: 2rem;
       text-align: center;
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     h1 {
-      font-size: 4vw;
-      font-weight: bold;
-      letter-spacing: 0.15em;
-      max-width: 90vw;
-    }
-
-    h1.smaller {
-      font-size: 3vw;
+      font-size: 2vw;
       margin-bottom: 1rem;
+      text-shadow: 2px 2px #000;
     }
 
     p {
-      font-size: 2vw;
+      font-size: 1.2vw;
       max-width: 80vw;
       margin-top: 1rem;
-      line-height: 1.5;
+      line-height: 2;
+      text-shadow: 1px 1px #000;
     }
 
-    /* Scroll down arrow */
+    .emoji {
+      font-size: 1.5em;
+      margin-left: 0.3em;
+    }
+
     .scroll-down {
       position: absolute;
       bottom: 20px;
-      font-size: 2rem;
+      font-size: 1.5rem;
       animation: bounce 2s infinite;
       cursor: default;
       user-select: none;
+      color: #fff;
+      text-shadow: 1px 1px #000;
     }
 
     @keyframes bounce {
@@ -64,34 +72,55 @@
       50% { transform: translateY(10px); }
     }
 
-    /* Emoji styles */
-    .emoji {
-      font-size: 1.5em;
-      margin-left: 0.3em;
+    a {
+      color: #4fc3f7;
+      text-decoration: none;
+    }
+
+    audio {
+      display: none;
     }
   </style>
 </head>
 <body>
 
+  <!-- Background music by C418 (Sweden) -->
+  <audio autoplay loop>
+    <source src="https://files.catbox.moe/iyk4s5.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
   <section id="slide1">
-    <h1 class="smaller">Hai I love SpaceMeteor<span class="emoji">❤️</span></h1>
+    <h1>Hai I love SpaceMeteor<span class="emoji">❤️</span></h1>
     <div class="scroll-down">⬇️ Scroll down</div>
   </section>
 
   <section id="slide2">
-    <p>We met in Minecraft in the server <a href="https://efil.minehut.gg" style="color: #4fc3f7; text-decoration: none;">efil.minehut.gg</a></p>
+    <p>We met in Minecraft... like all legendary couples do.<br>
+      It all started in a random server called <a href="https://efil.minehut.gg">efil.minehut.gg</a>,<br>
+      and somehow, it felt like fate. <span class="emoji">🌠</span>
+    </p>
   </section>
 
   <section id="slide3">
-    <p>How did we fall in love? I asked her to be my wife and she agreed.</p>
+    <p>How did we fall in love?<br>
+      I popped the most romantic question a blocky man can ask: “Wanna be my wife?”<br>
+      And Space said yes. No hesitation. Instant chemistry. (Or maybe lag.)
+    </p>
   </section>
 
   <section id="slide4">
-    <p>How we got to meet each other better? We pvped for some hours.</p>
+    <p>How did we get to know each other better?<br>
+      We did what any sane Minecraft couple would do—duel to the death for hours in PvP.<br>
+      Nothing says love like sharpness V and lava buckets.
+    </p>
   </section>
 
   <section id="slide5">
-    <p>Thank you for reading and thank you Space for agreeing to be my wife <span class="emoji">🙏</span></p>
+    <p>Thank you for reading this epic saga of blocky romance.<br>
+      And thank you, Space, for accepting to be my pixelated wife <span class="emoji">🙏</span><br>
+      May our love be stronger than bedrock and never be griefed.
+    </p>
   </section>
 
 </body>

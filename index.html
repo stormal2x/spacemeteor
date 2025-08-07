@@ -2,100 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Space Aesthetic</title>
+  <title>StormalSpace Cinematic</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background-color: black;
+    * { margin: 0; padding: 0; }
+    html, body { height: 100%; width: 100%; background: black; overflow: hidden; font-family: 'Press Start 2P', monospace; color: white; }
+    .scene {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 2s ease;
     }
-
-    #slideshow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    .scene.visible { opacity: 1; }
+    .text {
+      position: absolute; bottom: 10%; width: 100%; text-align: center;
+      font-size: 2vw; text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     }
-
-    #slideshow img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 2s ease-in-out; /* fade effect */
+    .fade-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: black; opacity: 1;
+      transition: opacity 2s ease;
+      z-index: 10; pointer-events: none;
     }
-
-    #slideshow img.active {
-      opacity: 1;
-    }
-
-    /* Black fade overlay for cinematic effect */
-    #fade {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    #startScreen {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: black;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 2s ease-in-out;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    #startText {
+      font-size: 2vw; text-align: center; color: white;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     }
   </style>
 </head>
 <body>
 
-<div id="slideshow">
-  <img src="https://i.pinimg.com/1200x/85/fe/40/85fe40b0f29481e26fa0666bb5087781.jpg" class="active">
-  <img src="https://i.pinimg.com/1200x/ac/ec/29/acec2924163567893e876fa0d20f1247.jpg">
-  <img src="https://i.pinimg.com/1200x/3a/3a/99/3a3a99e48e68349cf4a6b742a4692b4c.jpg">
-  <img src="https://i.pinimg.com/1200x/e9/03/fe/e903fe8892bb53d562d4bc57f3ee907b.jpg">
-  <img src="https://i.pinimg.com/1200x/c9/2f/25/c92f25ecc530424e4f27c438b10b7d30.jpg">
-  <img src="https://i.pinimg.com/1200x/61/0d/8e/610d8e4b798e680a7f1406b615b46ede.jpg">
-</div>
+  <!-- Click to Start Screen -->
+  <div id="startScreen">
+    <div id="startText">Click to Start</div>
+  </div>
 
-<div id="fade"></div>
+  <!-- Fade overlay for smooth transitions -->
+  <div id="fade" class="fade-overlay"></div>
 
-<audio id="bg-music" loop>
-  <source src="your-music-file.mp3" type="audio/mpeg">
-</audio>
+  <!-- Cinematic scenes -->
+  <div id="s1" class="scene" style="background-image:url('https://i.pinimg.com/1200x/85/fe/40/85fe40b0f29481e26fa0666bb5087781.jpg');"><div class="text">Hai, I love SpaceMeteor ❤️</div></div>
+  <div id="s2" class="scene" style="background-image:url('https://i.pinimg.com/1200x/ac/ec/29/acec2924163567893e876fa0d20f1247.jpg');"><div class="text">We met in Minecraft... like all legendary couples do.</div></div>
+  <div id="s3" class="scene" style="background-image:url('https://i.pinimg.com/1200x/3a/3a/99/3a3a99e48e68349cf4a6b742a4692b4c.jpg');"><div class="text">It all started on efil.minehut.gg</div></div>
+  <div id="s4" class="scene" style="background-image:url('https://i.pinimg.com/1200x/e9/03/fe/e903fe8892bb53d562d4bc57f3ee907b.jpg');"><div class="text">Wanna be my wife? — She said yes!</div></div>
+  <div id="s5" class="scene" style="background-image:url('https://i.pinimg.com/1200x/c9/2f/25/c92f25ecc530424e4f27c438b10b7d30.jpg');"><div class="text">PvP, sharpness V, lava buckets—intense.</div></div>
+  <div id="s6" class="scene" style="background:black;"><div class="text">Thanks for watching ❤️</div></div>
 
-<script>
-  const slides = document.querySelectorAll('#slideshow img');
-  const fadeOverlay = document.getElementById('fade');
-  const music = document.getElementById('bg-music');
+  <!-- Background Music -->
+  <audio id="bg-music" loop>
+    <source src="https://archive.org/download/c418swedenminecraftvolumealpha_201908/sweden_vinyl.mp3" type="audio/mpeg">
+  </audio>
 
-  let current = 0;
-  const displayTime = 6000; // 6 seconds per image
+  <script>
+    const scenes = ['s1','s2','s3','s4','s5','s6'];
+    const fade = document.getElementById('fade');
+    const startScreen = document.getElementById('startScreen');
+    const music = document.getElementById('bg-music');
+    let idx = 0;
 
-  // Music autoplay fix: wait for any click/tap
-  document.body.addEventListener('click', () => {
-    music.play().catch(err => console.log('Autoplay blocked:', err));
-  }, { once: true });
+    function runScene() {
+      fade.style.opacity = 1;
+      setTimeout(() => {
+        document.querySelectorAll('.scene').forEach(s => s.classList.remove('visible'));
+        document.getElementById(scenes[idx]).classList.add('visible');
+        fade.style.opacity = 0;
+        idx++;
+        if (idx < scenes.length) {
+          setTimeout(runScene, 7000); // 5s view + 2s fade
+        }
+      }, 2000);
+    }
 
-  function changeSlide() {
-    // fade to black
-    fadeOverlay.style.opacity = 1;
-
-    setTimeout(() => {
-      slides[current].classList.remove('active');
-      current = (current + 1) % slides.length;
-      slides[current].classList.add('active');
-
-      // fade back in
-      fadeOverlay.style.opacity = 0;
-    }, 2000); // matches fade duration
-  }
-
-  setInterval(changeSlide, displayTime);
-</script>
-
+    startScreen.addEventListener('click', () => {
+      music.play().catch(err => console.log('Playback blocked:', err));
+      startScreen.style.display = 'none';
+      runScene();
+    });
+  </script>
 </body>
 </html>

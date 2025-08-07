@@ -6,33 +6,28 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       height: 100%;
-      scroll-behavior: smooth;
+      overflow: hidden;
       font-family: 'Press Start 2P', monospace;
-      overflow-x: hidden;
-      color: white;
       background: black;
+      color: white;
     }
 
-    /* Parallax Minecraft background */
+    /* Parallax Background */
     .mc-bg {
       position: fixed;
       width: 110vw;
       height: 110vh;
       top: 0;
       left: 0;
-      background: url('https://i.imgur.com/w6mXWok.png') repeat-x; /* Minecraft plains screenshot */
+      background: url('https://i.imgur.com/w6mXWok.png') repeat-x;
       background-size: cover;
       animation: pan 60s linear infinite;
       filter: brightness(0.5);
-      z-index: -3;
+      z-index: -2;
     }
 
     @keyframes pan {
@@ -40,7 +35,7 @@
       100% { background-position: -100vw 0; }
     }
 
-    /* Pixelated drifting hearts */
+    /* Heart particles */
     .heart {
       position: absolute;
       width: 16px;
@@ -57,84 +52,38 @@
       100% { transform: translateY(110vh) scale(1.2); opacity: 0; }
     }
 
-    /* Sections with fade-in text */
-    section {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 2rem;
-      text-align: center;
-      background-color: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      animation: fadeIn 1.5s ease forwards;
-      opacity: 0;
-    }
-
-    section.visible {
-      opacity: 1;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      font-size: 2vw;
-      margin-bottom: 1rem;
-      text-shadow: 2px 2px #000;
-    }
-
-    p {
-      font-size: 1.2vw;
-      max-width: 80vw;
-      margin-top: 1rem;
-      line-height: 2;
-      text-shadow: 1px 1px #000;
-    }
-
-    .emoji {
-      font-size: 1.5em;
-      margin-left: 0.3em;
-    }
-
-    .scroll-down {
+    /* Cinematic text container */
+    .cinematic-text {
       position: absolute;
-      bottom: 20px;
-      font-size: 1.5rem;
-      animation: bounce 2s infinite;
-      color: #fff;
-      text-shadow: 1px 1px #000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      max-width: 80vw;
+      font-size: 1.2vw;
+      text-shadow: 2px 2px #000;
+      opacity: 0;
+      animation: fadeInOut 6s ease forwards;
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(10px); }
-    }
-
-    a {
-      color: #4fc3f7;
-      text-decoration: none;
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background music (C418 - Sweden) -->
+  <!-- Music -->
   <audio id="bg-music" autoplay loop>
     <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 
-  <!-- Optional: Ambient Minecraft sounds -->
-  <audio id="ambient" autoplay loop>
-    <source src="https://files.catbox.moe/f1w6mr.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
   <script>
+    // Autoplay fix for browsers
     document.addEventListener('click', () => {
       document.querySelectorAll("audio").forEach(audio => {
         if (audio.paused) audio.play().catch(() => {});
@@ -142,10 +91,10 @@
     });
   </script>
 
-  <!-- Parallax Background -->
+  <!-- Background -->
   <div class="mc-bg"></div>
 
-  <!-- Heart particles -->
+  <!-- Hearts -->
   <script>
     for (let i = 0; i < 20; i++) {
       const heart = document.createElement('div');
@@ -157,52 +106,28 @@
     }
   </script>
 
-  <!-- Content Sections -->
-  <section>
-    <h1>Hai I love SpaceMeteor<span class="emoji">❤️</span></h1>
-    <div class="scroll-down">⬇️ Scroll down</div>
-  </section>
-
-  <section>
-    <p>We met in Minecraft... like all legendary couples do.<br>
-      It all started in a random server called <a href="https://efil.minehut.gg">efil.minehut.gg</a>,<br>
-      and somehow, it felt like fate. <span class="emoji">🌠</span>
-    </p>
-  </section>
-
-  <section>
-    <p>How did we fall in love?<br>
-      I popped the most romantic question a blocky man can ask: “Wanna be my wife?”<br>
-      And Space said yes. No hesitation. Instant chemistry. (Or maybe lag.)
-    </p>
-  </section>
-
-  <section>
-    <p>How did we get to know each other better?<br>
-      We did what any sane Minecraft couple would do—duel to the death for hours in PvP.<br>
-      Nothing says love like sharpness V and lava buckets.
-    </p>
-  </section>
-
-  <section>
-    <p>Thank you for reading this epic saga of blocky romance.<br>
-      And thank you, Space, for accepting to be my pixelated wife <span class="emoji">🙏</span><br>
-      May our love be stronger than bedrock and never be griefed.
-    </p>
-  </section>
+  <!-- Cinematic Text -->
+  <div id="cinematic"></div>
 
   <script>
-    // Reveal sections with fade effect
-    const sections = document.querySelectorAll("section");
-    const revealOnScroll = () => {
-      const trigger = window.innerHeight * 0.85;
-      sections.forEach(sec => {
-        const top = sec.getBoundingClientRect().top;
-        if (top < trigger) sec.classList.add("visible");
-      });
-    };
-    window.addEventListener("scroll", revealOnScroll);
-    revealOnScroll();
+    const lines = [
+      "Hai, I love SpaceMeteor ❤️",
+      "We met in Minecraft... like all legendary couples do.",
+      "It all started in a random server called efil.minehut.gg",
+      "I popped the most romantic question a blocky man can ask: 'Wanna be my wife?'",
+      "Space said yes. No hesitation. Instant chemistry. (Or maybe lag.)",
+      "We battled in PvP for hours... sharpness V and lava buckets.",
+      "Thank you, Space, for being my pixelated wife 🙏",
+      "May our love be stronger than bedrock and never be griefed."
+    ];
+
+    const container = document.getElementById("cinematic");
+
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        container.innerHTML = `<div class="cinematic-text" style="animation-delay:0s">${line}</div>`;
+      }, index * 6000); // 6s per line
+    });
   </script>
 
 </body>

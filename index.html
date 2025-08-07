@@ -16,11 +16,11 @@
       height: 100%;
       scroll-behavior: smooth;
       background-color: #1d1d1d;
-      color: #d7f7be;
+      color: #ffffff; /* White text */
       font-family: 'Press Start 2P', monospace;
       overflow-y: scroll;
       scroll-snap-type: y mandatory;
-      background-image: url('https://i.imgur.com/vsZRv3v.png'); /* Optional Minecraft dirt background */
+      background-image: url('https://i.imgur.com/JpQ7mWd.png'); /* New working background */
       background-size: cover;
       background-attachment: fixed;
     }
@@ -61,8 +61,6 @@
       bottom: 20px;
       font-size: 1.5rem;
       animation: bounce 2s infinite;
-      cursor: default;
-      user-select: none;
       color: #fff;
       text-shadow: 1px 1px #000;
     }
@@ -76,19 +74,25 @@
       color: #4fc3f7;
       text-decoration: none;
     }
-
-    audio {
-      display: none;
-    }
   </style>
 </head>
 <body>
 
   <!-- Background music by C418 (Sweden) -->
-  <audio autoplay loop>
+  <audio id="bg-music" autoplay loop>
     <source src="https://files.catbox.moe/iyk4s5.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
+
+  <script>
+    // Attempt to resume autoplay on user interaction (needed for mobile/desktop browsers with restrictions)
+    document.addEventListener('click', () => {
+      const audio = document.getElementById('bg-music');
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      }
+    });
+  </script>
 
   <section id="slide1">
     <h1>Hai I love SpaceMeteor<span class="emoji">❤️</span></h1>

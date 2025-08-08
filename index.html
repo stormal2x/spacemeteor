@@ -1,85 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>StormalSpace Cinematic</title>
+  <meta charset="UTF-8" />
+  <title>The StormalSpace History</title>
   <style>
-    * { margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; background: black; overflow: hidden; font-family: 'Press Start 2P', monospace; color: white; }
-    .scene {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-size: cover; background-position: center;
-      opacity: 0; transition: opacity 2s ease;
-    }
-    .scene.visible { opacity: 1; }
-    .text {
-      position: absolute; bottom: 10%; width: 100%; text-align: center;
-      font-size: 2vw; text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-    }
-    .fade-overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: black; opacity: 1;
-      transition: opacity 2s ease;
-      z-index: 10; pointer-events: none;
-    }
-    #startScreen {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Press Start 2P', monospace;
       background: black;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
+      color: white;
     }
-    #startText {
-      font-size: 2vw; text-align: center; color: white;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+
+    /* Parallax Background */
+    .mc-bg {
+      position: fixed;
+      width: 110vw;
+      height: 110vh;
+      top: 0;
+      left: 0;
+      background: url('https://i.imgur.com/w6mXWok.png') repeat-x;
+      background-size: cover;
+      animation: pan 60s linear infinite;
+      filter: brightness(0.5);
+      z-index: -2;
+    }
+
+    @keyframes pan {
+      0% { background-position: 0 0; }
+      100% { background-position: -100vw 0; }
+    }
+
+    /* Heart particles */
+    .heart {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: url('https://i.imgur.com/0a6vFvF.png') no-repeat center / contain;
+      animation: float 6s linear infinite;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(-10vh) scale(1); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(110vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Cinematic text container */
+    .cinematic-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      max-width: 80vw;
+      font-size: 1.2vw;
+      text-shadow: 2px 2px #000;
+      opacity: 0;
+      animation: fadeInOut 6s ease forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Click to Start Screen -->
-  <div id="startScreen">
-    <div id="startText">Click to Start</div>
-  </div>
-
-  <!-- Fade overlay for smooth transitions -->
-  <div id="fade" class="fade-overlay"></div>
-
-  <!-- Cinematic scenes -->
-  <div id="s1" class="scene" style="background-image:url('https://i.pinimg.com/1200x/85/fe/40/85fe40b0f29481e26fa0666bb5087781.jpg');"><div class="text">Hai, I love SpaceMeteor ❤️</div></div>
-  <div id="s2" class="scene" style="background-image:url('https://i.pinimg.com/1200x/ac/ec/29/acec2924163567893e876fa0d20f1247.jpg');"><div class="text">We met in Minecraft... like all legendary couples do.</div></div>
-  <div id="s3" class="scene" style="background-image:url('https://i.pinimg.com/1200x/3a/3a/99/3a3a99e48e68349cf4a6b742a4692b4c.jpg');"><div class="text">It all started on efil.minehut.gg</div></div>
-  <div id="s4" class="scene" style="background-image:url('https://i.pinimg.com/1200x/e9/03/fe/e903fe8892bb53d562d4bc57f3ee907b.jpg');"><div class="text">Wanna be my wife? — She said yes!</div></div>
-  <div id="s5" class="scene" style="background-image:url('https://i.pinimg.com/1200x/c9/2f/25/c92f25ecc530424e4f27c438b10b7d30.jpg');"><div class="text">PvP, sharpness V, lava buckets—intense.</div></div>
-  <div id="s6" class="scene" style="background:black;"><div class="text">Thanks for watching ❤️</div></div>
-
-  <!-- Background Music -->
-  <audio id="bg-music" loop>
-    <source src="https://archive.org/download/c418swedenminecraftvolumealpha_201908/sweden_vinyl.mp3" type="audio/mpeg">
+  <!-- Music -->
+  <audio id="bg-music" autoplay loop>
+    <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
   </audio>
 
   <script>
-    const scenes = ['s1','s2','s3','s4','s5','s6'];
-    const fade = document.getElementById('fade');
-    const startScreen = document.getElementById('startScreen');
-    const music = document.getElementById('bg-music');
-    let idx = 0;
-
-    function runScene() {
-      fade.style.opacity = 1;
-      setTimeout(() => {
-        document.querySelectorAll('.scene').forEach(s => s.classList.remove('visible'));
-        document.getElementById(scenes[idx]).classList.add('visible');
-        fade.style.opacity = 0;
-        idx = (idx + 1) % scenes.length; // This will loop back to 0 after the last scene
-        setTimeout(runScene, 7000); // 5s view + 2s fade
-      }, 2000);
-    }
-
-    startScreen.addEventListener('click', () => {
-      music.play().catch(err => console.log('Playback blocked:', err));
-      startScreen.style.display = 'none';
-      runScene();
+    // Autoplay fix for browsers
+    document.addEventListener('click', () => {
+      document.querySelectorAll("audio").forEach(audio => {
+        if (audio.paused) audio.play().catch(() => {});
+      });
     });
   </script>
+
+  <!-- Background -->
+  <div class="mc-bg"></div>
+
+  <!-- Hearts -->
+  <script>
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = `${Math.random() * 100}vw`;
+      heart.style.animationDuration = `${4 + Math.random() * 4}s`;
+      heart.style.animationDelay = `${Math.random() * 5}s`;
+      document.body.appendChild(heart);
+    }
+  </script>
+
+  <!-- Cinematic Text -->
+  <div id="cinematic"></div>
+
+  <script>
+    const lines = [
+      "Hai, I love SpaceMeteor ❤️",
+      "We met in Minecraft... like all legendary couples do.",
+      "It all started in a random server called efil.minehut.gg (turn on the server)",
+      "I got to ask her 'Wanna be my wife?'",
+      "Space said yes (I may have forced her 💀)",
+      "We battled in PvP for hours... and she became better than me",
+      "Thank you Space, for being my pixelated wife 🙏",
+      "May our love be stronger than bedrock and never be griefed."
+    ];
+
+    const container = document.getElementById("cinematic");
+
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        container.innerHTML = `<div class="cinematic-text" style="animation-delay:0s">${line}</div>`;
+      }, index * 6000); // 6s per line
+    });
+  </script>
+
 </body>
 </html>

@@ -1,86 +1,79 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RainClone — Advanced Demo (Client-side)</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RainClone — Supercharged Demo</title>
 <style>
   :root{
-    --bg:#060812; --panel:#0f1418; --muted:#9aa0a6; --accent:#46d5ff; --accent-2:#7b61ff; --gold:#f5c156;
-    --card-radius:14px; --gap:18px; --glass: rgba(255,255,255,0.03);
-    --font-main: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    --big: 20px; --large:16px; --normal:14px; --small:12px;
+    --bg:#05060a; --card:#0f1316; --muted:#9aa0a6; --accent:#46d5ff; --accent-2:#7b61ff; --gold:#f5c156;
+    --radius:12px; --glass: rgba(255,255,255,0.03);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono";
+    --ui-scale: 1;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:var(--font-main);background:
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:
     radial-gradient(800px 400px at 10% 10%, rgba(70,213,255,0.03), transparent),
-    linear-gradient(180deg,#06060b,#070712); color:#e8f4f8; -webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  /* App layout */
-  .app{max-width:1300px;margin:18px auto; display:grid; grid-template-columns: 260px 1fr 340px; gap:18px; align-items:start; padding:10px}
-  header{grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; padding:14px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(255,255,255,0.02)}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:66px;height:66px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:900;font-size:18px}
-  h1{margin:0;font-size:22px}
+    linear-gradient(180deg,#05060a,#0b0b10); color:#e8f4f8;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1300px;margin:18px auto;display:grid;grid-template-columns:260px 1fr 340px;gap:18px;align-items:start;padding:10px;transform:scale(var(--ui-scale));transform-origin:top left}
+  header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02)}
+  .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:900}
+  h1{margin:0;font-size:20px}
   .tag{color:var(--muted);font-size:13px}
-  /* profile bar */
-  .profile-bar{display:flex;gap:12px;align-items:center}
-  .avatar{width:62px;height:62px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7b61ff);display:grid;place-items:center;font-weight:800}
-  .big-balance{font-size:28px;font-weight:900;color:var(--gold)}
-  .profile-controls{display:flex;gap:8px;align-items:center}
-  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800;background:linear-gradient(180deg,var(--accent), rgba(70,213,255,0.85)); color:#062; box-shadow: 0 8px 26px rgba(0,0,0,0.5)}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
-  .small-muted{color:var(--muted);font-size:13px}
 
-  /* Left column: taller game list / big buttons */
-  .left{ background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.02); height:calc(100vh - 150px); overflow:auto}
-  .balance-box{margin-bottom:14px}
-  .balance-label{font-size:13px;color:var(--muted)}
-  .balance-amt{font-size:24px;font-weight:900;color:var(--gold);margin-top:6px}
-  .game-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-  .game-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:transparent;border:1px solid transparent;cursor:pointer;font-size:16px}
-  .game-item.active{background:linear-gradient(90deg, rgba(70,213,255,0.05), rgba(123,97,255,0.03)); color:var(--accent); border-color:rgba(70,213,255,0.06); box-shadow:0 18px 44px rgba(0,0,0,0.5)}
-  .icon{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:grid;place-items:center;font-weight:900}
+  /* left */
+  .left{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.02);height:calc(100vh - 150px);overflow:auto}
+  .balance{font-weight:900;font-size:22px;color:var(--gold)}
+  .game-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .game-btn{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;background:transparent;border:1px solid transparent;cursor:pointer}
+  .game-btn.active{background:linear-gradient(90deg, rgba(70,213,255,0.05), rgba(123,97,255,0.03));border-color:rgba(70,213,255,0.06);color:var(--accent);box-shadow:0 18px 34px rgba(0,0,0,0.55)}
 
-  /* Center: large focus area */
-  .center{min-height:640px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.02); display:flex;flex-direction:column; gap:12px;}
-  .home-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
-  .card{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(255,255,255,0.02); cursor:pointer; transition:transform 170ms ease, box-shadow 170ms ease}
-  .card:hover{transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.6)}
-  .card h3{margin:0;font-size:18px}
-  .card p{margin:6px 0 0 0;color:var(--muted); font-size:13px}
+  /* center */
+  .center{min-height:680px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:12px}
+  .home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);cursor:pointer;border:1px solid rgba(255,255,255,0.02);transition:transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.6)}
 
-  /* Focused game area layout bigger */
+  /* focused */
   .focused{display:flex;gap:18px;align-items:flex-start}
-  .main-game{flex:1; min-height:520px; border-radius:12px; padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(255,255,255,0.02)}
-  .side-panel{width:320px;display:flex;flex-direction:column;gap:12px}
+  .main-game{flex:1;border-radius:12px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);min-height:520px;border:1px solid rgba(255,255,255,0.02)}
+  .side{width:320px;display:flex;flex-direction:column;gap:12px}
   .panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-  .muted{color:var(--muted)}
-  .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
 
-  /* Crash large canvas */
-  #crashBig{width:100%;height:420px;border-radius:10px;background:linear-gradient(180deg, rgba(70,213,255,0.03), transparent)}
+  /* crash chart (svg) */
+  .crash-svg{width:100%;height:240px;background:linear-gradient(180deg, rgba(70,213,255,0.025), transparent);border-radius:8px;overflow:hidden}
+  .crash-controls{display:flex;gap:8px;align-items:center;margin-top:12px}
 
-  /* Dice big */
-  .dice-large{display:flex;gap:16px;align-items:center;justify-content:center}
-  .dice-face{font-size:120px;padding:30px;border-radius:14px;background:rgba(255,255,255,0.02)}
+  /* slots */
+  .slots-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:12px}
+  .reel{width:140px;height:180px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);display:grid;place-items:center;font-size:64px}
+  .reel.spin{animation:spin 0.75s cubic-bezier(.2,.9,.1,1);}
 
-  /* Mines large grid */
+  @keyframes spin{0%{transform:translateY(-20px) scaleY(1.02)}100%{transform:none}}
+
+  /* mines */
   .mines-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
-  .mine-cell{height:64px;border-radius:10px;background:rgba(255,255,255,0.02);display:grid;place-items:center;font-size:18px;color:var(--muted);cursor:pointer}
-  .mine-open{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:#fff}
+  .mine-cell{height:64px;border-radius:10px;background:rgba(255,255,255,0.02);display:grid;place-items:center;cursor:pointer;color:var(--muted);font-weight:800}
+  .mine-open{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:#fff}
 
-  /* Slots big reels */
-  .slots-row{display:flex;gap:14px;align-items:center;justify-content:center}
-  .reel{width:140px;height:200px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);display:grid;place-items:center;font-size:60px}
+  /* strategy simulator */
+  .sim-controls{display:flex;gap:8px;align-items:center;margin-top:12px}
 
-  /* Right column: stats, achievements, settings */
-  .right{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.02);height:calc(100vh - 150px); overflow:auto}
-  .achievement{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
-  .small{font-size:12px}
+  /* right */
+  .right{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.02);height:calc(100vh - 150px);overflow:auto}
 
   /* responsive */
-  @media (max-width:1200px){ .app{grid-template-columns: 1fr; padding:12px} .right{display:none} .left{display:flex;flex-direction:row;gap:8px;overflow:auto;height:auto} .home-grid{grid-template-columns:repeat(2,1fr)} .mines-grid{grid-template-columns:repeat(6,1fr)} }
+  @media (max-width:1200px){
+    .wrap{grid-template-columns:1fr; padding:12px}
+    .right{display:none}
+    .home-grid{grid-template-columns:repeat(2,1fr)}
+    .mines-grid{grid-template-columns:repeat(6,1fr)}
+  }
+  /* small helpers */
+  .muted{color:var(--muted)}
+  .mono{font-family:var(--mono)}
+  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(180deg,var(--accent),rgba(70,213,255,0.85));color:#022;font-weight:800}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -88,57 +81,48 @@
   <div style="display:flex;gap:12px;align-items:center">
     <div class="logo">RC</div>
     <div>
-      <h1>RainClone</h1>
-      <div class="tag">Advanced demo — client-side only</div>
+      <h1>RainClone — Supercharged</h1>
+      <div class="tag">Bigger UI • Smooth reels • SVG Crash chart • Strategy simulator</div>
     </div>
   </div>
 
-  <div class="profile-bar">
-    <div style="display:flex;gap:10px;align-items:center">
-      <div class="avatar" id="avatar">You</div>
-      <div style="text-align:left">
-        <div class="small-muted">Profile</div>
-        <div style="font-weight:800" id="profileName">Demo Player</div>
-      </div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <div style="text-align:right">
+      <div class="muted">Profile</div>
+      <div class="balance mono" id="topBalance">0 RC</div>
     </div>
-
-    <div style="text-align:center">
-      <div class="small-muted">Balance</div>
-      <div class="big-balance" id="topBalance">0 RC</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
       <div style="display:flex;gap:8px">
-        <button class="btn" id="openProfile">Profile</button>
-        <button class="btn ghost" id="themeToggle">Theme</button>
+        <button class="btn ghost" id="exportBtn">Export</button>
+        <button class="btn ghost" id="importBtn">Import</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <div class="small-muted">Sound</div>
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="soundToggle" checked> On</label>
+        <label class="muted">Save</label><input type="checkbox" id="persist" checked>
       </div>
     </div>
   </div>
 </header>
 
-<div class="app">
+<div class="wrap">
   <!-- LEFT -->
   <aside class="left">
-    <div class="balance-box">
-      <div class="balance-label">Wallet</div>
-      <div class="balance-amt" id="walletBalance">0 RC</div>
-      <div class="small-muted">Demo balance stored locally (optional)</div>
+    <div>
+      <div class="muted">Wallet</div>
+      <div class="balance" id="wallet">0 RC</div>
+      <div class="muted" style="font-size:13px;margin-top:6px">Demo balance (local)</div>
     </div>
 
-    <div class="muted">Games</div>
+    <div class="muted" style="margin-top:10px">Games</div>
     <div class="game-list" id="gameList">
-      <div class="game-item active" data-game="home"><div class="icon">🏠</div> <div>Games Home</div></div>
-      <div class="game-item" data-game="crash"><div class="icon">📈</div> <div>Crash</div></div>
-      <div class="game-item" data-game="dice"><div class="icon">🎲</div> <div>Dice</div></div>
-      <div class="game-item" data-game="mines"><div class="icon">💣</div> <div>Mines</div></div>
-      <div class="game-item" data-game="slots"><div class="icon">🎰</div> <div>Slots</div></div>
+      <button class="game-btn active" data-game="home">🏠 Games Home</button>
+      <button class="game-btn" data-game="crash">📈 Crash</button>
+      <button class="game-btn" data-game="dice">🎲 Dice</button>
+      <button class="game-btn" data-game="mines">💣 Mines</button>
+      <button class="game-btn" data-game="slots">🎰 Slots</button>
+      <button class="game-btn" data-game="sim">📊 Strategy Simulator</button>
     </div>
 
-    <div style="margin-top:18px">
+    <div style="margin-top:16px">
       <div class="muted">Quick add</div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <input id="quickAdd" type="number" value="200" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
@@ -146,802 +130,978 @@
       </div>
     </div>
 
-    <div style="margin-top:18px">
+    <div style="margin-top:14px">
       <div class="muted">Session history</div>
-      <div id="leftHistory" style="margin-top:8px; max-height:320px; overflow:auto; color:var(--muted); font-size:13px"></div>
+      <div id="leftHistory" style="margin-top:8px;max-height:320px;overflow:auto;color:var(--muted);font-size:13px"></div>
     </div>
   </aside>
 
   <!-- CENTER -->
-  <main class="center">
+  <main class="center" id="center">
+    <!-- HOME -->
     <div id="homeView">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 style="margin:0">Games Home</h2>
-          <div class="small-muted">Large, descriptive cards — click a card or the left menu to open a game.</div>
+          <div class="muted">Click a card or menu item to open a focused game that uses most of the screen.</div>
         </div>
-        <div style="display:flex;gap:8px">
-          <div class="small-muted">Auto-strategy</div>
-          <select id="surpriseStrategy" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:inherit">
-            <option value="none">None</option>
-            <option value="martingale">Martingale (Crash)</option>
-            <option value="fixed">Fixed (Crash)</option>
-          </select>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="muted">UI scale:</div>
+          <input id="uiScale" type="range" min="0.9" max="1.3" step="0.05" value="1">
         </div>
       </div>
 
       <div class="home-grid" style="margin-top:16px">
-        <div class="card" data-open="crash">
-          <h3>Crash</h3>
-          <p>Place a bet, cash out before the multiplier crashes. Great for practicing timing.</p>
-        </div>
-
-        <div class="card" data-open="dice">
-          <h3>Dice</h3>
-          <p>Pick a target and roll. Simple, fast, and clear results.</p>
-        </div>
-
-        <div class="card" data-open="mines">
-          <h3>Mines</h3>
-          <p>Open tiles and avoid bombs. Risk scales with opened tiles.</p>
-        </div>
-
-        <div class="card" data-open="slots">
-          <h3>Slots</h3>
-          <p>Spin 3 big reels. Match symbols to win big.</p>
-        </div>
-
-        <div class="card" data-open="crash">
-          <h3>Auto-bet demo</h3>
-          <p>Try automatic strategies (Martingale/fixed) — simulation client-side only.</p>
-        </div>
-
-        <div class="card" data-open="mines">
-          <h3>Practice Labs</h3>
-          <p>Lower risk modes and practice cashouts safely.</p>
-        </div>
+        <div class="card" data-open="crash"><h3>Crash</h3><p class="muted">Place a bet and cash out before it crashes. SVG history and zoom.</p></div>
+        <div class="card" data-open="dice"><h3>Dice</h3><p class="muted">Simple roll game — large faces and clear feedback.</p></div>
+        <div class="card" data-open="mines"><h3>Mines</h3><p class="muted">Open tiles and avoid bombs — cashout anytime.</p></div>
+        <div class="card" data-open="slots"><h3>Slots</h3><p class="muted">Big physics-style reels with controlled stops.</p></div>
+        <div class="card" data-open="sim"><h3>Strategy Simulator</h3><p class="muted">Backtest Martingale/Fixed strategies and view ROI charts.</p></div>
+        <div class="card" data-open="crash"><h3>Practice Mode</h3><p class="muted">Lower risk for practicing cashouts and strategies.</p></div>
       </div>
     </div>
 
-    <!-- Focused game view -->
+    <!-- FOCUSED area -->
     <div id="gameView" style="display:none" class="focused">
-      <div class="main-game" id="mainGameArea"><!-- dynamic content injected --></div>
+      <div class="main-game" id="mainGame"><!-- dynamic content --></div>
 
-      <div class="side-panel">
+      <div class="side">
         <div class="panel">
-          <div class="small-muted">Round Info</div>
-          <div id="roundInfoBig" style="font-weight:800;margin-top:8px">—</div>
-          <div id="roundSub" class="small-muted" style="margin-top:6px">Detailed round status will appear here.</div>
+          <div class="muted">Round</div>
+          <div id="roundLabel" style="font-weight:900;margin-top:8px">—</div>
+          <div id="roundSub" class="muted" style="margin-top:6px">Status & tips shown here.</div>
         </div>
 
         <div class="panel">
-          <div class="small-muted">Quick Controls</div>
+          <div class="muted">Quick Controls</div>
           <div style="margin-top:8px">
-            <div class="small-muted">Bet</div>
+            <div class="muted">Bet</div>
             <input id="sideBet" type="number" value="100" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
             <div style="display:flex;gap:8px;margin-top:12px">
-              <button class="btn" id="placeBtn" style="flex:1">Place</button>
-              <button class="btn ghost" id="cashBtn" style="flex:1">Cashout</button>
+              <button class="btn" id="placeBtn">Place</button>
+              <button class="btn ghost" id="cashBtn">Cashout</button>
             </div>
-            <div style="margin-top:10px" class="small-muted">Keyboard: Space = place, C = cashout</div>
+            <div class="muted" style="margin-top:10px">Shortcuts: Space = place • C = cashout</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="small-muted">Session Analytics</div>
+          <div class="muted">Analytics</div>
           <canvas id="analytics" width="300" height="140" style="width:100%;height:140px;margin-top:8px;background:rgba(255,255,255,0.01);border-radius:8px"></canvas>
-          <div style="display:flex;justify-content:space-between;margin-top:8px">
-            <div class="small-muted">Win rate</div>
-            <div id="winRate" style="font-weight:800">0%</div>
-          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px"><div class="muted">Win rate</div><div id="winRate" style="font-weight:900">0%</div></div>
         </div>
 
         <div class="panel">
-          <div class="small-muted">Achievements</div>
+          <div class="muted">Achievements</div>
           <div id="achievements" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
         </div>
       </div>
     </div>
-
   </main>
 
   <!-- RIGHT -->
   <aside class="right">
     <div class="panel">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div class="small-muted">Leaderboard</div><div id="leaderboard" style="margin-top:8px"></div></div>
-        <div><div class="small-muted">Stats</div><div id="statsBig" style="margin-top:8px">W:0 L:0</div></div>
+        <div><div class="muted">Leaderboard</div><div id="leaders" style="margin-top:8px"></div></div>
+        <div><div class="muted">Session</div><div id="stats" style="margin-top:8px">W:0 L:0</div></div>
       </div>
     </div>
 
     <div class="panel" style="margin-top:12px">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="small-muted">Provably fair</div>
+        <div class="muted">Provably-fair</div>
         <div style="display:flex;gap:8px">
           <button class="btn ghost" id="newSeed">New</button>
           <button class="btn" id="revealSeed">Reveal</button>
         </div>
       </div>
-      <div id="provHash" class="small-muted" style="margin-top:8px">—</div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button class="btn ghost" id="exportBtn">Export</button>
-        <button class="btn ghost" id="importBtn">Import</button>
-        <input type="file" id="importFile" style="display:none">
-      </div>
+      <div id="provHash" class="muted mono" style="margin-top:8px">—</div>
     </div>
 
     <div class="panel" style="margin-top:12px">
-      <div class="small-muted">Settings</div>
-      <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
-        <label><input type="checkbox" id="persist" checked> Save to localStorage</label>
-        <label><input type="checkbox" id="reduceMotion"> Reduce motion</label>
-        <label><input type="checkbox" id="sound" checked> Sound (demo)</label>
-        <button class="btn ghost" id="clearBtn" style="margin-top:6px">Clear storage</button>
+      <div class="muted">Strategy Simulator</div>
+      <div class="sim-controls" style="margin-top:8px">
+        <select id="simMode"><option value="martingale">Martingale</option><option value="fixed">Fixed</option></select>
+        <input id="simStart" type="number" value="50" style="width:80px;padding:8px;border-radius:8px">
+        <input id="simRounds" type="number" value="100" style="width:80px;padding:8px;border-radius:8px">
+        <button class="btn" id="runSim">Run</button>
       </div>
+      <canvas id="simCanvas" width="320" height="140" style="width:100%;height:140px;margin-top:8px;background:rgba(255,255,255,0.01);border-radius:8px"></canvas>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost" id="exportFull">Export</button>
+        <input type="file" id="importFile" style="display:none"/>
+        <button class="btn ghost" id="importFull">Import</button>
+      </div>
+      <div style="margin-top:10px"><button class="btn ghost" id="clearStorage">Clear Storage</button></div>
     </div>
   </aside>
 </div>
 
-<!-- Profile modal (hidden) -->
-<div id="profileModal" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:880px;max-width:95%;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03);display:none;z-index:1200;box-shadow:0 40px 120px rgba(0,0,0,0.6)">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div><h2 style="margin:0">Profile — Demo Player</h2><div class="small-muted">Local session stats & export</div></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn ghost" id="exportState">Export JSON</button>
-      <button class="btn" id="closeProfile">Close</button>
-    </div>
-  </div>
-
-  <div style="display:flex;gap:12px;margin-top:12px">
-    <div style="flex:1">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div style="width:86px;height:86px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:900">You</div>
-        <div>
-          <div class="small-muted">Balance</div>
-          <div class="balance-amt" id="profileBalance">0 RC</div>
-          <div class="small-muted">Wins: <span id="profileWins">0</span> — Losses: <span id="profileLosses">0</span></div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <div class="small-muted">Session history (recent)</div>
-        <div id="profileHistory" style="margin-top:8px;max-height:240px;overflow:auto"></div>
-      </div>
-    </div>
-
-    <div style="width:320px">
-      <div class="small-muted">Achievements</div>
-      <div id="profileAch" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>
-      <div style="margin-top:12px">
-        <div class="small-muted">Import / Export</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn" id="exportProfile">Download JSON</button>
-          <button class="btn ghost" id="importProfile">Upload JSON</button>
-          <input id="profFile" type="file" style="display:none">
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<footer style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">Demo only — no real money. Modify initial balance in the code.</footer>
+<footer style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">Demo only — no real money. Tweak starting balance in the script.</footer>
 
 <script>
-/*
-  RainClone Advanced Demo
-  - Fully client-side demo. No real money, no servers.
-  - Surprise features: achievements, auto-strategy (martingale/fixed), analytics canvas, export/import.
-  - Starting balance can be changed here.
-*/
+/* ------------------------------
+  RainClone — Supercharged Single-file Demo
+  - Surprise features included: SVG crash chart (history + zoom), smooth slot reels, strategy simulator.
+  - Lots of bug fixes: element guards, animation cancelation, localStorage resilience.
+  - All client-side. Modify START_BALANCE below.
+-------------------------------*/
 
-// ----------------- State and persistence -----------------
-const START_BALANCE = 3000;
-const stateKey = 'rainclone_demo_v2';
-let state = {
-  balance: START_BALANCE,
-  history: [],       // {game, outcome, amt, time}
-  wins: 0,
-  losses: 0,
-  leaders: [],
-  provable: { seed: null, hash: null, revealed: null },
-  achievements: {}
-};
+document.addEventListener('DOMContentLoaded', () => {
+  const START_BALANCE = 3000;
+  const STORAGE_KEY = 'rainclone_super_v1';
 
-// load from localStorage if saved
-function loadState(){
-  try {
-    const raw = localStorage.getItem(stateKey);
-    if(raw){ Object.assign(state, JSON.parse(raw)); }
-  } catch(e){ console.warn('load failed',e); }
-}
-function saveState(){
-  if(document.getElementById('persist').checked) localStorage.setItem(stateKey, JSON.stringify(state));
-  updateUI();
-}
-function resetState(){
-  if(confirm('Reset demo state?')){ localStorage.removeItem(stateKey); location.reload(); }
-}
+  const qs = s => document.querySelector(s);
+  const qsa = s => Array.from(document.querySelectorAll(s));
+  const $ = id => document.getElementById(id);
 
-// ----------------- UI helpers -----------------
-const $ = id => document.getElementById(id);
-function qAll(sel){ return Array.from(document.querySelectorAll(sel)); }
-function now(){ return new Date().toLocaleTimeString(); }
-
-function updateUI(){
-  $('topBalance').innerText = state.balance.toFixed(2) + ' RC';
-  $('walletBalance').innerText = state.balance.toFixed(2) + ' RC';
-  $('profileBalance').innerText = state.balance.toFixed(2) + ' RC';
-  $('profileWins').innerText = state.wins;
-  $('profileLosses').innerText = state.losses;
-  $('statsBig').innerText = `W:${state.wins} L:${state.losses}`;
-  $('provHash').innerText = state.provable.hash || '—';
-  renderHistoryPanels();
-  renderAchievements();
-  renderLeaderboard();
-  drawAnalytics();
-}
-
-function pushHistory(entry){
-  state.history.unshift(entry);
-  if(state.history.length>200) state.history.pop();
-  // keep leaders simple
-  if(entry.win && entry.amt > 0) state.leaders.push({name:'You', win:entry.amt, time: entry.time});
-  state.leaders.sort((a,b)=>b.win-a.win);
-  if(state.leaders.length>30) state.leaders.length=30;
-  saveState();
-}
-
-// ----------------- History / panels -----------------
-function renderHistoryPanels(){
-  const left = $('leftHistory'); left.innerHTML='';
-  const profile = $('profileHistory'); profile.innerHTML='';
-  const ticker = $('ticker'); ticker.innerHTML='';
-  state.history.slice(0,20).forEach(h=>{
-    const r = document.createElement('div'); r.style.padding='6px'; r.style.borderBottom='1px solid rgba(255,255,255,0.02)'; r.innerHTML = `<div style="display:flex;justify-content:space-between"><div>${h.game}</div><div class="muted">${h.time}</div></div><div class="muted">${h.outcome} <strong style="float:right">${h.amt>0? '+'+h.amt.toFixed(2): h.amt.toFixed(2)}</strong></div>`;
-    left.appendChild(r);
-    const pr = r.cloneNode(true); profile.appendChild(pr);
-    // ticker
-    const t = document.createElement('div'); t.className='row'; t.style.display='flex'; t.style.justifyContent='space-between'; t.innerHTML = `<div style="font-weight:700">${h.game}</div><div class="muted">${h.amt>0? '+'+h.amt.toFixed(2): h.amt.toFixed(2)}</div>`;
-    ticker.appendChild(t);
-  });
-}
-
-// ----------------- Leaderboard & achievements -----------------
-function renderLeaderboard(){
-  const el = $('leaderboard'); el.innerHTML='';
-  if(state.leaders.length===0) { el.innerHTML = '<div class="small-muted">No wins yet</div>'; return; }
-  state.leaders.slice(0,6).forEach((l,i)=>{
-    const d = document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.padding='6px 0';
-    d.innerHTML = `<div>${i+1}. ${l.name}</div><div class="muted">${l.win.toFixed(2)}</div>`;
-    el.appendChild(d);
-  });
-}
-function awardAchievement(key, label){
-  if(!state.achievements[key]){
-    state.achievements[key] = { label, time: new Date().toLocaleString() };
-    pushHistory({game:'System', outcome:`Achievement unlocked: ${label}`, amt:0, time: now(), win:true});
-    saveState();
-  }
-}
-function renderAchievements(){
-  const el = $('achievements'); el.innerHTML='';
-  const prof = $('profileAch'); prof.innerHTML='';
-  const known = state.achievements;
-  const badges = [
-    {k:'first_win', label:'First Win'},
-    {k:'three_wins', label:'3 Wins'},
-    {k:'ten_wins', label:'10 Wins'},
-    {k:'jackpot', label:'Big Jackpot'}
-  ];
-  badges.forEach(b=>{
-    const active = !!known[b.k];
-    const div = document.createElement('div'); div.className='achievement'; div.innerHTML = `<div>${b.label}</div><div style="opacity:${active?1:0.4}">${active? '✅' : '🔒'}</div>`;
-    el.appendChild(div);
-    const div2 = div.cloneNode(true); prof.appendChild(div2);
-  });
-}
-
-// ----------------- Provably-fair (demo) -----------------
-async function newProvable(){
-  const seed = Math.random().toString(36).slice(2)+Date.now().toString(36);
-  state.provable.seed = seed;
-  const hashBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(seed));
-  state.provable.hash = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  saveState();
-}
-function revealProvable(){
-  if(!state.provable.seed) return alert('No server seed set yet');
-  alert('Server seed (demo):\n' + state.provable.seed + '\n\nHash: ' + state.provable.hash);
-}
-
-// ----------------- Analytics small chart -----------------
-function drawAnalytics(){
-  const canvas = $('analytics'); if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  ctx.clearRect(0,0,w,h);
-  // last 20 rounds amounts
-  const rounds = state.history.slice(0,20).reverse();
-  const bars = rounds.length;
-  if(bars===0) {
-    ctx.fillStyle = 'rgba(255,255,255,0.03)';
-    ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = '#9aa0a6'; ctx.font = '12px sans-serif'; ctx.fillText('No rounds yet', 10, 20);
-    return;
-  }
-  const max = Math.max(...rounds.map(r => Math.abs(r.amt))) || 1;
-  const barW = (w - 20)/bars;
-  rounds.forEach((r,i)=>{
-    const val = r.amt;
-    const hBar = Math.min(h-20, Math.abs(val)/max * (h-30));
-    const x = 10 + i * barW;
-    const y = h - hBar - 10;
-    ctx.fillStyle = val >= 0 ? 'rgba(87,221,129,0.9)' : 'rgba(255,86,86,0.9)';
-    ctx.fillRect(x, y, barW-6, hBar);
-  });
-  // winrate
-  const wins = state.history.filter(r=>r.win).length;
-  const rate = state.history.length ? Math.round((wins/state.history.length)*100) : 0;
-  $('winRate').innerText = rate + '%';
-}
-
-// ----------------- Game implementations (Crash, Dice, Mines, Slots) -----------------
-/* Helper */
-function addRound(game, outcome, amt, win){
-  const entry = { game, outcome, amt, time: now(), win: !!win };
-  state.history.unshift(entry);
-  if(state.history.length>300) state.history.length=300;
-  if(win) state.wins++; else if(game!=='System') state.losses++;
-  if(win && amt >= 500) awardAchievement('jackpot', 'Big Jackpot');
-  // achievements counts
-  if(state.wins >= 1) awardAchievement('first_win','First Win');
-  if(state.wins >= 3) awardAchievement('three_wins','3 Wins');
-  if(state.wins >= 10) awardAchievement('ten_wins','10 Wins');
-  pushHistory(entry);
-  updateUI();
-}
-
-/* Crash (focused) */
-let crashState = { running:false, mult:1, crashAt:0, bet:0, raf: null };
-function renderCrash(){
-  const container = $('mainGameArea'); container.innerHTML = `
-    <h2>Crash — Focused (Large)</h2>
-    <div class="muted">Place a bet and cash out before the multiplier crashes. Keyboard: Space place, C cashout.</div>
-    <canvas id="crashBig" width="1000" height="420" style="width:100%;height:420px;margin-top:12px;border-radius:10px"></canvas>
-    <div class="controls" style="margin-top:10px">
-      <div style="display:flex;gap:10px;align-items:center">
-        <div class="muted">Bet</div><input id="crashBet" type="number" value="100" style="width:120px;padding:10px;border-radius:8px">
-        <div class="muted">Auto cashout</div><input id="crashAuto" type="number" step="0.01" value="2.00" style="width:120px;padding:10px;border-radius:8px">
-        <div class="muted">Strategy</div><select id="crashStrategy" style="padding:8px;border-radius:8px"><option value="none">None</option><option value="martingale">Martingale</option><option value="fixed">Fixed</option></select>
-      </div>
-      <div style="margin-left:auto;display:flex;gap:8px;margin-top:12px">
-        <button id="crashStart" class="btn">Place & Start</button>
-        <button id="crashCash" class="btn ghost">Cashout</button>
-      </div>
-    </div>
-    <div style="margin-top:10px" id="crashStatusText" class="muted">Status: idle</div>
-  `;
-  // canvas
-  const canvas = $('crashBig'), ctx = canvas.getContext('2d');
-  function resize(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); draw(1); }
-  window.addEventListener('resize', resize); resize();
-
-  crashState = { running:false, mult:1, crashAt:0, bet:0, raf:null };
-
-  function draw(m){
-    ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
-    // grid
-    ctx.fillStyle = 'rgba(255,255,255,0.01)'; ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
-    // bar representing height
-    const h = canvas.clientHeight, w = canvas.clientWidth;
-    const norm = Math.min(1, Math.log(m+1)/Math.log(12));
-    const barH = 20 + (h-60) * norm;
-    ctx.fillStyle = 'rgba(70,213,255,0.12)'; ctx.fillRect(24, h - barH - 12, w-48, barH);
-    ctx.fillStyle = '#e8f4f8'; ctx.font = '20px sans-serif'; ctx.fillText(m.toFixed(2) + 'x', 30, 34);
-  }
-
-  function startRound(autoAt){
-    if(crashState.running) return;
-    const bet = parseFloat($('crashBet').value) || 0;
-    if(bet <= 0 || bet > state.balance){ alert('Invalid bet or insufficient funds'); return; }
-    crashState.bet = bet;
-    state.balance -= bet; updateUI();
-    // make crash point with a heavy-tail distribution for excitement
-    const r = Math.random(); const crashPoint = 1 + (Math.pow(1/(1-r), 0.6)); // skewed
-    crashState.crashAt = Math.max(1.0, Math.round(crashPoint * 100) / 100);
-    crashState.mult = 1;
-    crashState.running = true;
-    $('crashStatusText').innerText = 'Running...';
-    addRound('Crash', 'Placed bet', -bet, false);
-    let last = performance.now();
-    function frame(now){
-      const dt = (now - last) / 1000; last = now;
-      crashState.mult += dt * (0.8 + Math.log(crashState.mult + 1) * 0.6);
-      draw(crashState.mult);
-      if(autoAt && crashState.mult >= autoAt){
-        // auto cashout
-        const profit = (autoAt - 1) * bet;
-        state.balance += bet + profit;
-        addRound('Crash', `Auto cashout @${autoAt.toFixed(2)}x`, +profit, true);
-        $('crashStatusText').innerText = `Auto-cashed out @${autoAt.toFixed(2)}x (+${profit.toFixed(2)} RC)`;
-        crashState.running = false;
-        saveState();
-        awardAchievement('first_win','First Win');
-        return;
-      }
-      if(crashState.mult >= crashState.crashAt){
-        // crashed
-        addRound('Crash', `Crashed @${crashState.crashAt.toFixed(2)}x`, -bet, false);
-        $('crashStatusText').innerText = `Crashed @${crashState.crashAt.toFixed(2)}x — you lost ${bet} RC`;
-        crashState.running = false;
-        saveState();
-        return;
-      }
-      if(crashState.running) crashState.raf = requestAnimationFrame(frame);
-    }
-    crashState.raf = requestAnimationFrame(frame);
-  }
-
-  function cashout(){
-    if(!crashState.running){ alert('No active round'); return; }
-    const bet = crashState.bet;
-    const cur = crashState.mult;
-    const profit = Math.round((cur - 1) * bet * 100) / 100;
-    state.balance += bet + profit;
-    addRound('Crash', `Cashout @${cur.toFixed(2)}x`, +profit, true);
-    $('crashStatusText').innerText = `Cashed out @${cur.toFixed(2)}x (+${profit} RC)`;
-    crashState.running = false;
-    if(crashState.raf) cancelAnimationFrame(crashState.raf);
-    saveState();
-  }
-
-  $('crashStart').addEventListener('click', ()=>{
-    const auto = parseFloat($('crashAuto').value) || null;
-    startRound(auto);
-  });
-  $('crashCash').addEventListener('click', cashout);
-}
-
-/* Dice — big and simple */
-function renderDice(){
-  const container = $('mainGameArea');
-  container.innerHTML = `
-    <h2>Dice — Focused</h2>
-    <div class="muted">Pick a target (4-6). Roll 1-6. Higher roll wins depending on your target.</div>
-    <div class="dice-large" style="margin-top:12px">
-      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
-        <div class="muted">Pick</div>
-        <select id="dicePick" style="padding:10px;border-radius:8px"><option value="4">≥ 4</option><option value="5">≥ 5</option><option value="6">= 6</option></select>
-        <div class="muted">Bet</div><input id="diceBet" type="number" value="100" style="width:140px;padding:10px;border-radius:8px">
-        <button id="diceRollBtn" class="btn">Roll</button>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div class="muted">Result</div>
-        <div id="diceFace" class="dice-face">—</div>
-        <div id="diceMsg" class="muted" style="margin-top:8px">Roll to play</div>
-      </div>
-    </div>
-  `;
-  $('diceRollBtn').addEventListener('click', ()=>{
-    const pick = parseInt($('dicePick').value,10);
-    const bet = parseFloat($('diceBet').value) || 0;
-    if(bet > state.balance){ alert('Not enough balance'); return; }
-    state.balance -= bet; updateUI();
-    const roll = Math.floor(Math.random()*6)+1;
-    let win=false, profit=0;
-    if(pick === 6){
-      if(roll === 6) { win=true; profit = bet * 5; }
-    } else {
-      if(roll >= pick) { win=true; profit = Math.round((bet * (6/(6-(pick-1)) - 1)) * 100) / 100; }
-    }
-    $('diceFace').innerText = roll;
-    if(win){ state.balance += bet + profit; addRound('Dice', `Rolled ${roll} — WIN`, +profit, true); $('diceMsg').innerText = `WIN +${profit.toFixed(2)} RC`; } else { addRound('Dice', `Rolled ${roll} — LOSE`, -bet, false); $('diceMsg').innerText = `LOSE -${bet.toFixed(2)} RC`; }
-    saveState(); updateUI();
-  });
-}
-
-/* Mines */
-function renderMines(){
-  const container = $('mainGameArea');
-  container.innerHTML = `
-    <h2>Mines — Focused</h2>
-    <div class="muted">Open tiles; avoid bombs. Cashout anytime to collect current multiplier.</div>
-    <div style="display:flex;gap:12px;margin-top:12px">
-      <div>
-        <div class="muted">Bombs</div>
-        <select id="bombsCount" style="padding:8px;border-radius:8px"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option></select>
-      </div>
-      <div>
-        <div class="muted">Bet</div>
-        <input id="minesBet" type="number" value="100" style="width:140px;padding:10px;border-radius:8px">
-      </div>
-      <div style="margin-left:auto">
-        <button id="minesStartBtn" class="btn">Start</button>
-        <button id="minesCashBtn" class="btn ghost">Cashout</button>
-      </div>
-    </div>
-    <div class="mines-grid" id="minesGrid" style="margin-top:12px"></div>
-    <div id="minesMsg" class="muted" style="margin-top:10px"></div>
-  `;
-  const grid = $('minesGrid');
-  let bombs = new Set(), opened = new Set(), running=false, curBet=0;
-  function makeGrid(){
-    grid.innerHTML = '';
-    for(let i=0;i<48;i++){
-      const cell = document.createElement('div'); cell.className='mine-cell'; cell.dataset.i=i; cell.innerText='';
-      cell.addEventListener('click', ()=>{
-        if(!running) return;
-        const idx = parseInt(cell.dataset.i,10);
-        if(opened.has(idx)) return;
-        opened.add(idx);
-        if(bombs.has(idx)){
-          cell.classList.add('mine-open'); cell.innerText='💣';
-          running=false;
-          addRound('Mines', 'Hit a bomb', -curBet, false);
-          $('minesMsg').innerText = 'Boom — you hit a bomb.';
-          saveState(); updateUI();
-        } else {
-          cell.classList.add('mine-open'); cell.innerText='•';
-          const mul = 1 + (opened.size * 0.12);
-          $('minesMsg').innerText = `Safe — x${mul.toFixed(2)} — open more or cashout.`;
-        }
-      });
-      grid.appendChild(cell);
-    }
-  }
-  makeGrid();
-  $('minesStartBtn').addEventListener('click', ()=>{
-    const bet = parseFloat($('minesBet').value)||0;
-    const bombsCount = parseInt($('bombsCount').value,10);
-    if(bet<=0 || bet>state.balance){ alert('Invalid bet or insufficient funds'); return; }
-    state.balance -= bet; saveState(); updateUI();
-    curBet = bet; running=true; opened.clear(); bombs.clear();
-    while(bombs.size < bombsCount) bombs.add(Math.floor(Math.random()*48));
-    grid.querySelectorAll('.mine-cell').forEach(c=>{ c.classList.remove('mine-open'); c.innerText=''; });
-    addRound('Mines','Started', -bet, false);
-  });
-  $('minesCashBtn').addEventListener('click', ()=>{
-    if(!running){ alert('No active mines round'); return; }
-    const mul = 1 + (opened.size * 0.12); const profit = Math.round((curBet * (mul - 1)) * 100) / 100;
-    state.balance += curBet + profit; addRound('Mines', `Cashed out x${mul.toFixed(2)}`, +profit, true);
-    running=false; saveState(); updateUI(); $('minesMsg').innerText='Cashed out!';
-  });
-}
-
-/* Slots */
-function renderSlots(){
-  const container = $('mainGameArea');
-  container.innerHTML = `
-    <h2>Slots — Focused</h2>
-    <div class="muted">Spin three big reels. Match to win.</div>
-    <div style="display:flex;align-items:center;gap:18px;margin-top:12px">
-      <div style="display:flex;gap:12px">
-        <div class="reel" id="sr1">🍒</div>
-        <div class="reel" id="sr2">🍋</div>
-        <div class="reel" id="sr3">🔔</div>
-      </div>
-      <div style="margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div class="muted">Bet</div><input id="slotsBet" type="number" value="100" style="width:140px;padding:10px;border-radius:8px">
-        <div style="display:flex;gap:8px"><button id="spinBtn" class="btn">Spin</button></div>
-        <div id="slotsMsg" class="muted" style="margin-top:6px">Match 3 for big wins.</div>
-      </div>
-    </div>
-  `;
-  const symbols = ['🍒','🍋','🔔','⭐','7️⃣'];
-  const r1 = $('sr1'), r2 = $('sr2'), r3 = $('sr3');
-  $('spinBtn').addEventListener('click', ()=>{
-    const bet = parseFloat($('slotsBet').value)||0;
-    if(bet>state.balance){ alert('Not enough'); return; }
-    state.balance -= bet; saveState(); updateUI();
-    // spin effect simple
-    r1.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-    r2.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-    r3.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-    let profit=0, outcome='Lose';
-    if(r1.innerText===r2.innerText && r2.innerText===r3.innerText){
-      profit = r1.innerText==='7️⃣' ? bet*50 : bet*10; outcome='Jackpot';
-    } else if(r1.innerText===r2.innerText || r2.innerText===r3.innerText || r1.innerText===r3.innerText){
-      profit = bet*2; outcome='Small Win';
-    }
-    if(profit>0){ state.balance += bet + profit; addRound('Slots', outcome, +profit, true); $('slotsMsg').innerText = `${outcome} +${profit.toFixed(2)} RC`; } else { addRound('Slots', 'Lose', -bet, false); $('slotsMsg').innerText = 'No match'; }
-    saveState(); updateUI();
-  });
-}
-
-// ----------------- Auto strategies (demo) -----------------
-let autoRunning = false;
-async function runAutoMartingale({startBet=50, rounds=10, target=2.0}){
-  if(autoRunning) return;
-  autoRunning = true;
-  let currentBet = startBet;
-  for(let i=0; i<rounds && autoRunning; i++){
-    // run a crash round simulated quickly and attempt cashout at target
-    try {
-      // place + simulate one crash quickly (but we won't wait heavy animation here)
-      // We'll use a simplified single-draw approach: random crash point, check if >= target
-      if(currentBet > state.balance){ break; }
-      state.balance -= currentBet; saveState(); updateUI();
-      const crashPoint = 1 + (Math.pow(1/(1-Math.random()), 0.6));
-      if(crashPoint >= target){
-        // win
-        const profit = (target - 1) * currentBet;
-        state.balance += currentBet + profit;
-        addRound('AutoCrash', `Auto win @${target}x`, +profit, true);
-        currentBet = startBet; // reset on win
-      } else {
-        // lose -> double bet (martingale)
-        addRound('AutoCrash', `Auto lost @${crashPoint.toFixed(2)}x`, -currentBet, false);
-        currentBet = Math.min(currentBet * 2, state.balance);
-      }
-      updateUI();
-      await new Promise(r => setTimeout(r, 350)); // tiny pause
-    } catch(e){ console.error(e); break; }
-  }
-  autoRunning = false;
-}
-
-// ----------------- Export / Import -----------------
-function exportState(){
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'rainclone_state.json'; a.click(); URL.revokeObjectURL(url);
-}
-function importState(file){
-  const fr = new FileReader();
-  fr.onload = e => {
-    try {
-      const obj = JSON.parse(e.target.result);
-      Object.assign(state, obj);
-      saveState(); updateUI(); alert('Imported state (demo).');
-    } catch(err){ alert('Invalid file'); }
+  // state
+  let state = {
+    balance: START_BALANCE,
+    history: [], // {game, outcome, amt, time, win}
+    wins: 0,
+    losses: 0,
+    leaders: [],
+    provable: { seed: null, hash: null },
+    achievements: {},
+    crashHistory: [] // store multipliers of last rounds for SVG overlay
   };
-  fr.readAsText(file);
-}
 
-// ----------------- UI wiring and keyboard shortcuts -----------------
-function initUI(){
-  loadState(); updateUI();
-  // left menu
-  qAll('.game-item').forEach(it => {
-    it.addEventListener('click', ()=>{
-      qAll('.game-item').forEach(x=>x.classList.remove('active'));
-      it.classList.add('active');
-      openGame(it.dataset.game);
+  // load saved state safely
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        // validate fields to avoid malformed state errors
+        if(typeof parsed === 'object'){
+          state = Object.assign(state, parsed);
+          // ensure arrays exist
+          state.history = Array.isArray(state.history) ? state.history : [];
+          state.crashHistory = Array.isArray(state.crashHistory) ? state.crashHistory : [];
+          state.leaders = Array.isArray(state.leaders) ? state.leaders : [];
+          state.achievements = state.achievements || {};
+        }
+      }
+    } catch(e){
+      console.warn('Failed to load state:', e);
+      // fallback to defaults
+      state = Object.assign({}, state);
+    }
+  }
+  function saveState(){
+    try {
+      if(document.getElementById('persist') && document.getElementById('persist').checked){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+    } catch(e){
+      console.warn('save failed', e);
+    }
+    renderHeader();
+  }
+
+  // UI updates
+  function renderHeader(){
+    const top = $('topBalance');
+    if(top) top.innerText = (state.balance || 0).toFixed(2) + ' RC';
+    const wallet = $('wallet');
+    if(wallet) wallet.innerText = (state.balance || 0).toFixed(2) + ' RC';
+    const stats = $('stats');
+    if(stats) stats.innerText = `W:${state.wins} L:${state.losses}`;
+    const prov = $('provHash');
+    if(prov) prov.innerText = state.provable.hash || '—';
+    renderHistoryPanels();
+    renderLeaders();
+    renderAchievements();
+    drawAnalytics();
+  }
+
+  function pushRound(round){
+    // round: {game, outcome, amt, time, win}
+    state.history.unshift(round);
+    if(state.history.length > 300) state.history.length = 300;
+    if(round.win && round.amt > 0) state.leaders.unshift({ name: 'You', win: round.amt, time: round.time });
+    // keep leaders trimmed
+    state.leaders.sort((a,b)=>b.win-a.win);
+    if(state.leaders.length > 50) state.leaders.length = 50;
+    // track crash history multipliers (if round contains crashMult)
+    if(round.game === 'Crash' && typeof round.crashMult === 'number'){
+      state.crashHistory.unshift(round.crashMult);
+      if(state.crashHistory.length > 50) state.crashHistory.length = 50;
+    }
+    saveState();
+  }
+
+  function renderHistoryPanels(){
+    const leftHistory = $('leftHistory'); if(leftHistory) leftHistory.innerHTML = '';
+    const ticker = $('leftHistory'); // reuse small area (keeps UI simple)
+    (state.history.slice(0,20)).forEach(h => {
+      const d = document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid rgba(255,255,255,0.02)';
+      d.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.game}</div><div class="muted">${h.time}</div></div><div class="muted">${h.outcome} <strong style="float:right">${h.amt>0? '+'+h.amt.toFixed(2): h.amt.toFixed(2)}</strong></div>`;
+      if(leftHistory) leftHistory.appendChild(d);
     });
-  });
-  // home cards open
-  qAll('.card[data-open]').forEach(c=> c.addEventListener('click', ()=> {
-    const g = c.dataset.open; qAll('.game-item').forEach(x=>x.classList.remove('active'));
-    const target = document.querySelector(`.game-item[data-game="${g}"]`);
-    if(target) target.classList.add('active');
-    openGame(g);
-  }));
+  }
 
-  $('addBtn').addEventListener('click', ()=> {
-    const v = parseFloat($('quickAdd').value)||0;
-    state.balance += v; pushHistory({game:'System', outcome:'Added funds', amt:v, time: now(), win:true}); saveState(); updateUI();
-  });
+  function renderLeaders(){
+    const el = $('leaders'); if(!el) return;
+    el.innerHTML = '';
+    if(!state.leaders.length){ el.innerHTML = '<div class="muted">No wins yet</div>'; return; }
+    state.leaders.slice(0,6).forEach((l,i) => {
+      const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0';
+      row.innerHTML = `<div>${i+1}. ${l.name}</div><div class="muted">${l.win.toFixed(2)}</div>`;
+      el.appendChild(row);
+    });
+  }
 
-  // profile modal
-  $('openProfile').addEventListener('click', ()=> {
-    $('profileModal').style.display='block';
-    renderProfileModal();
-  });
-  $('closeProfile').addEventListener('click', ()=> $('profileModal').style.display='none');
-  $('exportProfile').addEventListener('click', exportState);
-  $('importProfile').addEventListener('click', ()=> $('profFile').click());
-  $('profFile').addEventListener('change', (e)=> importState(e.target.files[0]));
+  function renderAchievements(){
+    const el = $('achievements'); if(!el) return; el.innerHTML = '';
+    const known = state.achievements || {};
+    const badges = [
+      {k:'first_win', label:'First win'},
+      {k:'3_wins', label:'3 wins'},
+      {k:'10_wins', label:'10 wins'},
+      {k:'big_jackpot', label:'Big jackpot (≥500)'}
+    ];
+    badges.forEach(b => {
+      const div = document.createElement('div'); div.className = 'achievement'; div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='6px'; div.style.borderRadius='8px'; div.style.background='rgba(255,255,255,0.02)';
+      div.innerHTML = `<div>${b.label}</div><div style="opacity:${known[b.k]?1:0.35}">${known[b.k] ? '✅' : '🔒'}</div>`;
+      el.appendChild(div);
+    });
+  }
 
-  // provable
-  $('newSeed').addEventListener('click', newProvable);
-  $('revealSeed').addEventListener('click', revealProvable);
+  // analytics small chart
+  function drawAnalytics(){
+    const canvas = $('analytics'); if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    const rounds = state.history.slice(0,20);
+    if(rounds.length === 0){
+      ctx.fillStyle = 'rgba(255,255,255,0.02)';
+      ctx.fillRect(0,0,canvas.width, canvas.height);
+      ctx.fillStyle = '#9aa0a6'; ctx.font = '12px sans-serif'; ctx.fillText('No rounds yet', 10, 20);
+      $('winRate') && ($('winRate').innerText = '0%');
+      return;
+    }
+    const max = Math.max(...rounds.map(r => Math.abs(r.amt) || 0), 1);
+    const barW = (canvas.width - 20)/rounds.length;
+    rounds.slice().reverse().forEach((r, i) => {
+      const val = r.amt;
+      const h = Math.min(canvas.height - 20, Math.abs(val)/max * (canvas.height - 30));
+      const x = 10 + i * barW;
+      const y = canvas.height - h - 10;
+      ctx.fillStyle = (val >= 0) ? 'rgba(87,221,129,0.9)' : 'rgba(255,86,86,0.9)';
+      ctx.fillRect(x, y, barW - 6, h);
+    });
+    const wins = state.history.filter(h => h.win).length;
+    const rate = state.history.length ? Math.round((wins / state.history.length) * 100) : 0;
+    $('winRate') && ($('winRate').innerText = rate + '%');
+  }
 
-  // export / import from right panel
-  $('exportBtn').addEventListener('click', exportState);
-  $('importBtn').addEventListener('click', ()=> $('importFile').click());
-  $('importFile').addEventListener('change', e=> importState(e.target.files[0]));
+  // achievements helper
+  function award(key, label){
+    if(!state.achievements[key]){
+      state.achievements[key] = { label, time: new Date().toLocaleString() };
+      pushRound({game:'System', outcome:'Achievement: '+label, amt:0, time: new Date().toLocaleTimeString(), win:true});
+      saveState();
+    }
+  }
 
-  // clear storage
-  $('clearBtn').addEventListener('click', ()=> { if(confirm('Clear local storage?')){ localStorage.removeItem(stateKey); location.reload(); }});
+  // -------------------
+  // Provably fair demo
+  // -------------------
+  async function newServerSeed(){
+    const seed = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    state.provable.seed = seed;
+    try {
+      const hashBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(seed));
+      state.provable.hash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e){
+      // fallback simple hash if crypto fails (very unlikely)
+      state.provable.hash = '0x' + Array.from(seed).reduce((s,c)=> s + c.charCodeAt(0).toString(16), '');
+    }
+    saveState(); renderHeader();
+  }
+  function revealServerSeed(){
+    if(!state.provable.seed) return alert('No server seed yet. Click "New" to generate one.');
+    alert('Server seed (demo):\n' + state.provable.seed + '\n\nHash: ' + (state.provable.hash || '—'));
+  }
 
-  // theme toggle
-  $('themeToggle').addEventListener('click', ()=> {
-    document.body.classList.toggle('light');
-    // very simple: invert background for fun
-    if(document.body.classList.contains('light')) { document.body.style.background = 'linear-gradient(180deg,#fbfbfb,#f0f0f0)'; document.body.style.color = '#042'; }
-    else { document.body.style.background = 'radial-gradient(800px 400px at 10% 10%, rgba(70,213,255,0.03), transparent), linear-gradient(180deg,#06060b,#070712)'; document.body.style.color = '#e8f4f8'; }
-  });
+  // -------------------
+  // Crash implementation (SVG chart + smooth)
+  // -------------------
+  let crashRunning = false;
+  let crashRAF = null;
+  // Simple function to create a determinisitic crash using a seed string
+  function deterministicCrashFromSeed(seed){
+    // map seed -> number between 1.00 and 30.00 using simple hash reduce
+    let acc = 0;
+    for(let i=0;i<seed.length;i++) acc = (acc * 31 + seed.charCodeAt(i)) % 1000000;
+    const r = (acc % 100000) / 100000; // 0..0.99999
+    const crash = 1 + Math.pow(r, -0.5); // heavier tail
+    return Math.min(100, Math.round(crash * 100)/100);
+  }
 
-  // export/import profile (modal)
-  $('exportState').addEventListener('click', exportState);
-  $('importProfile').addEventListener('click', ()=> $('profFile').click());
+  function renderCrashView(){
+    const main = $('mainGame');
+    if(!main) return;
+    main.innerHTML = `
+      <h2>Crash — Large</h2>
+      <div class="muted">SVG history shown below; manual and auto cashout supported.</div>
+      <div style="margin-top:12px">
+        <svg id="crashSVG" class="crash-svg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="width:100%;height:240px"></svg>
+      </div>
+      <div class="crash-controls">
+        <div class="muted">Bet</div><input id="crashBet" type="number" value="150" style="width:120px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+        <div class="muted">Auto cashout</div><input id="crashAuto" type="number" value="2.00" step="0.01" style="width:110px;padding:8px;border-radius:8px">
+        <button class="btn" id="startCrash">Place & Start</button>
+        <button class="btn ghost" id="cashCrash">Cashout</button>
+        <button class="btn ghost" id="zoomToggle">Zoom</button>
+      </div>
+      <div id="crashHint" class="muted" style="margin-top:10px">Status: idle</div>
+    `;
+    drawCrashSVG(); // initial render
+    // event binding
+    const startBtn = $('startCrash'); if(startBtn) startBtn.addEventListener('click', ()=> {
+      const bet = parseFloat($('crashBet').value) || 0;
+      const autoCash = parseFloat($('crashAuto').value) || null;
+      startCrashRound(bet, autoCash);
+    });
+    const cashBtn = $('cashCrash'); if(cashBtn) cashBtn.addEventListener('click', manualCashout);
+    const zoom = $('zoomToggle'); if(zoom) zoom.addEventListener('click', ()=> {
+      // zoom toggles between full and zoomed view by changing viewBox scale
+      const svg = $('crashSVG');
+      if(!svg) return;
+      const vb = svg.getAttribute('data-zoom') === '1';
+      if(vb){
+        svg.removeAttribute('viewBox');
+        svg.setAttribute('data-zoom','0');
+      } else {
+        // zoom in to last half of view
+        svg.setAttribute('viewBox','500 0 500 240');
+        svg.setAttribute('data-zoom','1');
+      }
+    });
+  }
 
-  // keyboard shortcuts
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === '1') openGame('home');
-    if(e.key === '2') openGame('crash');
-    if(e.key === '3') openGame('dice');
-    if(e.key === '4') openGame('mines');
-    if(e.key === '5') openGame('slots');
-    if(e.code === 'Space'){ e.preventDefault(); const place = $('placeBtn'); if(place) place.click(); }
-    if(e.key.toLowerCase() === 'c'){ const cash = $('cashBtn'); if(cash) cash.click(); }
-  });
+  function drawCrashSVG(){
+    const svg = $('crashSVG'); if(!svg) return;
+    // clear
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    // background rect
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x','0'); rect.setAttribute('y','0'); rect.setAttribute('width','100%'); rect.setAttribute('height','100%');
+    rect.setAttribute('fill','rgba(255,255,255,0.01)');
+    svg.appendChild(rect);
+    // draw baseline grid lines
+    for(let i=0;i<5;i++){
+      const y = 240 - (i*(240/5));
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1','0'); line.setAttribute('x2','1000'); line.setAttribute('y1',String(y)); line.setAttribute('y2',String(y));
+      line.setAttribute('stroke','rgba(255,255,255,0.02)'); line.setAttribute('stroke-width','1');
+      svg.appendChild(line);
+    }
+    // if crash history exists, plot polyline
+    const history = state.crashHistory.slice(0,50).reverse();
+    if(history.length){
+      const maxMult = Math.max(...history, 10);
+      const points = history.map((m,i)=>{
+        const x = Math.round(i*(1000/(history.length-1||1)));
+        const y = Math.round(240 - ( (Math.min(m, maxMult)/maxMult) * 220) - 10);
+        return `${x},${y}`;
+      }).join(' ');
+      const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      poly.setAttribute('points', points);
+      poly.setAttribute('fill','none');
+      poly.setAttribute('stroke','url(#grad1)');
+      poly.setAttribute('stroke-width','3');
+      // gradient
+      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+      const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+      grad.setAttribute('id','grad1'); grad.setAttribute('x1','0%'); grad.setAttribute('x2','100%');
+      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#46d5ff');
+      const s2 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('stop-color','#7b61ff');
+      grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad); svg.appendChild(defs);
+      svg.appendChild(poly);
+      // add markers for last value
+      const last = history[history.length-1];
+      const lastX = Math.round( (history.length-1) * (1000/(history.length-1||1)));
+      const lastY = Math.round(240 - ((Math.min(last,Math.max(...history,10)) / Math.max(...history,10)) * 220) - 10);
+      const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circle.setAttribute('cx', String(lastX)); circle.setAttribute('cy', String(lastY)); circle.setAttribute('r','6'); circle.setAttribute('fill','#46d5ff'); svg.appendChild(circle);
+    } else {
+      // no history: draw example faint curve
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M0,230 C200,120 400,90 600,50 800,30 1000,10');
+      path.setAttribute('fill','none'); path.setAttribute('stroke','rgba(255,255,255,0.03)'); path.setAttribute('stroke-width','2');
+      svg.appendChild(path);
+    }
+  }
 
-  // side quick place / cash
-  $('placeBtn').addEventListener('click', ()=> {
-    const active = qAll('.game-item').find(x=>x.classList.contains('active'));
-    if(active) openGame(active.dataset.game);
-  });
-  $('cashBtn').addEventListener('click', ()=> {
-    // try to call cashout if present (Crash/Mines)
-    // we attempt to find buttons in current focused view
-    const cashBtns = Array.from(document.querySelectorAll('button')).filter(b=>/cash/i.test(b.id || b.innerText));
-    if(cashBtns.length) cashBtns[0].click(); else alert('No cashout available in this view');
-  });
+  function startCrashRound(bet, autoCashout){
+    if(crashRunning){ alert('Round already running'); return; }
+    if(!bet || bet <= 0){ alert('Invalid bet'); return; }
+    if(bet > state.balance){ alert('Insufficient funds'); return; }
+    // commit bet
+    state.balance -= bet; renderHeader();
+    const seed = (state.provable.seed || Math.random().toString(36).slice(2)) + Date.now().toString(36);
+    // deterministic-ish crash
+    const crashAt = deterministicCrashFromSeed(seed);
+    let mult = 1.0;
+    crashRunning = true;
+    $('crashHint') && ($('crashHint').innerText = 'Running...');
+    let last = performance.now();
+    function animate(now){
+      const dt = (now - last)/1000; last = now;
+      // growth model: exponential-ish
+      mult += dt * (0.8 + Math.log(mult + 1) * 0.5);
+      // check auto
+      if(autoCashout && mult >= autoCashout){
+        // win
+        const profit = Math.round((autoCashout - 1) * bet * 100) / 100;
+        state.balance += bet + profit;
+        addRoundAndFinish('Crash', `Auto cashout @${autoCashout.toFixed(2)}x`, profit, true, crashAt);
+        return;
+      }
+      // crash condition
+      if(mult >= crashAt){
+        // crash: lose bet
+        addRoundAndFinish('Crash', `Crashed @${crashAt.toFixed(2)}x`, -bet, false, crashAt);
+        return;
+      }
+      // update displayed multiplier
+      $('crashHint') && ($('crashHint').innerText = `Running — ${mult.toFixed(2)}x`);
+      crashRAF = requestAnimationFrame(animate);
+    }
+    crashRAF = requestAnimationFrame(animate);
+  }
 
+  function manualCashout(){
+    if(!crashRunning){ alert('No active crash round'); return; }
+    // we don't have the current 'bet' and 'mult' in this scope; store them via closure? To avoid complexity,
+    // we'll provide a simplified manual cashout approach by scanning the last active round from history: but
+    // since we need the current multiplier, we will store current crashState. Implement crashState above.
+    if(!window.__crashState || !window.__crashState.running){ alert('No active crash'); return; }
+    const cs = window.__crashState;
+    const profit = Math.round((cs.mult - 1) * cs.bet * 100) / 100;
+    state.balance += cs.bet + profit;
+    addRoundAndFinish('Crash', `Manual cashout @${cs.mult.toFixed(2)}x`, profit, true, cs.crashAt);
+  }
+
+  function addRoundAndFinish(game, outcome, amt, win, crashAt){
+    crashRunning = false;
+    if(crashRAF) { cancelAnimationFrame(crashRAF); crashRAF = null; }
+    // push round with crashAt if relevant
+    const entry = { game, outcome, amt: amt, time: new Date().toLocaleTimeString(), win: !!win };
+    if(typeof crashAt === 'number') entry.crashMult = crashAt;
+    state.history.unshift(entry);
+    if(entry.win) state.wins++;
+    else if(game !== 'System') state.losses++;
+    if(entry.win && amt >= 500) award('big_jackpot','Big Jackpot');
+    // push history & crash history
+    if(typeof crashAt === 'number') state.crashHistory.unshift(crashAt);
+    if(state.crashHistory.length > 50) state.crashHistory.length = 50;
+    saveState();
+    // update UI
+    $('crashHint') && ($('crashHint').innerText = `${outcome} (${amt >=0 ? '+'+amt.toFixed(2) : amt.toFixed(2)} RC)`);
+    drawCrashSVG();
+    renderHeader();
+  }
+
+  // To support manual cashout in a robust way, create global crashState to be referenced by manual cashout.
+  window.__crashState = { running:false, mult:1.0, bet:0, crashAt:0 };
+
+  // Improved startCrashRound storing crashState
+  function startCrashRound(bet, autoCashout){
+    if(window.__crashState.running){ alert('Round already running'); return; }
+    if(!bet || bet <= 0){ alert('Invalid bet'); return; }
+    if(bet > state.balance){ alert('Insufficient funds'); return; }
+    state.balance -= bet; renderHeader();
+    const seed = (state.provable.seed || Math.random().toString(36).slice(2)) + Date.now().toString(36);
+    const crashAt = deterministicCrashFromSeed(seed);
+    window.__crashState = { running:true, mult:1.0, bet:bet, crashAt:crashAt, raf:null };
+    $('crashHint') && ($('crashHint').innerText = 'Running...');
+    let last = performance.now();
+    function loop(now){
+      const cs = window.__crashState;
+      const dt = (now - last)/1000; last = now;
+      cs.mult += dt * (0.8 + Math.log(cs.mult + 1) * 0.6);
+      // auto cashout
+      if(autoCashout && cs.mult >= autoCashout){
+        const profit = Math.round((autoCashout - 1) * bet * 100) / 100;
+        state.balance += bet + profit;
+        pushRound({game:'Crash', outcome:`Auto cashout @${autoCashout.toFixed(2)}x`, amt:profit, time:new Date().toLocaleTimeString(), win:true, crashMult:crashAt});
+        cs.running = false;
+        cs.raf && cancelAnimationFrame(cs.raf);
+        window.__crashState = { running:false, mult:1.0, bet:0, crashAt:0 };
+        saveState(); renderHeader(); drawCrashSVG(); $('crashHint') && ($('crashHint').innerText = `Auto-cashed @${autoCashout.toFixed(2)}x (+${profit} RC)`);
+        return;
+      }
+      if(cs.mult >= cs.crashAt){
+        // crashed
+        pushRound({game:'Crash', outcome:`Crashed @${cs.crashAt.toFixed(2)}x`, amt:-bet, time:new Date().toLocaleTimeString(), win:false, crashMult: cs.crashAt});
+        cs.running = false;
+        cs.raf && cancelAnimationFrame(cs.raf);
+        window.__crashState = { running:false, mult:1.0, bet:0, crashAt:0 };
+        saveState(); renderHeader(); drawCrashSVG(); $('crashHint') && ($('crashHint').innerText = `Crashed @${cs.crashAt.toFixed(2)}x — lost ${bet} RC`);
+        return;
+      }
+      // update hint
+      $('crashHint') && ($('crashHint').innerText = `Running — ${cs.mult.toFixed(2)}x`);
+      cs.raf = requestAnimationFrame(loop);
+    }
+    window.__crashState.raf = requestAnimationFrame(loop);
+  }
+
+  // -------------------
+  // Slots: smooth physics-style reels
+  // -------------------
+  const slotSymbols = ['🍒','🍋','🔔','⭐','7️⃣'];
+  function renderSlots(){
+    const main = $('mainGame');
+    if(!main) return;
+    main.innerHTML = `
+      <h2>Slots — Smooth Reels</h2>
+      <div class="muted">Spin and watch reels stop one after another. Matching results pay out.</div>
+      <div class="slots-row">
+        <div class="reel" id="r1">${slotSymbols[0]}</div>
+        <div class="reel" id="r2">${slotSymbols[1]}</div>
+        <div class="reel" id="r3">${slotSymbols[2]}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+        <div class="muted">Bet</div><input id="slotsBet" type="number" value="150" style="width:120px;padding:8px;border-radius:8px">
+        <button class="btn" id="spinBtn">Spin</button>
+        <div id="slotsMsg" class="muted">Try to match 3 — big payout for 7️⃣</div>
+      </div>
+    `;
+    const r1 = $('r1'), r2 = $('r2'), r3 = $('r3');
+    const spinBtn = $('spinBtn');
+    let spinning = false;
+    function stopReel(el, symbol){
+      el.classList.remove('spin');
+      el.innerText = symbol;
+    }
+    async function spin(){
+      if(spinning) return;
+      const bet = parseFloat($('slotsBet').value) || 0;
+      if(!bet || bet > state.balance){ alert('Invalid bet or insufficient funds'); return; }
+      spinning = true;
+      state.balance -= bet; saveState(); renderHeader();
+      // add quick flicker animation
+      [r1,r2,r3].forEach(el => el.classList.add('spin'));
+      // create target symbols
+      const target1 = slotSymbols[Math.floor(Math.random()*slotSymbols.length)];
+      const target2 = slotSymbols[Math.floor(Math.random()*slotSymbols.length)];
+      const target3 = slotSymbols[Math.floor(Math.random()*slotSymbols.length)];
+      // stop delays staggered for satisfying feel
+      await new Promise(r => setTimeout(r, 220)); stopReel(r1, target1);
+      await new Promise(r => setTimeout(r, 160)); stopReel(r2, target2);
+      await new Promise(r => setTimeout(r, 180)); stopReel(r3, target3);
+      // evaluate
+      let profit = 0;
+      if(target1 === target2 && target2 === target3){
+        profit = (target1 === '7️⃣') ? bet * 50 : bet * 10;
+      } else if (target1 === target2 || target2 === target3 || target1 === target3){
+        profit = bet * 2;
+      }
+      if(profit > 0){
+        state.balance += bet + profit;
+        addRoundAndFinish('Slots', `Win ${profit.toFixed(2)} RC`, profit, true);
+        $('slotsMsg').innerText = `Win +${profit.toFixed(2)} RC`;
+      } else {
+        addRoundAndFinish('Slots', `Lose ${bet.toFixed(2)} RC`, -bet, false);
+        $('slotsMsg').innerText = `No match — lost ${bet.toFixed(2)} RC`;
+      }
+      spinning = false;
+      saveState(); renderHeader();
+    }
+    spinBtn && spinBtn.addEventListener('click', spin);
+  }
+
+  // -------------------
+  // Dice
+  // -------------------
+  function renderDice(){
+    const main = $('mainGame');
+    if(!main) return;
+    main.innerHTML = `
+      <h2>Dice — Large</h2>
+      <div class="muted">Pick a target (4-6). Roll 1-6 to win.</div>
+      <div style="display:flex;gap:24px;align-items:center;margin-top:16px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div class="muted">Pick</div>
+          <select id="dicePick" style="padding:8px;border-radius:8px"><option value="4">≥ 4</option><option value="5">≥ 5</option><option value="6">= 6</option></select>
+          <div class="muted">Bet</div><input id="diceBet" type="number" value="150" style="width:120px;padding:8px;border-radius:8px">
+          <button class="btn" id="diceRoll">Roll</button>
+        </div>
+        <div style="text-align:center">
+          <div class="muted">Result</div>
+          <div id="diceFace" style="font-size:120px;padding:18px;margin-top:8px;background:rgba(255,255,255,0.02);border-radius:14px">—</div>
+          <div id="diceMsg" class="muted" style="margin-top:8px">Roll to play</div>
+        </div>
+      </div>
+    `;
+    $('diceRoll').addEventListener('click', ()=>{
+      const pick = parseInt($('dicePick').value,10);
+      const bet = parseFloat($('diceBet').value) || 0;
+      if(!bet || bet > state.balance){ alert('Invalid bet or insufficient funds'); return; }
+      state.balance -= bet; saveState(); renderHeader();
+      const roll = Math.floor(Math.random()*6)+1;
+      let win=false, profit=0;
+      if(pick === 6){
+        if(roll === 6){ win=true; profit = bet * 5; }
+      } else {
+        if(roll >= pick){ win=true; profit = Math.round((bet * (6/(6-(pick-1)) - 1)) * 100) / 100; }
+      }
+      $('diceFace').innerText = roll;
+      if(win){ state.balance += bet + profit; addRoundAndFinish('Dice', `Rolled ${roll} — WIN`, profit, true); $('diceMsg').innerText = `WIN +${profit.toFixed(2)} RC`; } else { addRoundAndFinish('Dice', `Rolled ${roll} — LOSE`, -bet, false); $('diceMsg').innerText = `LOSE -${bet.toFixed(2)} RC`; }
+    });
+  }
+
+  // -------------------
+  // Mines
+  // -------------------
+  function renderMinesView(){
+    const main = $('mainGame');
+    if(!main) return;
+    main.innerHTML = `
+      <h2>Mines — Focused</h2>
+      <div class="muted">Open tiles. Hit a bomb = lose. Cashout anytime to collect reward.</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <div><div class="muted">Bombs</div><select id="bombCount" style="padding:8px;border-radius:8px"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option></select></div>
+        <div><div class="muted">Bet</div><input id="minesBet" type="number" value="150" style="width:120px;padding:8px;border-radius:8px"></div>
+        <div style="margin-left:auto"><button class="btn" id="startMines">Start</button><button class="btn ghost" id="cashMines">Cashout</button></div>
+      </div>
+      <div class="mines-grid" id="minesGrid" style="margin-top:12px"></div>
+      <div id="minesMsg" class="muted" style="margin-top:8px"></div>
+    `;
+    const grid = $('minesGrid'); if(!grid) return;
+    function initGrid(){
+      grid.innerHTML = '';
+      for(let i=0;i<48;i++){
+        const cell = document.createElement('div');
+        cell.className = 'mine-cell';
+        cell.dataset.i = i;
+        cell.innerText = '?';
+        grid.appendChild(cell);
+      }
+    }
+    initGrid();
+    let bombs = new Set(), opened = new Set(), currentBet = 0, running=false;
+    function start(){
+      const bet = parseFloat($('minesBet').value) || 0;
+      if(!bet || bet > state.balance){ alert('Invalid bet or insufficient funds'); return; }
+      const count = parseInt($('bombCount').value,10);
+      state.balance -= bet; saveState(); renderHeader();
+      currentBet = bet; running = true; opened.clear(); bombs.clear();
+      while(bombs.size < count) bombs.add(Math.floor(Math.random()*48));
+      grid.querySelectorAll('.mine-cell').forEach(c => { c.classList.remove('mine-open'); c.innerText = '?'; });
+      $('minesMsg').innerText = `Started — open tiles carefully.`;
+      pushRound({game:'Mines', outcome:'Started', amt:-bet, time:new Date().toLocaleTimeString(), win:false});
+    }
+    function openCell(idx, el){
+      if(!running) return;
+      if(opened.has(idx)) return;
+      opened.add(idx);
+      if(bombs.has(idx)){
+        el.classList.add('mine-open'); el.innerText = '💣';
+        running = false;
+        pushRound({game:'Mines', outcome:'Hit bomb', amt:-currentBet, time:new Date().toLocaleTimeString(), win:false});
+        $('minesMsg').innerText = 'Boom — hit a bomb.';
+        renderHeader(); saveState();
+      } else {
+        el.classList.add('mine-open'); el.innerText = '•';
+        const mul = 1 + (opened.size * 0.12);
+        $('minesMsg').innerText = `Safe — multiplier x${mul.toFixed(2)} — open more or cashout.`;
+      }
+    }
+    function cashout(){
+      if(!running){ alert('No active mines round'); return; }
+      const mul = 1 + (opened.size * 0.12);
+      const profit = Math.round((currentBet * (mul - 1)) * 100) / 100;
+      state.balance += currentBet + profit;
+      pushRound({game:'Mines', outcome:`Cashed x${mul.toFixed(2)}`, amt:profit, time:new Date().toLocaleTimeString(), win:true});
+      running = false;
+      $('minesMsg').innerText = `Cashed out +${profit.toFixed(2)} RC`;
+      renderHeader(); saveState();
+    }
+    grid.addEventListener('click', (e) => {
+      const cell = e.target.closest('.mine-cell');
+      if(!cell) return;
+      const idx = parseInt(cell.dataset.i,10);
+      openCell(idx, cell);
+    });
+    $('startMines').addEventListener('click', start);
+    $('cashMines').addEventListener('click', cashout);
+  }
+
+  // -------------------
+  // Strategy simulator
+  // -------------------
+  function renderSimulator(){
+    const main = $('mainGame');
+    if(!main) return;
+    main.innerHTML = `
+      <h2>Strategy Simulator</h2>
+      <div class="muted">Backtest Martingale or Fixed strategies on a simulated Crash RNG.</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <div class="muted">Mode</div><select id="simMode" style="padding:8px;border-radius:8px"><option value="martingale">Martingale</option><option value="fixed">Fixed</option></select>
+        <div class="muted">Start bet</div><input id="simStart" type="number" value="50" style="width:120px;padding:8px;border-radius:8px">
+        <div class="muted">Rounds</div><input id="simRounds" type="number" value="200" style="width:120px;padding:8px;border-radius:8px">
+        <button class="btn" id="runSim">Run</button>
+      </div>
+      <canvas id="simCanvasMain" width="900" height="220" style="width:100%;height:220px;background:rgba(255,255,255,0.01);border-radius:8px;margin-top:12px"></canvas>
+      <div id="simResult" class="muted" style="margin-top:8px"></div>
+    `;
+    $('runSim').addEventListener('click', runSimulation);
+  }
+
+  function runSimulation(){
+    const mode = $('simMode').value;
+    const startBet = Math.max(1, parseFloat($('simStart').value) || 50);
+    const rounds = Math.max(1, parseInt($('simRounds').value,10) || 200);
+    let balance = 10000; // simulator bankroll
+    let bet = startBet;
+    const history = [];
+    for(let i=0;i<rounds;i++){
+      // simulate crash
+      const crash = deterministicCrashFromSeed((Math.random().toString(36)+Date.now().toString(36)).slice(0,12));
+      const target = 2.0; // we assume we're cashing at 2x for the strategy
+      if(crash >= target){
+        // win
+        const profit = Math.round((target - 1) * bet * 100) / 100;
+        balance += profit;
+        history.push(balance);
+        if(mode === 'martingale') bet = startBet;
+        else bet = startBet;
+      } else {
+        // lose
+        balance -= bet;
+        history.push(balance);
+        if(mode === 'martingale') bet = Math.min(balance, bet*2);
+        else bet = startBet;
+      }
+      if(balance <= 0) break;
+    }
+    // draw history
+    const canvas = $('simCanvasMain'); if(!canvas) return;
+    const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    const max = Math.max(...history, 1); const min = Math.min(...history,0);
+    history.forEach((v,i) => {
+      const x = i * (canvas.width / (history.length||1));
+      const y = canvas.height - ((v - min) / (max - min || 1)) * (canvas.height - 20) - 10;
+      ctx.fillStyle = i === history.length-1 ? '#46d5ff' : 'rgba(70,213,255,0.6)';
+      ctx.fillRect(x, y, Math.max(2, canvas.width / (history.length||1) - 1), 4);
+    });
+    $('simResult').innerText = `End balance: ${history.length? history[history.length-1].toFixed(2) : balance.toFixed(2)}  (start ${startBet})`;
+  }
+
+  // Helper to open a game view and render UI
+  function openGame(name){
+    const home = $('homeView'), game = $('gameView');
+    if(!home || !game) return;
+    home.style.display = name === 'home' ? 'block' : 'none';
+    game.style.display = name === 'home' ? 'none' : 'flex';
+    $('roundLabel') && ($('roundLabel').innerText = name.charAt(0).toUpperCase() + name.slice(1));
+    // clear main
+    const main = $('mainGame'); if(!main) return;
+    main.innerHTML = '';
+    if(name === 'home'){
+      // nothing
+    } else if(name === 'crash'){
+      renderCrashView();
+      // ensure crash controls bound
+      const start = $('startCrash'); start && start.addEventListener('click', ()=> {
+        const bet = parseFloat($('crashBet').value) || 0;
+        const auto = parseFloat($('crashAuto').value) || null;
+        startCrashRound(bet, auto);
+      });
+      const cashB = $('cashCrash'); cashB && cashB.addEventListener('click', ()=> {
+        // manual cashout uses global crash state
+        if(window.__crashState && window.__crashState.running){
+          const cs = window.__crashState;
+          const profit = Math.round((cs.mult - 1) * cs.bet * 100) / 100;
+          state.balance += cs.bet + profit;
+          pushRound({game:'Crash', outcome:`Manual cashout @${cs.mult.toFixed(2)}x`, amt:profit, time:new Date().toLocaleTimeString(), win:true, crashMult: cs.crashAt});
+          // stop
+          cs.running = false;
+          if(cs.raf) cancelAnimationFrame(cs.raf);
+          window.__crashState = { running:false, mult:1, bet:0, crashAt:0 };
+          saveState(); renderHeader(); drawCrashSVG(); $('crashHint') && ($('crashHint').innerText = `Cashed out @${cs.mult.toFixed(2)}x (+${profit.toFixed(2)} RC)`);
+        } else alert('No running crash round.');
+      });
+    } else if(name === 'slots'){
+      renderSlots();
+    } else if(name === 'dice'){
+      renderDice();
+    } else if(name === 'mines'){
+      renderMinesView();
+    } else if(name === 'sim'){
+      renderSimulator();
+    }
+  }
+
+  // Basic helpers to add rounds and update achievements
+  function addRoundEntry(game, outcome, amt, win, crashMult){
+    const entry = { game, outcome, amt, time: new Date().toLocaleTimeString(), win };
+    if(typeof crashMult === 'number') entry.crashMult = crashMult;
+    state.history.unshift(entry);
+    if(state.history.length > 300) state.history.length = 300;
+    if(win) state.wins++; else if(game !== 'System') state.losses++;
+    if(win && amt >= 500) award('big_jackpot','Big jackpot');
+    if(state.wins >= 1) award('first_win','First win');
+    if(state.wins >= 3) award('3_wins','3 wins');
+    if(state.wins >= 10) award('10_wins','10 wins');
+    saveState();
+  }
+
+  function addRound(r){
+    // wrapper preserving interface used earlier
+    addRoundEntry(r.game, r.outcome, r.amt, r.win, r.crashMult);
+  }
+
+  // -----------------
+  // Bind UI top-level
+  // -----------------
+  function bindUI(){
+    // left menu
+    qsa('.game-btn').forEach(btn => btn.addEventListener('click', e => {
+      qsa('.game-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const g = btn.dataset.game;
+      openGame(g);
+    }));
+
+    // home card opens
+    qsa('.card[data-open]').forEach(card => card.addEventListener('click', e => {
+      const g = card.dataset.open;
+      const match = qsa(`.game-btn[data-game="${g}"]`)[0];
+      qsa('.game-btn').forEach(b => b.classList.remove('active'));
+      match && match.classList.add('active');
+      openGame(g);
+    }));
+
+    // quick add
+    $('addBtn').addEventListener('click', ()=> {
+      const v = parseFloat($('quickAdd').value) || 0;
+      state.balance += v;
+      addRound({game:'System', outcome:'Added funds', amt:v, time:new Date().toLocaleTimeString(), win:true});
+      saveState(); renderHeader();
+    });
+
+    // UI scale slider
+    const uiScale = $('uiScale');
+    uiScale && uiScale.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--ui-scale', e.target.value);
+    });
+
+    // provable
+    $('newSeed').addEventListener('click', newServerSeed);
+    $('revealSeed').addEventListener('click', revealServerSeed);
+
+    // export / import
+    $('exportFull').addEventListener('click', ()=> {
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'rainclone_state.json'; a.click(); URL.revokeObjectURL(url);
+    });
+    $('importFull').addEventListener('click', ()=> $('importFile').click());
+    $('importFile').addEventListener('change', (e)=> {
+      const f = e.target.files && e.target.files[0];
+      if(!f) return;
+      const fr = new FileReader();
+      fr.onload = ev => {
+        try {
+          const obj = JSON.parse(ev.target.result);
+          Object.assign(state, obj);
+          saveState(); renderHeader();
+          alert('Imported state (demo)');
+        } catch(err){ alert('Invalid file'); }
+      };
+      fr.readAsText(f);
+    });
+
+    // export & import header
+    $('exportBtn').addEventListener('click', ()=> $('exportFull').click());
+    $('importBtn').addEventListener('click', ()=> $('importFull').click());
+
+    // clear storage
+    $('clearStorage').addEventListener('click', ()=> { if(confirm('Clear local storage and reset demo?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); }});
+
+    // strategy simulator run (also bound in its rendering)
+    $('runSim') && $('runSim').addEventListener('click', runSimulation);
+
+    // keyboard shortcuts - place / cash operate as opening the focused view and triggering place/cash buttons
+    window.addEventListener('keydown', (ev) => {
+      if(ev.code === 'Space'){ ev.preventDefault(); // place -> open focused view
+        const active = qsa('.game-btn').find(b => b.classList.contains('active'));
+        if(active){
+          // open focused game to ensure place control available
+          openGame(active.dataset.game);
+          // click placeBtn if exists
+          const place = $('placeBtn');
+          place && place.click();
+        }
+      } else if(ev.key.toLowerCase() === 'c'){
+        const cash = $('cashBtn'); cash && cash.click();
+      } else if(ev.key >= '1' && ev.key <= '6'){
+        // quick switches for first several games (1-home,2-crash,3-dice,4-mines,5-slots,6-sim)
+        const map = { '1':'home','2':'crash','3':'dice','4':'mines','5':'slots','6':'sim' };
+        const target = map[ev.key];
+        if(target){
+          const match = qsa(`.game-btn[data-game="${target}"]`)[0];
+          if(match){ qsa('.game-btn').forEach(b=>b.classList.remove('active')); match.classList.add('active'); openGame(target); }
+        }
+      }
+    });
+
+    // side place/cash binds
+    $('placeBtn') && $('placeBtn').addEventListener('click', ()=> {
+      // opens focused view of active game and focuses control (helps users)
+      const active = qsa('.game-btn').find(b => b.classList.contains('active'));
+      if(active) openGame(active.dataset.game);
+    });
+    $('cashBtn') && $('cashBtn').addEventListener('click', ()=> {
+      // attempt to click the first cash-like button present
+      const candidates = Array.from(document.querySelectorAll('button')).filter(b => /cash|cashout/i.test(b.id || b.innerText));
+      if(candidates.length) candidates[0].click(); else alert('No cashout available in the current view.');
+    });
+
+    // UI adjustments: run simulator binding if element exists
+    if($('runSim')) $('runSim').addEventListener('click', runSimulation);
+  }
+
+  // start
+  loadState();
+  renderHeader();
+  bindUI();
   // open home by default
   openGame('home');
-  // ensure provable seed exists
-  if(!state.provable.seed) newProvable();
-  saveState();
-}
 
-// render profile modal content
-function renderProfileModal(){
-  $('profileBalance').innerText = state.balance.toFixed(2) + ' RC';
-  $('profileWins').innerText = state.wins;
-  $('profileLosses').innerText = state.losses;
-  const ph = $('profileHistory'); ph.innerHTML = '';
-  state.history.slice(0,40).forEach(h=>{
-    const d = document.createElement('div'); d.style.padding='6px'; d.style.borderBottom='1px solid rgba(255,255,255,0.02)';
-    d.innerHTML = `<div style="display:flex;justify-content:space-between"><div>${h.game}</div><div class="muted">${h.time}</div></div><div class="muted">${h.outcome} <strong style="float:right">${h.amt>0? '+'+h.amt.toFixed(2): h.amt.toFixed(2)}</strong></div>`;
-    ph.appendChild(d);
-  });
-  const pa = $('profileAch'); pa.innerHTML = '';
-  Object.keys(state.achievements).forEach(k=>{
-    const a = state.achievements[k];
-    const div = document.createElement('div'); div.className='achievement'; div.innerHTML = `<div>${a.label}</div><div class="muted">${a.time}</div>`; pa.appendChild(div);
-  });
-}
+  // ensure provable exists
+  if(!state.provable.seed) newServerSeed();
 
-// Game open logic
-function openGame(name){
-  document.getElementById('homeView').style.display = name === 'home' ? 'block' : 'none';
-  document.getElementById('gameView').style.display = name === 'home' ? 'none' : 'flex';
-  // clear previous main content
-  $('mainGameArea').innerHTML = '';
-  // set active left menu
-  qAll('.game-item').forEach(x=> x.classList.toggle('active', x.dataset.game === name));
-  // update round info title
-  $('roundInfoBig').innerText = name.charAt(0).toUpperCase() + name.slice(1);
-  if(name === 'crash') renderCrash();
-  if(name === 'dice') renderDice();
-  if(name === 'mines') renderMines();
-  if(name === 'slots') renderSlots();
-  drawAnalytics();
-}
-
-// Import helper
-function importState(file){
-  const fr = new FileReader();
-  fr.onload = e => {
-    try {
-      const obj = JSON.parse(e.target.result);
-      Object.assign(state, obj);
-      saveState(); updateUI(); alert('Imported demo state');
-    } catch(err){ alert('Invalid file'); }
+  // small helpers to expose some functions for easier debugging/testing in console (optional)
+  window.RainClone = {
+    state, saveState, loadState, openGame, newServerSeed, revealServerSeed
   };
-  fr.readAsText(file);
-}
 
-// attach import file inputs
-$('importFile').addEventListener('change', (e)=> importState(e.target.files[0]));
-$('profFile').addEventListener('change', (e)=> importState(e.target.files[0]));
+  // initial draw for crash (empty)
+  drawCrashSVG();
 
-// Initialize UI
-initUI();
+  // small fix: ensure elements that may not exist in some views are guarded before adding listeners
+  // e.g., sim run button may be created later; we check its presence before binding.
 
+  // ensure analytics refresh
+  setInterval(() => {
+    renderHeader();
+  }, 800);
+
+}); // domcontentloaded
 </script>
 </body>
 </html>

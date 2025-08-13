@@ -2,133 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>The StormalSpace History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Legend Retard Jew</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    /* --- Basic reset --- */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Press Start 2P', monospace;
-      background: black;
-      color: white;
+    /* --- Black background + centered content --- */
+    body {
+      background: #000;          /* Black background */
+      color: #fff;               /* White text */
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      display: grid;
+      place-items: center;       /* Centers the content both directions */
+      padding: 24px;             /* Some breathing room on small screens */
     }
 
-    /* Parallax Background */
-    .mc-bg {
-      position: fixed;
-      width: 110vw;
-      height: 110vh;
-      top: 0;
-      left: 0;
-      background: url('https://i.imgur.com/w6mXWok.png') repeat-x;
-      background-size: cover;
-      animation: pan 60s linear infinite;
-      filter: brightness(0.5);
-      z-index: -2;
+    .wrap {
+      text-align: center;        /* Center the text */
+      line-height: 1.35;
+      max-width: 900px;          /* Prevents super-long lines */
     }
 
-    @keyframes pan {
-      0% { background-position: 0 0; }
-      100% { background-position: -100vw 0; }
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: clamp(28px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: 0.3px;
     }
 
-    /* Heart particles */
-    .heart {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: url('https://i.imgur.com/0a6vFvF.png') no-repeat center / contain;
-      animation: float 6s linear infinite;
-      opacity: 0.8;
-      z-index: -1;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(-10vh) scale(1); opacity: 0; }
-      10% { opacity: 1; }
-      100% { transform: translateY(110vh) scale(1.2); opacity: 0; }
-    }
-
-    /* Cinematic text container */
-    .cinematic-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      max-width: 80vw;
-      font-size: 1.2vw;
-      text-shadow: 2px 2px #000;
-      opacity: 0;
-      animation: fadeInOut 6s ease forwards;
-    }
-
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { opacity: 0; }
+    p {
+      margin: 0;
+      font-size: clamp(16px, 2.5vw, 22px);
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
-
-  <!-- Music -->
-  <audio id="bg-music" autoplay loop>
-    <source src="https://files.catbox.moe/8h1v2z.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
-  <script>
-    // Autoplay fix for browsers
-    document.addEventListener('click', () => {
-      document.querySelectorAll("audio").forEach(audio => {
-        if (audio.paused) audio.play().catch(() => {});
-      });
-    });
-  </script>
-
-  <!-- Background -->
-  <div class="mc-bg"></div>
-
-  <!-- Hearts -->
-  <script>
-    for (let i = 0; i < 20; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = `${Math.random() * 100}vw`;
-      heart.style.animationDuration = `${4 + Math.random() * 4}s`;
-      heart.style.animationDelay = `${Math.random() * 5}s`;
-      document.body.appendChild(heart);
-    }
-  </script>
-
-  <!-- Cinematic Text -->
-  <div id="cinematic"></div>
-
-  <script>
-    const lines = [
-      "Hai, I love SpaceMeteor ❤️",
-      "We met in Minecraft... like all legendary couples do.",
-      "It all started in a random server called efil.minehut.gg (turn on the server)",
-      "I got to ask her 'Wanna be my wife?'",
-      "Space said yes (I may have forced her 💀)",
-      "We battled in PvP for hours... and she became better than me",
-      "Thank you Space, for being my pixelated wife 🙏",
-      "May our love be stronger than bedrock and never be griefed."
-    ];
-
-    const container = document.getElementById("cinematic");
-
-    lines.forEach((line, index) => {
-      setTimeout(() => {
-        container.innerHTML = `<div class="cinematic-text" style="animation-delay:0s">${line}</div>`;
-      }, index * 6000); // 6s per line
-    });
-  </script>
-
+  <main class="wrap">
+    <!-- ✅ EDIT THE TEXT BELOW -->
+    <h1>Legend Retard Jew</h1>
+    <p>Legend go kill yourself you retard jew</p>
+    <!-- ⬆️ That's it. No JavaScript required. -->a
+  </main>
 </body>
 </html>

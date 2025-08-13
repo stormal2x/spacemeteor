@@ -3,47 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>chigga</title>
+  <title>Jewsino - Fake Currency Casino</title>
   <style>
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: Arial, sans-serif; }
 
     body {
-      background: #000;
+      background-color: #111;
       color: #fff;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      display: grid;
-      place-items: center;
-      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
 
-    .wrap {
+    header {
       text-align: center;
-      line-height: 1.5;
-      max-width: 900px;
+      padding: 20px;
     }
 
-    img {
-      width: 250px; /* Smaller fixed width */
-      height: auto; /* Keep aspect ratio */
-      margin: 20px 0;
+    h1 {
+      font-size: 2.5rem;
+      color: gold;
+    }
+
+    .balance {
+      margin-top: 10px;
+      font-size: 1.2rem;
+    }
+
+    .game {
+      background: #222;
       border: 2px solid #444;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      width: 300px;
+      text-align: center;
     }
 
-    p {
-      font-size: clamp(16px, 2.5vw, 22px);
-      opacity: 0.95;
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: gold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: orange;
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <img src="chigga.png" alt="Stock Portfolio Screenshot" />
-    <p>"I need to wait for ref money to hit .5 sol to trade again 💔"</p>
-    <p>"Im in the trenches bro I gonna make it out 💔"</p>
-  </main>
+  <header>
+    <h1>🎰 Jewsino 🎰</h1>
+    <div class="balance">Balance: <span id="balance">1000</span> J-Credits</div>
+  </header>
+
+  <div class="game">
+    <h2>Fake Dice Roll</h2>
+    <p>Bet Amount: <input type="number" id="bet" value="100" min="1" /></p>
+    <button onclick="rollDice()">Roll 🎲</button>
+    <p id="result"></p>
+  </div>
+
+  <script>
+    let balance = 1000;
+    function rollDice() {
+      const bet = parseInt(document.getElementById('bet').value);
+      if (bet > balance || bet <= 0) {
+        document.getElementById('result').textContent = "Invalid bet amount.";
+        return;
+      }
+      const roll = Math.floor(Math.random() * 6) + 1;
+      if (roll >= 4) {
+        balance += bet;
+        document.getElementById('result').textContent = `You rolled a ${roll}! You win ${bet} J-Credits!`;
+      } else {
+        balance -= bet;
+        document.getElementById('result').textContent = `You rolled a ${roll}! You lose ${bet} J-Credits.`;
+      }
+      document.getElementById('balance').textContent = balance;
+    }
+  </script>
 </body>
 </html>

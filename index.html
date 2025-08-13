@@ -3,228 +3,240 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RainClone — Demo Casino (Fake Currency)</title>
+  <title>RainClone — Cleaner Demo Casino (Fake Currency)</title>
   <style>
     :root{
-      --bg:#07070a; --panel:#0f1114; --muted:#9aa0a6; --accent:#4dd0e1; --gold:#f5c156; --glass: rgba(255,255,255,0.03);
-      --card-radius:14px;
+      --bg:#06060a; --panel:#0f1114; --muted:#9aa0a6; --accent:#4dd0e1; --gold:#f5c156; --glass: rgba(255,255,255,0.03);
+      --card-radius:12px; --gap:18px; --trans: 280ms cubic-bezier(.2,.9,.2,1);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#05060a 0%, #0c0d11 100%);color:#e6eef3}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);border-bottom:1px solid rgba(255,255,255,0.03)}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7b61ff);display:flex;align-items:center;justify-content:center;font-weight:800}
-    h1{font-size:18px;margin:0}
-    nav a{color:var(--muted);text-decoration:none;margin-left:16px;font-size:14px}
-    .wrap{display:grid;grid-template-columns:320px 1fr 340px;gap:20px;padding:22px;align-items:start}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#e6eef3}
 
-    /* left panel */
-    .panel{background:var(--panel);border-radius:var(--card-radius);padding:16px;border:1px solid rgba(255,255,255,0.03)}
+    /* Layout */
+    header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7b61ff);display:grid;place-items:center;font-weight:800}
+    nav.toplinks{display:flex;gap:12px}
+    nav.toplinks a{color:var(--muted);text-decoration:none;font-size:13px}
+
+    .container{display:grid;grid-template-columns:260px 1fr 320px;gap:var(--gap);padding:20px}
+
+    /* Left panel - simplified controls */
+    .side{background:var(--panel);padding:14px;border-radius:var(--card-radius);border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:12px}
     .balance{font-size:12px;color:var(--muted)}
-    .balance-amt{font-size:28px;color:var(--gold);margin-top:6px}
-    .controls{display:flex;gap:8px;margin-top:12px}
-    .controls input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-    .controls button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#002;cursor:pointer;font-weight:700}
+    .balance-amt{font-size:26px;color:var(--gold);font-weight:800}
+    .quick{display:flex;gap:8px}
+    .quick input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .btn{padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#012;cursor:pointer;font-weight:700}
+    .small{padding:8px 10px;border-radius:8px;border:none;background:#222;color:var(--muted);cursor:pointer}
 
-    /* center area - games */
-    .games{display:flex;flex-direction:column;gap:18px}
-    .game-card{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-    .game-header{display:flex;justify-content:space-between;align-items:center}
-    .muted{color:var(--muted);font-size:13px}
+    /* center - main area with tabs */
+    .main{display:flex;flex-direction:column;gap:14px}
+    .tabs{display:flex;gap:8px}
+    .tab{padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.02);cursor:pointer;color:var(--muted)}
+    .tab.active{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);color:#fff;border-color:rgba(255,255,255,0.04);box-shadow:0 6px 18px rgba(0,0,0,0.45)}
 
-    /* crash */
-    .crash-graph{height:140px;background:linear-gradient(180deg, rgba(77,208,225,0.03), transparent);border-radius:8px;margin-top:12px;display:flex;align-items:end;padding:8px}
-    .multiplier{font-size:22px;font-weight:800}
-    .action-row{display:flex;gap:10px;margin-top:12px;align-items:center}
-    .action-row input{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
-    .primary{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;font-weight:800;color:#012}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);transition:all var(--trans)}
+    .panel.hidden{opacity:0;transform:translateY(6px) scale(0.995);pointer-events:none;height:0;padding:0;border:0;overflow:hidden}
+
+    .help{font-size:13px;color:var(--muted);margin-top:8px}
+
+    /* crash nicer graph */
+    .crash-graph{height:180px;background:linear-gradient(180deg, rgba(77,208,225,0.03), transparent);border-radius:8px;margin-top:12px;display:flex;align-items:end;padding:8px;position:relative;overflow:hidden}
+    .crash-line{position:absolute;left:0;bottom:0;height:6px;background:linear-gradient(90deg,var(--accent),#7b61ff);width:4px;border-radius:4px;transform-origin:bottom;transition:height 120ms linear}
+    .multiplier{font-size:20px;font-weight:800}
+
+    .controls{display:flex;gap:10px;align-items:center;margin-top:12px}
+    .controls input{padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+
+    /* mines */
+    .mines-grid{display:grid;grid-template-columns:repeat(5,48px);gap:8px;justify-content:start}
+    .mineCell{width:48px;height:48px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#0b0b0d;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:all 150ms ease}
+    .mineCell.revealed{background:#121217;color:#fff;transform:translateY(-2px)}
 
     /* right panel */
-    .ticker{background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);padding:10px;border-radius:8px;overflow:hidden}
-    .recent-wins{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow:auto;padding-right:6px}
-    .win{display:flex;justify-content:space-between;font-size:13px}
+    .right{display:flex;flex-direction:column;gap:12px}
+    .wins{max-height:220px;overflow:auto}
+    .win{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.02)}
 
-    /* responsive */
-    @media (max-width:1100px){.wrap{grid-template-columns:1fr;padding:12px}.logo{width:38px;height:38px}}
+    /* subtle responsive */
+    @media (max-width:1100px){.container{grid-template-columns:1fr;padding:12px}.right{display:none}}
   </style>
 </head>
 <body>
   <header>
-    <div class="brand">
-      <div class="logo">RC</div>
-      <div>
-        <h1>RainClone</h1>
-        <div style="font-size:12px;color:var(--muted)">Demo — fake currency, client-side only</div>
-      </div>
-    </div>
-    <nav>
-      <a href="#crash">Crash</a>
-      <a href="#dice">Dice</a>
-      <a href="#mines">Mines</a>
-      <a href="#slots">Slots</a>
-      <a href="#provably">Provably Fair</a>
-    </nav>
+    <div class="brand"><div class="logo">RC</div><div><div style="font-weight:800">RainClone</div><div style="font-size:12px;color:var(--muted)">Cleaner demo — client-side fake currency</div></div></div>
+    <nav class="toplinks"><a href="#">Crash</a><a href="#">Dice</a><a href="#">Mines</a><a href="#">Provably</a></nav>
   </header>
 
-  <main class="wrap">
-    <!-- LEFT: Balance & quick actions -->
-    <aside class="panel">
-      <div class="balance">Balance</div>
-      <div class="balance-amt" id="balanceAmt">5,000 RC</div>
-
-      <div style="margin-top:14px;color:var(--muted);font-size:13px">Quick bet</div>
-      <div class="controls">
-        <input id="quickBet" type="number" value="50" min="1" />
-        <button id="addBet">Bet</button>
+  <div class="container">
+    <!-- LEFT -->
+    <aside class="side">
+      <div>
+        <div class="balance">Balance</div>
+        <div class="balance-amt" id="balanceAmt">5,000 RC</div>
+        <div class="help">Your demo balance — safe to experiment.</div>
       </div>
 
-      <div style="margin-top:16px;color:var(--muted);font-size:13px">Auto-play / multipliers</div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="autoCash" type="number" value="2.00" step="0.01" />
-        <button onclick="toggleAuto()" style="padding:8px;border-radius:8px;border:none;background:#303030;color:#fff">Auto</button>
+      <div>
+        <div style="font-size:13px;color:var(--muted)">Quick bet</div>
+        <div class="quick" style="margin-top:8px">
+          <input id="quickBet" type="number" value="50" min="1" />
+          <button id="addBet" class="btn">Bet</button>
+        </div>
       </div>
 
-      <div style="margin-top:18px;color:var(--muted);font-size:13px">Bet History</div>
-      <div id="history" style="max-height:220px;overflow:auto;margin-top:8px;font-size:13px"></div>
+      <div>
+        <div style="font-size:13px;color:var(--muted)">Choose game</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="small" onclick="selectGame('crash')">Crash</button>
+          <button class="small" onclick="selectGame('dice')">Dice</button>
+          <button class="small" onclick="selectGame('mines')">Mines</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;color:var(--muted)">History</div>
+        <div id="history" style="max-height:220px;overflow:auto;margin-top:8px;font-size:13px"></div>
+      </div>
     </aside>
 
-    <!-- CENTER: Games -->
-    <section class="games">
-      <article class="game-card" id="crash">
-        <div class="game-header">
-          <div>
-            <div style="font-weight:800">Crash (Multiplier)</div>
-            <div class="muted">Cash out before the round crashes — simulated demo</div>
-          </div>
+    <!-- CENTER -->
+    <main class="main">
+      <div class="tabs">
+        <div class="tab active" data-target="crash" onclick="selectGame('crash',this)">Crash</div>
+        <div class="tab" data-target="dice" onclick="selectGame('dice',this)">Dice</div>
+        <div class="tab" data-target="mines" onclick="selectGame('mines',this)">Mines</div>
+      </div>
+
+      <!-- CRASH PANEL -->
+      <section id="crash" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Crash (multiplier)</strong><div class="help">Place a bet and cash out before the round crashes. This demo shows a smooth multiplier growth.</div></div>
           <div class="multiplier" id="currentMult">1.00x</div>
         </div>
 
         <div class="crash-graph" id="crashGraph" aria-hidden="true">
-          <!-- simple bar animation area (client-side simulation) -->
-          <div id="crashBar" style="width:4px;background:linear-gradient(180deg,var(--accent),#7b61ff);border-radius:4px;height:10%"></div>
+          <div id="crashLine" class="crash-line" style="height:8%"></div>
         </div>
 
-        <div class="action-row">
+        <div class="controls">
           <input id="betCrash" type="number" value="50" min="1" />
           <input id="cashAt" type="number" value="2.00" step="0.01" />
-          <button class="primary" onclick="startRound()">Place & Start</button>
-          <button onclick="cashOutNow()">Cashout</button>
+          <button class="btn" onclick="startRound()">Place & Start</button>
+          <button class="small" onclick="cashOutNow()">Cashout</button>
         </div>
-      </article>
+      </section>
 
-      <article class="game-card" id="dice">
-        <div class="game-header"><div style="font-weight:800">Dice</div><div class="muted">Pick under/over — simulated</div></div>
+      <!-- DICE PANEL -->
+      <section id="dice" class="panel hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Dice</strong><div class="help">Pick under/over. The UI is simplified so you only see the game you're playing.</div></div>
+          <div class="muted">Chance target: <span id="diceTargetLabel">50</span></div>
+        </div>
+
         <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-          <select id="diceChoice"><option value="over">Over</option><option value="under">Under</option></select>
-          <input id="diceTarget" type="number" value="50" min="1" max="99" />
+          <select id="diceChoice" onchange="updateDiceLabel()"><option value="over">Over</option><option value="under">Under</option></select>
+          <input id="diceTarget" type="number" value="50" min="1" max="99" oninput="updateDiceLabel()" />
           <input id="betDice2" type="number" value="50" min="1" />
-          <button onclick="playDice()">Roll</button>
+          <button class="btn" onclick="playDice()">Roll</button>
         </div>
+
         <div id="diceResult" style="margin-top:12px;color:var(--muted)"></div>
-      </article>
+      </section>
 
-      <article class="game-card" id="mines">
-        <div class="game-header"><div style="font-weight:800">Mines (Demo)</div><div class="muted">Click squares to reveal — client-only mock</div></div>
-        <div style="margin-top:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
-          <button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button>
-          <button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button>
+      <!-- MINES PANEL -->
+      <section id="mines" class="panel hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Mines</strong><div class="help">Click tiles to reveal. Hitting a mine ends the round. This mock keeps things clear and slow so you can follow.</div></div>
+          <div class="muted">Click squares to reveal</div>
         </div>
-        <div id="minesMsg" style="margin-top:10px;color:var(--muted)"></div>
-      </article>
-    </section>
 
-    <!-- RIGHT: Ticker, provably fair, leaderboard -->
-    <aside class="panel" style="display:flex;flex-direction:column;gap:12px">
-      <div class="ticker">
-        <div style="font-weight:800;margin-bottom:8px">Recent wins</div>
-        <div class="recent-wins" id="recentWins"></div>
+        <div style="margin-top:12px" class="mines-grid" id="minesGrid"></div>
+        <div id="minesMsg" style="margin-top:12px;color:var(--muted)"></div>
+      </section>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="right">
+      <div class="side panel">
+        <div style="font-weight:800">Recent wins</div>
+        <div class="wins" id="recentWins"></div>
       </div>
 
-      <div class="panel" style="padding:12px;background:var(--glass);border-radius:10px}">
-        <div style="font-weight:800">Provably fair (demo)</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:8px">Server seed + client seed -> outcome. This demo shows a hashed server seed and reveals it after the round.</div>
-        <button style="margin-top:8px;padding:8px;background:#2b2b2b;border-radius:8px;border:none;color:var(--muted)" onclick="showProvably()">Show</button>
-      </div>
-
-      <div class="panel" style="padding:12px;text-align:center">
+      <div class="side panel">
         <div style="font-weight:800">Leaderboard</div>
-        <div style="margin-top:8px;color:var(--muted);font-size:13px">Top demo players</div>
         <div id="leaders" style="margin-top:8px"></div>
       </div>
+
+      <div class="side panel">
+        <div style="font-weight:800">Provably fair (demo)</div>
+        <div class="help">Click reveal to see a sample hashed server seed and learn the idea.</div>
+        <button class="small" onclick="showProvably()">Reveal</button>
+      </div>
     </aside>
-  </main>
+  </div>
 
   <script>
-    // --- Small dataset + helpers (client-only demo) ---
-    let balance = 5000; // RC fake currency
+    // --- Basic state ---
+    let balance = 5000;
     const balanceEl = document.getElementById('balanceAmt');
-    const recentWins = document.getElementById('recentWins');
-    const history = document.getElementById('history');
-    const leaders = document.getElementById('leaders');
+    const historyEl = document.getElementById('history');
     updateUI();
 
     function updateUI(){ balanceEl.textContent = format(balance) + ' RC'; }
     function format(n){ return n.toLocaleString(); }
+    function pushHistory(text){ const el=document.createElement('div'); el.textContent = text; historyEl.prepend(el); if(historyEl.childElementCount>80) historyEl.removeChild(historyEl.lastChild); }
 
-    // recent wins demo filler (based on Rainbet's recent-wins style)
-    const sampleWins = [
-      ['Paul', 0.23],['Nick',148],['Hidden',1.45],['Yaan',2.34],['deni',2.64],['mari',6.51]
-    ];
-    function renderWins(){ recentWins.innerHTML = ''; sampleWins.forEach(w=>{ const row=document.createElement('div'); row.className='win'; row.innerHTML=`<span style="color:var(--muted)">${w[0]}</span><span style="color:var(--gold);">${w[1]} RC</span>`; recentWins.appendChild(row)});
+    // --- game switching (smooth) ---
+    function selectGame(id, tabEl){ document.querySelectorAll('.panel').forEach(p=>{ if(p.id===id){ p.classList.remove('hidden') } else { p.classList.add('hidden') }});
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); if(tabEl) tabEl.classList.add('active');
     }
-    renderWins();
 
-    // history
-    function pushHistory(text){ const el=document.createElement('div'); el.textContent=text; history.prepend(el); if(history.childElementCount>50) history.removeChild(history.lastChild); }
+    // quick bet
+    document.getElementById('addBet').addEventListener('click', ()=>{ const v=Number(document.getElementById('quickBet').value); if(!v||v<=0||v>balance) return; balance -= v; updateUI(); pushHistory('Quick bet: -'+v+' RC'); });
 
-    // --- Crash simulation ---
-    let roundRunning=false; let currentMult=1; let crashAt=0; let crashInterval=null;
-    function startRound(){ if(roundRunning) return; const bet = Number(document.getElementById('betCrash').value); if(bet<=0 || bet>balance) return; // simple validation
-      // provably fair mock: serverSeed (hidden), clientSeed (random) => generate crash
-      const serverSeed = cryptoRandomHex(16); const clientSeed = cryptoRandomHex(8);
-      // pseudo 'provably fair' outcome (client-side only) -> drive crashAt
-      crashAt = 1 + (Math.floor((parseInt(serverSeed.slice(0,8),16) % 1000) + 50)/100);
-      currentMult = 1; roundRunning=true; document.getElementById('currentMult').textContent = currentMult.toFixed(2) + 'x'; pushHistory('Round started: bet '+bet+' RC');
-      const bar = document.getElementById('crashBar'); bar.style.height='6%';
-      crashInterval = setInterval(()=>{
-        currentMult += currentMult*0.04; // exponential-ish growth
-        bar.style.height = Math.min(100, Math.log(currentMult+1)*30) + '%';
-        document.getElementById('currentMult').textContent = currentMult.toFixed(2) + 'x';
-        if(currentMult >= crashAt){ // crash
-          clearInterval(crashInterval); roundRunning=false; pushHistory('Round crashed at '+currentMult.toFixed(2)+'x');
-          balance -= bet; updateUI();
-        }
-      },120);
+    // --- Crash smoother animation using rAF ---
+    let running=false, currentMult=1, crashAt=0, betCrash=0;
+    const crashLine = document.getElementById('crashLine'); const multEl = document.getElementById('currentMult');
+    function startRound(){ if(running) return; betCrash = Number(document.getElementById('betCrash').value); if(!betCrash||betCrash>balance) return; // validation
+      // simple deterministic-ish crash number (demo only)
+      const seed = cryptoRandomHex(8);
+      crashAt = 1 + ((parseInt(seed.slice(0,6),16) % 400) / 100); // 1.00 - ~5.00
+      currentMult = 1; running = true; pushHistory('Crash started: bet '+betCrash+' RC');
+      // animate with rAF
+      let last = performance.now(); function tick(now){ if(!running) return; const dt = (now-last)/1000; last = now; // growth speed depends on currentMult
+        currentMult += dt * (0.8 + Math.log(currentMult+1)*0.5); // smooth growth
+        const height = Math.min(96, Math.log(currentMult+1)*32);
+        crashLine.style.height = height + '%'; multEl.textContent = currentMult.toFixed(2)+'x';
+        if(currentMult >= crashAt){ // crashed
+          running=false; balance -= betCrash; updateUI(); pushHistory('Crashed at '+currentMult.toFixed(2)+'x — lost '+betCrash+' RC'); return; }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
     }
-    function cashOutNow(){ if(!roundRunning) return; const bet = Number(document.getElementById('betCrash').value); const cashAt = Number(document.getElementById('cashAt').value);
-      // immediate cashout uses currentMult
-      const won = Math.floor(bet * currentMult);
-      balance += won; pushHistory('Cashed out at '+currentMult.toFixed(2)+'x, won '+won+' RC'); updateUI(); clearInterval(crashInterval); roundRunning=false;
-    }
+    function cashOutNow(){ if(!running) return; running=false; const won = Math.floor(betCrash * currentMult); balance += won; updateUI(); pushHistory('Cashed out at '+currentMult.toFixed(2)+'x — won '+won+' RC'); }
 
     function cryptoRandomHex(len){ const arr = new Uint8Array(len); crypto.getRandomValues(arr); return Array.from(arr, b=>b.toString(16).padStart(2,'0')).join(''); }
 
     // --- Dice ---
-    function playDice(){ const bet = Number(document.getElementById('betDice2').value); const target = Number(document.getElementById('diceTarget').value); const choice = document.getElementById('diceChoice').value; if(bet<=0 || bet>balance) return; const roll = Math.floor(Math.random()*100)+1; let win=false; if(choice==='over') win = roll>target; else win = roll<target; if(win){ const payout = Math.floor(bet * (98/Math.abs(50-target))); balance += payout; pushHistory('Dice won: roll '+roll+' paid '+payout+' RC'); document.getElementById('diceResult').textContent='Roll:'+roll+' — Win '+payout+' RC'; } else { balance -= bet; pushHistory('Dice lost: roll '+roll); document.getElementById('diceResult').textContent='Roll:'+roll+' — Lost '+bet+' RC'; } updateUI(); }
+    function updateDiceLabel(){ const t = Number(document.getElementById('diceTarget').value); document.getElementById('diceTargetLabel').textContent = t; }
+    function playDice(){ const bet = Number(document.getElementById('betDice2').value); const target = Number(document.getElementById('diceTarget').value); const choice = document.getElementById('diceChoice').value; if(!bet||bet>balance) return; const roll = Math.floor(Math.random()*100)+1; let win=false; if(choice==='over') win = roll>target; else win = roll<target; if(win){ const payout = Math.floor(bet * Math.max(1, (98 / Math.abs(50-target)))); balance += payout; pushHistory('Dice win: +'+payout+' RC'); document.getElementById('diceResult').textContent='Roll:'+roll+' — Win '+payout+' RC'; } else { balance -= bet; pushHistory('Dice loss: -'+bet+' RC'); document.getElementById('diceResult').textContent='Roll:'+roll+' — Lost '+bet+' RC'; } updateUI(); }
 
-    // --- Mines demo ---
-    document.querySelectorAll('.mineCell').forEach(btn=>{ btn.addEventListener('click',()=>{
-      if(btn.dataset.revealed) return; const isMine = Math.random()<0.2; btn.dataset.revealed=true; btn.textContent = isMine? '💣' : '✔️'; document.getElementById('minesMsg').textContent = isMine? 'Boom — you hit a mine.' : 'Safe — continue.';
-    })});
+    // --- Mines ---
+    const minesGrid = document.getElementById('minesGrid'); function resetMines(){ minesGrid.innerHTML=''; for(let i=0;i<15;i++){ const btn=document.createElement('button'); btn.className='mineCell'; btn.textContent='?'; btn.dataset.revealed='false'; btn.addEventListener('click', ()=>{ if(btn.dataset.revealed==='true') return; btn.dataset.revealed='true'; const isMine = Math.random() < 0.18; btn.classList.add('revealed'); btn.textContent = isMine ? '💣' : '✔️'; document.getElementById('minesMsg').textContent = isMine ? 'Boom — you hit a mine.' : 'Safe — continue.'; if(isMine) pushHistory('Mines: hit a mine.'); else pushHistory('Mines: safe tile.'); }); minesGrid.appendChild(btn); } }
+    resetMines();
 
-    // --- small utilities ---
-    function toggleAuto(){ alert('Auto-play demo — in a real site this would manage repeated bets.'); }
-    function showProvably(){ alert('Server seed (hashed): ' + cryptoRandomHex(16) + '\nThis is a client-side demo only.'); }
+    // --- Recent wins + Leaderboard filler ---
+    const recentWins = document.getElementById('recentWins'); const leaders = document.getElementById('leaders'); const sample = [['Paul',0.23],['Nick',148],['Hidden',1.45],['Yaan',2.34],['deni',2.64],['mari',6.51]];
+    function renderWins(){ recentWins.innerHTML=''; sample.forEach(w=>{ const r=document.createElement('div'); r.className='win'; r.innerHTML=`<span style="color:var(--muted)">${w[0]}</span><strong style="color:var(--gold)">${w[1]} RC</strong>`; recentWins.appendChild(r); }) }
+    function renderLeaders(){ leaders.innerHTML=''; [['Alice',1200],['Bob',980],['Carol',750]].forEach(l=>{ const d=document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.padding='6px 0'; d.innerHTML = `<span style="color:var(--muted)">${l[0]}</span><strong style="color:var(--gold)">${l[1]} RC</strong>`; leaders.appendChild(d)}); }
+    renderWins(); renderLeaders(); pushHistory('Cleaner UI loaded — select a game to begin.');
 
-    // render leaders
-    function renderLeaders(){ leaders.innerHTML=''; [['Alice',1200],['Bob',980],['Carol',750]].forEach(l=>{ const d=document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.marginTop='6px'; d.innerHTML = `<span style="color:var(--muted)">${l[0]}</span><strong style="color:var(--gold)">${l[1]} RC</strong>`; leaders.appendChild(d) }); }
-    renderLeaders();
+    function showProvably(){ alert('Server seed (hashed): ' + cryptoRandomHex(16) + '\n( Demo only — client-side )'); }
 
-    // initial sample history
-    pushHistory('Welcome to RainClone (demo).'); pushHistory('This is a client-side fake-currency demo.');
-
-    // quick bet button
-    document.getElementById('addBet').addEventListener('click', ()=>{ const v=Number(document.getElementById('quickBet').value); if(v<=0||v>balance) return; balance-=v; updateUI(); pushHistory('Quick bet placed: -'+v+' RC'); });
+    // initial selected game
+    selectGame('crash'); updateDiceLabel();
   </script>
 </body>
 </html>

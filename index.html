@@ -1,161 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jewsino - Fake Currency Casino</title>
+  <title>RainClone — Demo Casino (Fake Currency)</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: Arial, sans-serif; background-color: #0d0d0d; color: #fff; }
-
-    header {
-      background: #1a1a1a;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 2px solid #333;
+    :root{
+      --bg:#07070a; --panel:#0f1114; --muted:#9aa0a6; --accent:#4dd0e1; --gold:#f5c156; --glass: rgba(255,255,255,0.03);
+      --card-radius:14px;
     }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#05060a 0%, #0c0d11 100%);color:#e6eef3}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);border-bottom:1px solid rgba(255,255,255,0.03)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7b61ff);display:flex;align-items:center;justify-content:center;font-weight:800}
+    h1{font-size:18px;margin:0}
+    nav a{color:var(--muted);text-decoration:none;margin-left:16px;font-size:14px}
+    .wrap{display:grid;grid-template-columns:320px 1fr 340px;gap:20px;padding:22px;align-items:start}
 
-    h1 {
-      font-size: 2.5rem;
-      color: gold;
-    }
+    /* left panel */
+    .panel{background:var(--panel);border-radius:var(--card-radius);padding:16px;border:1px solid rgba(255,255,255,0.03)}
+    .balance{font-size:12px;color:var(--muted)}
+    .balance-amt{font-size:28px;color:var(--gold);margin-top:6px}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    .controls input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .controls button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#002;cursor:pointer;font-weight:700}
 
-    nav {
-      margin-top: 10px;
-    }
+    /* center area - games */
+    .games{display:flex;flex-direction:column;gap:18px}
+    .game-card{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .game-header{display:flex;justify-content:space-between;align-items:center}
+    .muted{color:var(--muted);font-size:13px}
 
-    nav a {
-      color: #ccc;
-      margin: 0 10px;
-      text-decoration: none;
-    }
+    /* crash */
+    .crash-graph{height:140px;background:linear-gradient(180deg, rgba(77,208,225,0.03), transparent);border-radius:8px;margin-top:12px;display:flex;align-items:end;padding:8px}
+    .multiplier{font-size:22px;font-weight:800}
+    .action-row{display:flex;gap:10px;margin-top:12px;align-items:center}
+    .action-row input{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+    .primary{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;font-weight:800;color:#012}
 
-    nav a:hover {
-      color: gold;
-    }
+    /* right panel */
+    .ticker{background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);padding:10px;border-radius:8px;overflow:hidden}
+    .recent-wins{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow:auto;padding-right:6px}
+    .win{display:flex;justify-content:space-between;font-size:13px}
 
-    .container {
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .game-card {
-      background: #1c1c1c;
-      border: 2px solid #333;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 10px;
-      width: 300px;
-      text-align: center;
-    }
-
-    .balance {
-      margin-top: 10px;
-      font-size: 1.2rem;
-      color: #0f0;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      background-color: gold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background-color: orange;
-    }
+    /* responsive */
+    @media (max-width:1100px){.wrap{grid-template-columns:1fr;padding:12px}.logo{width:38px;height:38px}}
   </style>
 </head>
 <body>
   <header>
-    <h1>🎰 Jewsino 🎰</h1>
+    <div class="brand">
+      <div class="logo">RC</div>
+      <div>
+        <h1>RainClone</h1>
+        <div style="font-size:12px;color:var(--muted)">Demo — fake currency, client-side only</div>
+      </div>
+    </div>
     <nav>
+      <a href="#crash">Crash</a>
       <a href="#dice">Dice</a>
-      <a href="#coinflip">Coin Flip</a>
+      <a href="#mines">Mines</a>
       <a href="#slots">Slots</a>
+      <a href="#provably">Provably Fair</a>
     </nav>
-    <div class="balance">Balance: <span id="balance">1000</span> J-Credits</div>
   </header>
 
-  <div class="container">
-    <div class="game-card" id="dice">
-      <h2>🎲 Dice Roll</h2>
-      <p>Bet Amount: <input type="number" id="betDice" value="100" min="1" /></p>
-      <button onclick="rollDice()">Roll</button>
-      <p id="resultDice"></p>
-    </div>
+  <main class="wrap">
+    <!-- LEFT: Balance & quick actions -->
+    <aside class="panel">
+      <div class="balance">Balance</div>
+      <div class="balance-amt" id="balanceAmt">5,000 RC</div>
 
-    <div class="game-card" id="coinflip">
-      <h2>🪙 Coin Flip</h2>
-      <p>Bet Amount: <input type="number" id="betCoin" value="100" min="1" /></p>
-      <button onclick="flipCoin()">Flip</button>
-      <p id="resultCoin"></p>
-    </div>
+      <div style="margin-top:14px;color:var(--muted);font-size:13px">Quick bet</div>
+      <div class="controls">
+        <input id="quickBet" type="number" value="50" min="1" />
+        <button id="addBet">Bet</button>
+      </div>
 
-    <div class="game-card" id="slots">
-      <h2>🎰 Slots</h2>
-      <p>Bet Amount: <input type="number" id="betSlots" value="100" min="1" /></p>
-      <button onclick="playSlots()">Spin</button>
-      <p id="resultSlots"></p>
-    </div>
-  </div>
+      <div style="margin-top:16px;color:var(--muted);font-size:13px">Auto-play / multipliers</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="autoCash" type="number" value="2.00" step="0.01" />
+        <button onclick="toggleAuto()" style="padding:8px;border-radius:8px;border:none;background:#303030;color:#fff">Auto</button>
+      </div>
+
+      <div style="margin-top:18px;color:var(--muted);font-size:13px">Bet History</div>
+      <div id="history" style="max-height:220px;overflow:auto;margin-top:8px;font-size:13px"></div>
+    </aside>
+
+    <!-- CENTER: Games -->
+    <section class="games">
+      <article class="game-card" id="crash">
+        <div class="game-header">
+          <div>
+            <div style="font-weight:800">Crash (Multiplier)</div>
+            <div class="muted">Cash out before the round crashes — simulated demo</div>
+          </div>
+          <div class="multiplier" id="currentMult">1.00x</div>
+        </div>
+
+        <div class="crash-graph" id="crashGraph" aria-hidden="true">
+          <!-- simple bar animation area (client-side simulation) -->
+          <div id="crashBar" style="width:4px;background:linear-gradient(180deg,var(--accent),#7b61ff);border-radius:4px;height:10%"></div>
+        </div>
+
+        <div class="action-row">
+          <input id="betCrash" type="number" value="50" min="1" />
+          <input id="cashAt" type="number" value="2.00" step="0.01" />
+          <button class="primary" onclick="startRound()">Place & Start</button>
+          <button onclick="cashOutNow()">Cashout</button>
+        </div>
+      </article>
+
+      <article class="game-card" id="dice">
+        <div class="game-header"><div style="font-weight:800">Dice</div><div class="muted">Pick under/over — simulated</div></div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <select id="diceChoice"><option value="over">Over</option><option value="under">Under</option></select>
+          <input id="diceTarget" type="number" value="50" min="1" max="99" />
+          <input id="betDice2" type="number" value="50" min="1" />
+          <button onclick="playDice()">Roll</button>
+        </div>
+        <div id="diceResult" style="margin-top:12px;color:var(--muted)"></div>
+      </article>
+
+      <article class="game-card" id="mines">
+        <div class="game-header"><div style="font-weight:800">Mines (Demo)</div><div class="muted">Click squares to reveal — client-only mock</div></div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          <button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button>
+          <button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button><button class="mineCell">?</button>
+        </div>
+        <div id="minesMsg" style="margin-top:10px;color:var(--muted)"></div>
+      </article>
+    </section>
+
+    <!-- RIGHT: Ticker, provably fair, leaderboard -->
+    <aside class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <div class="ticker">
+        <div style="font-weight:800;margin-bottom:8px">Recent wins</div>
+        <div class="recent-wins" id="recentWins"></div>
+      </div>
+
+      <div class="panel" style="padding:12px;background:var(--glass);border-radius:10px}">
+        <div style="font-weight:800">Provably fair (demo)</div>
+        <div style="color:var(--muted);font-size:13px;margin-top:8px">Server seed + client seed -> outcome. This demo shows a hashed server seed and reveals it after the round.</div>
+        <button style="margin-top:8px;padding:8px;background:#2b2b2b;border-radius:8px;border:none;color:var(--muted)" onclick="showProvably()">Show</button>
+      </div>
+
+      <div class="panel" style="padding:12px;text-align:center">
+        <div style="font-weight:800">Leaderboard</div>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px">Top demo players</div>
+        <div id="leaders" style="margin-top:8px"></div>
+      </div>
+    </aside>
+  </main>
 
   <script>
-    let balance = 1000;
+    // --- Small dataset + helpers (client-only demo) ---
+    let balance = 5000; // RC fake currency
+    const balanceEl = document.getElementById('balanceAmt');
+    const recentWins = document.getElementById('recentWins');
+    const history = document.getElementById('history');
+    const leaders = document.getElementById('leaders');
+    updateUI();
 
-    function updateBalance() {
-      document.getElementById('balance').textContent = balance;
+    function updateUI(){ balanceEl.textContent = format(balance) + ' RC'; }
+    function format(n){ return n.toLocaleString(); }
+
+    // recent wins demo filler (based on Rainbet's recent-wins style)
+    const sampleWins = [
+      ['Paul', 0.23],['Nick',148],['Hidden',1.45],['Yaan',2.34],['deni',2.64],['mari',6.51]
+    ];
+    function renderWins(){ recentWins.innerHTML = ''; sampleWins.forEach(w=>{ const row=document.createElement('div'); row.className='win'; row.innerHTML=`<span style="color:var(--muted)">${w[0]}</span><span style="color:var(--gold);">${w[1]} RC</span>`; recentWins.appendChild(row)});
+    }
+    renderWins();
+
+    // history
+    function pushHistory(text){ const el=document.createElement('div'); el.textContent=text; history.prepend(el); if(history.childElementCount>50) history.removeChild(history.lastChild); }
+
+    // --- Crash simulation ---
+    let roundRunning=false; let currentMult=1; let crashAt=0; let crashInterval=null;
+    function startRound(){ if(roundRunning) return; const bet = Number(document.getElementById('betCrash').value); if(bet<=0 || bet>balance) return; // simple validation
+      // provably fair mock: serverSeed (hidden), clientSeed (random) => generate crash
+      const serverSeed = cryptoRandomHex(16); const clientSeed = cryptoRandomHex(8);
+      // pseudo 'provably fair' outcome (client-side only) -> drive crashAt
+      crashAt = 1 + (Math.floor((parseInt(serverSeed.slice(0,8),16) % 1000) + 50)/100);
+      currentMult = 1; roundRunning=true; document.getElementById('currentMult').textContent = currentMult.toFixed(2) + 'x'; pushHistory('Round started: bet '+bet+' RC');
+      const bar = document.getElementById('crashBar'); bar.style.height='6%';
+      crashInterval = setInterval(()=>{
+        currentMult += currentMult*0.04; // exponential-ish growth
+        bar.style.height = Math.min(100, Math.log(currentMult+1)*30) + '%';
+        document.getElementById('currentMult').textContent = currentMult.toFixed(2) + 'x';
+        if(currentMult >= crashAt){ // crash
+          clearInterval(crashInterval); roundRunning=false; pushHistory('Round crashed at '+currentMult.toFixed(2)+'x');
+          balance -= bet; updateUI();
+        }
+      },120);
+    }
+    function cashOutNow(){ if(!roundRunning) return; const bet = Number(document.getElementById('betCrash').value); const cashAt = Number(document.getElementById('cashAt').value);
+      // immediate cashout uses currentMult
+      const won = Math.floor(bet * currentMult);
+      balance += won; pushHistory('Cashed out at '+currentMult.toFixed(2)+'x, won '+won+' RC'); updateUI(); clearInterval(crashInterval); roundRunning=false;
     }
 
-    function rollDice() {
-      const bet = parseInt(document.getElementById('betDice').value);
-      if (bet > balance || bet <= 0) return;
-      const roll = Math.floor(Math.random() * 6) + 1;
-      if (roll >= 4) {
-        balance += bet;
-        document.getElementById('resultDice').textContent = `You rolled a ${roll}! You win ${bet} J-Credits!`;
-      } else {
-        balance -= bet;
-        document.getElementById('resultDice').textContent = `You rolled a ${roll}! You lose ${bet} J-Credits.`;
-      }
-      updateBalance();
-    }
+    function cryptoRandomHex(len){ const arr = new Uint8Array(len); crypto.getRandomValues(arr); return Array.from(arr, b=>b.toString(16).padStart(2,'0')).join(''); }
 
-    function flipCoin() {
-      const bet = parseInt(document.getElementById('betCoin').value);
-      if (bet > balance || bet <= 0) return;
-      const outcome = Math.random() < 0.5 ? 'Heads' : 'Tails';
-      if (Math.random() < 0.5) {
-        balance += bet;
-        document.getElementById('resultCoin').textContent = `${outcome}! You win ${bet} J-Credits!`;
-      } else {
-        balance -= bet;
-        document.getElementById('resultCoin').textContent = `${outcome}! You lose ${bet} J-Credits.`;
-      }
-      updateBalance();
-    }
+    // --- Dice ---
+    function playDice(){ const bet = Number(document.getElementById('betDice2').value); const target = Number(document.getElementById('diceTarget').value); const choice = document.getElementById('diceChoice').value; if(bet<=0 || bet>balance) return; const roll = Math.floor(Math.random()*100)+1; let win=false; if(choice==='over') win = roll>target; else win = roll<target; if(win){ const payout = Math.floor(bet * (98/Math.abs(50-target))); balance += payout; pushHistory('Dice won: roll '+roll+' paid '+payout+' RC'); document.getElementById('diceResult').textContent='Roll:'+roll+' — Win '+payout+' RC'; } else { balance -= bet; pushHistory('Dice lost: roll '+roll); document.getElementById('diceResult').textContent='Roll:'+roll+' — Lost '+bet+' RC'; } updateUI(); }
 
-    function playSlots() {
-      const bet = parseInt(document.getElementById('betSlots').value);
-      if (bet > balance || bet <= 0) return;
-      const symbols = ['🍒', '🍋', '🍊', '⭐', '💎'];
-      const slot1 = symbols[Math.floor(Math.random() * symbols.length)];
-      const slot2 = symbols[Math.floor(Math.random() * symbols.length)];
-      const slot3 = symbols[Math.floor(Math.random() * symbols.length)];
-      if (slot1 === slot2 && slot2 === slot3) {
-        balance += bet * 5;
-        document.getElementById('resultSlots').textContent = `${slot1} ${slot2} ${slot3} Jackpot! You win ${bet * 5} J-Credits!`;
-      } else {
-        balance -= bet;
-        document.getElementById('resultSlots').textContent = `${slot1} ${slot2} ${slot3} You lose ${bet} J-Credits.`;
-      }
-      updateBalance();
-    }
+    // --- Mines demo ---
+    document.querySelectorAll('.mineCell').forEach(btn=>{ btn.addEventListener('click',()=>{
+      if(btn.dataset.revealed) return; const isMine = Math.random()<0.2; btn.dataset.revealed=true; btn.textContent = isMine? '💣' : '✔️'; document.getElementById('minesMsg').textContent = isMine? 'Boom — you hit a mine.' : 'Safe — continue.';
+    })});
+
+    // --- small utilities ---
+    function toggleAuto(){ alert('Auto-play demo — in a real site this would manage repeated bets.'); }
+    function showProvably(){ alert('Server seed (hashed): ' + cryptoRandomHex(16) + '\nThis is a client-side demo only.'); }
+
+    // render leaders
+    function renderLeaders(){ leaders.innerHTML=''; [['Alice',1200],['Bob',980],['Carol',750]].forEach(l=>{ const d=document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.marginTop='6px'; d.innerHTML = `<span style="color:var(--muted)">${l[0]}</span><strong style="color:var(--gold)">${l[1]} RC</strong>`; leaders.appendChild(d) }); }
+    renderLeaders();
+
+    // initial sample history
+    pushHistory('Welcome to RainClone (demo).'); pushHistory('This is a client-side fake-currency demo.');
+
+    // quick bet button
+    document.getElementById('addBet').addEventListener('click', ()=>{ const v=Number(document.getElementById('quickBet').value); if(v<=0||v>balance) return; balance-=v; updateUI(); pushHistory('Quick bet placed: -'+v+' RC'); });
   </script>
 </body>
 </html>

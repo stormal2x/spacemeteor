@@ -3,19 +3,25 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>RainClone — Clean Smooth (Demo)</title>
+<title>SpaceMeteor — Clean Smooth (Demo)</title>
 <style>
   :root{
-    --bg:#05060a; --panel:#0f1418; --muted:#9ba3ab; --accent:#49d6ff; --accent-2:#7b61ff; --gold:#f5c156;
-    --radius:12px; --glass: rgba(255,255,255,0.03);
+    --bg:#04050a;
+    --panel:#0c1320;
+    --muted:#9aa7b0;
+    --accent:#6fe6ff;      /* teal */
+    --accent-2:#b06bff;    /* purple */
+    --gold:#ffd66b;        /* warm accent for balances */
+    --radius:12px;
+    --glass: rgba(255,255,255,0.03);
     --ui-font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     --ui-scale:1;
     --ease-quick:cubic-bezier(.2,.9,.25,1);
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:var(--ui-font);background:
-    radial-gradient(900px 360px at 8% 8%, rgba(73,214,255,0.03), transparent),
-    linear-gradient(180deg,#05060a,#070714);color:#e6f2f8;-webkit-font-smoothing:antialiased}
+    radial-gradient(900px 360px at 8% 8%, rgba(111,230,255,0.03), transparent),
+    linear-gradient(180deg,#04050a,#071025);color:#e6f6fb;-webkit-font-smoothing:antialiased}
   /* scale for accessibility */
   html{transform-origin:0 0;transform:scale(var(--ui-scale));}
 
@@ -33,7 +39,7 @@
   .wallet .amount{font-weight:900;font-size:22px;color:var(--gold);margin-top:6px}
   .game-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .game-btn{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:1px solid transparent;cursor:pointer;background:transparent;color:var(--muted);transition:all 200ms var(--ease-quick)}
-  .game-btn.active{background:linear-gradient(90deg, rgba(73,214,255,0.05), rgba(123,97,255,0.03));color:var(--accent);border-color:rgba(73,214,255,0.06);box-shadow:0 18px 40px rgba(0,0,0,0.55)}
+  .game-btn.active{background:linear-gradient(90deg, rgba(111,230,255,0.05), rgba(176,107,255,0.03));color:var(--accent);border-color:rgba(111,230,255,0.06);box-shadow:0 18px 40px rgba(0,0,0,0.55)}
 
   /* center */
   .center{min-height:680px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:12px}
@@ -46,13 +52,13 @@
   .side{width:260px;display:flex;flex-direction:column;gap:12px}
 
   /* small controls */
-  .btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(180deg,var(--accent),rgba(72,214,255,0.85));color:#072;font-weight:800;cursor:pointer}
+  .btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(180deg,var(--accent),rgba(111,230,255,0.85));color:#072;font-weight:800;cursor:pointer}
   .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
   input[type=number], select, input[type=text]{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
 
   /* crash: SVG */
   .crash-area{display:flex;flex-direction:column;gap:12px}
-  .crash-svg{width:100%;height:300px;border-radius:10px;overflow:hidden;background:linear-gradient(180deg, rgba(73,214,255,0.03), transparent)}
+  .crash-svg{width:100%;height:300px;border-radius:10px;overflow:hidden;background:linear-gradient(180deg, rgba(111,230,255,0.03), transparent)}
 
   /* slots */
   .slots-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:12px}
@@ -77,16 +83,16 @@
 
 <header>
   <div style="display:flex;gap:12px;align-items:center">
-    <div class="logo">RC</div>
+    <div class="logo">☄️ SM</div>
     <div>
-      <h1>RainClone — Clean Smooth</h1>
+      <h1>SpaceMeteor — Clean Smooth</h1>
       <div class="muted">Minimal • Smooth • Demo</div>
     </div>
   </div>
 
   <div style="display:flex;gap:12px;align-items:center">
     <div class="muted">Balance</div>
-    <div style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono';font-weight:900;color:var(--gold)" id="topBalance">0 RC</div>
+    <div style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono';font-weight:900;color:var(--gold)" id="topBalance">0 SM</div>
     <div style="display:flex;gap:8px;align-items:center">
       <label class="muted">Reduce motion</label>
       <input type="checkbox" id="reducedMotionToggle">
@@ -96,12 +102,12 @@
   </div>
 </header>
 
-<div class="app" role="application" aria-label="RainClone demo">
+<div class="app" role="application" aria-label="SpaceMeteor demo">
   <!-- LEFT -->
   <aside class="left" aria-label="Navigation">
     <div class="wallet">
       <div class="label">Wallet</div>
-      <div class="amount" id="walletAmount">0 RC</div>
+      <div class="amount" id="walletAmount">0 SM</div>
       <div class="muted" style="margin-top:6px">Local demo balance</div>
     </div>
 
@@ -129,7 +135,7 @@
     <div id="homeView">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <h2 style="margin:0">Welcome</h2>
+          <h2 style="margin:0">Welcome to SpaceMeteor</h2>
           <div class="muted">Clean interface focused on the active game — less clutter, smoother experience.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
@@ -178,16 +184,15 @@
 <footer style="text-align:center;color:var(--muted);margin-top:12px">Demo only — no real money. Tweak START_BALANCE in the script.</footer>
 
 <script>
-/* Clean Smooth edition — simplified UI and removed session history & right column features.
-   - Single-file demo
-   - Keeps Crash, Slots, Dice, Mines
-   - Left nav + center focused area
-   - Fewer elements → smoother experience
+/* SpaceMeteor — Clean Smooth edition
+   - Client-side demo rebranded to SpaceMeteor (SM = SpaceMeteor Credits)
+   - Features: Crash, Slots, Dice, Mines, Focus mode, Undo quick add
+   - Storage key updated to avoid clashing with prior files
 */
 
 document.addEventListener('DOMContentLoaded', () => {
   const START_BALANCE = 2500;
-  const STORAGE_KEY = 'rainclone_clean_v1';
+  const STORAGE_KEY = 'spacemeteor_clean_v1';
   const MAX_HISTORY = 300;
 
   const $ = id => document.getElementById(id);
@@ -219,19 +224,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function saveState(){
     try {
-      if($('persist') && $('persist').checked){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } else {
-        // still update header
-        renderHeader();
-      }
+      // keep a persistent toggle optional; default behavior is to persist
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch(e){ console.warn('save failed', e); }
     renderHeader();
   }
 
   function renderHeader(){
-    if($('topBalance')) $('topBalance').innerText = (state.balance || 0).toFixed(2) + ' RC';
-    if($('walletAmount')) $('walletAmount').innerText = (state.balance || 0).toFixed(2) + ' RC';
+    if($('topBalance')) $('topBalance').innerText = (state.balance || 0).toFixed(2) + ' SM';
+    if($('walletAmount')) $('walletAmount').innerText = (state.balance || 0).toFixed(2) + ' SM';
     if($('roundLabel')) $('roundLabel').innerText = ''; // clear when switching
   }
 
@@ -246,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     saveState();
   }
 
-  // basic UI binding for static controls
+  /* Static UI binding */
   function bindStatic(){
     qa('.game-btn').forEach(btn=>{
       btn.addEventListener('click', ()=> {
@@ -282,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     $('focusToggle') && $('focusToggle').addEventListener('click', ()=> {
-      // hide left nav to focus on center
       const left = document.querySelector('.left');
       if(!left) return;
       if(left.style.display === 'none'){
@@ -297,10 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     $('helpBtn') && $('helpBtn').addEventListener('click', ()=> {
-      alert('Quick tour:\n\nLeft: select games and quick-add funds.\nCenter: focused game area. Use keyboard: Space = place; C = cashout.');
+      alert('SpaceMeteor quick tour:\n\nLeft: select games and quick-add SM credits.\nCenter: focused game area. Use keyboard: Space = place; C = cashout.');
     });
 
-    // reduced motion
     $('reducedMotionToggle') && $('reducedMotionToggle').addEventListener('change', (e)=> {
       const on = e.target.checked;
       document.documentElement.style.setProperty('--ease-quick', on ? 'linear' : 'cubic-bezier(.2,.9,.25,1)');
@@ -314,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ---------- Game views ---------- */
+  /* Game rendering & logic (Crash, Slots, Dice, Mines) */
   function openGame(name){
     const home = $('homeView'), game = $('gameView');
     if(!home || !game) return;
@@ -336,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function registerRAF(id){ if(id) globalRAFHandles.push(id); }
   function stopAllAnimations(){ while(globalRAFHandles.length) cancelAnimationFrame(globalRAFHandles.pop()); }
 
-  /* ---------- Crash (simplified, robust) ---------- */
+  /* Crash */
   const crashState = { running:false, bet:0, mult:1, crashAt:0, raf:null };
 
   function deterministicCrashFromSeed(seed){
@@ -383,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(crashState.raf) cancelAnimationFrame(crashState.raf);
       crashState.running = false; crashState.raf = null;
       drawCrashSVG(); saveState(); renderHeader();
-      $('crashStatus') && ($('crashStatus').innerText = `Cashed @${cs.mult.toFixed(2)}x (+${profit.toFixed(2)})`);
+      $('crashStatus') && ($('crashStatus').innerText = `Cashed @${cs.mult.toFixed(2)}x (+${profit.toFixed(2)} SM)`);
     });
   }
 
@@ -409,8 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
       const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
       grad.setAttribute('id','g1'); grad.setAttribute('x1','0%'); grad.setAttribute('x2','100%');
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#49d6ff');
-      const s2 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('stop-color','#7b61ff');
+      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color',getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#6fe6ff');
+      const s2 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('stop-color',getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#b06bff');
       grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad); svg.appendChild(defs);
       svg.appendChild(poly);
     } else {
@@ -441,17 +440,16 @@ document.addEventListener('DOMContentLoaded', () => {
         pushHistory({game:'Crash', outcome:`Auto cashout @${autoCash.toFixed(2)}x`, amt:profit, time: now(), win:true, extra: crashAt});
         crashState.running = false; crashState.raf = null;
         drawCrashSVG(); saveState(); renderHeader();
-        $('crashStatus') && ($('crashStatus').innerText = `Auto-cashed @${autoCash.toFixed(2)}x (+${profit.toFixed(2)})`);
+        $('crashStatus') && ($('crashStatus').innerText = `Auto-cashed @${autoCash.toFixed(2)}x (+${profit.toFixed(2)} SM)`);
         return;
       }
       if(crashState.mult >= crashState.crashAt){
         pushHistory({game:'Crash', outcome:`Crashed @${crashState.crashAt.toFixed(2)}x`, amt:-bet, time: now(), win:false, extra: crashAt});
         crashState.running = false; crashState.raf = null;
         drawCrashSVG(); saveState(); renderHeader();
-        $('crashStatus') && ($('crashStatus').innerText = `Crashed @${crashState.crashAt.toFixed(2)}x — lost ${bet} RC`);
+        $('crashStatus') && ($('crashStatus').innerText = `Crashed @${crashState.crashAt.toFixed(2)}x — lost ${bet} SM`);
         return;
       }
-      // expose current for manual cashout support
       window.__crashLive = {mult: crashState.mult, bet: crashState.bet, crashAt: crashState.crashAt, running: crashState.running};
       $('crashStatus') && ($('crashStatus').innerText = `Running — ${crashState.mult.toFixed(2)}x`);
       crashState.raf = requestAnimationFrame(loop);
@@ -461,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     registerRAF(crashState.raf);
   }
 
-  /* ---------- Slots ---------- */
+  /* Slots */
   function renderSlots(){
     const main = $('mainGame'); if(!main) return;
     main.innerHTML = `
@@ -499,10 +497,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if(profit>0){
         state.balance += bet + profit;
         pushHistory({game:'Slots', outcome:'Win', amt:profit, time: now(), win:true});
-        $('slotsMsg').innerText = `Win +${profit.toFixed(2)} RC`;
+        $('slotsMsg').innerText = `Win +${profit.toFixed(2)} SM`;
       } else {
         pushHistory({game:'Slots', outcome:'Lose', amt:-bet, time: now(), win:false});
-        $('slotsMsg').innerText = `No match — lost ${bet.toFixed(2)} RC`;
+        $('slotsMsg').innerText = `No match — lost ${bet.toFixed(2)} SM`;
       }
       saveState(); renderHeader();
       spinning = false;
@@ -510,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('spinBtn') && $('spinBtn').addEventListener('click', spin);
   }
 
-  /* ---------- Dice ---------- */
+  /* Dice */
   function renderDice(){
     const main = $('mainGame'); if(!main) return;
     main.innerHTML = `
@@ -540,13 +538,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if(pick===6){ if(roll===6){ win=true; profit=bet*5; } }
       else { if(roll>=pick){ win=true; profit = Math.round((bet * (6/(6-(pick-1)) - 1)) * 100)/100; } }
       $('diceFace').innerText = roll;
-      if(win){ state.balance += bet + profit; pushHistory({game:'Dice', outcome:`Rolled ${roll} — Win`, amt:profit, time: now(), win:true}); $('diceMsg').innerText = `WIN +${profit.toFixed(2)} RC`; }
-      else { pushHistory({game:'Dice', outcome:`Rolled ${roll} — Lose`, amt:-bet, time: now(), win:false}); $('diceMsg').innerText = `LOSE -${bet.toFixed(2)} RC`; }
+      if(win){ state.balance += bet + profit; pushHistory({game:'Dice', outcome:`Rolled ${roll} — Win`, amt:profit, time: now(), win:true}); $('diceMsg').innerText = `WIN +${profit.toFixed(2)} SM`; }
+      else { pushHistory({game:'Dice', outcome:`Rolled ${roll} — Lose`, amt:-bet, time: now(), win:false}); $('diceMsg').innerText = `LOSE -${bet.toFixed(2)} SM`; }
       saveState(); renderHeader();
     });
   }
 
-  /* ---------- Mines ---------- */
+  /* Mines */
   function renderMines(){
     const main = $('mainGame'); if(!main) return;
     main.innerHTML = `
@@ -599,25 +597,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const profit = Math.round((curBet * (mul - 1)) * 100)/100;
       state.balance += curBet + profit;
       pushHistory({game:'Mines', outcome:`Cashed x${mul.toFixed(2)}`, amt:profit, time: now(), win:true});
-      running=false; saveState(); renderHeader(); $('minesMsg').innerText = `Cashed out +${profit.toFixed(2)} RC`;
+      running=false; saveState(); renderHeader(); $('minesMsg').innerText = `Cashed out +${profit.toFixed(2)} SM`;
     });
   }
 
-  /* ---------- Utilities ---------- */
   function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
-  /* ---------- Init ---------- */
+  /* Init */
   loadState();
   renderHeader();
   bindStatic();
   openGame('home');
-  // save on unload
   window.addEventListener('beforeunload', ()=> saveState());
 
-  // expose minimal debug helpers
-  window.RainClone = { state, saveState, openGame };
+  // expose debug object
+  window.SpaceMeteor = { state, saveState, openGame };
 
-}); // DOMContentLoaded
+  // periodic redraw of crash svg if shown
+  setInterval(()=> { const svg = $('crashSvg'); if(svg) drawCrashSVG(); }, 900);
+});
 </script>
 
 </body>

@@ -3,733 +3,619 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RainClone — Demo Casino (client-side)</title>
+<title>RainClone — Simple Demo</title>
+<meta name="color-scheme" content="dark">
 <style>
-  /* ---------- Base / Layout ---------- */
   :root{
-    --bg:#07070a; --card:#0f1116; --muted:#9aa0a6; --accent:#6ad1ff; --gold:#f0c95f;
-    --glass: rgba(255,255,255,0.03);
-    --radius:12px;
-    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+    --bg:#06060b; --panel:#0f1216; --muted:#9aa0a6; --accent:#48d9ff; --gold:#f5c156;
+    --card-radius:14px; --gap:18px; --glass: rgba(255,255,255,0.03);
+    --accent-2:#7b61ff;
+    --max-width:1200px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%; margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  body{background:
-    radial-gradient(1000px 400px at 10% 10%, rgba(106,209,255,0.04), transparent 10%),
-    radial-gradient(800px 300px at 90% 90%, rgba(240,201,95,0.03), transparent 10%),
-    var(--bg); color:#e6eef7; -webkit-font-smoothing:antialiased; padding:18px;}
-  .app{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:280px 1fr 320px; gap:18px; align-items:start;}
-  header{grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px}
-  .brand{display:flex; gap:12px; align-items:center}
-  .logo{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:700;}
-  h1{font-size:1.25rem; margin:0}
-  .sub{color:var(--muted); font-size:0.9rem}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:
+    radial-gradient(700px 400px at 10% 10%, rgba(72,217,255,0.03), transparent),
+    linear-gradient(180deg,#06060b,#0a0b0e); color:#e8f2f7}
+  a{color:inherit}
+  .wrap{max-width:var(--max-width);margin:18px auto;display:grid;grid-template-columns:220px 1fr 300px;gap:18px;align-items:start;padding:10px}
+  header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 8px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02)}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:800}
+  h1{font-size:18px;margin:0}
+  .subtitle{color:var(--muted);font-size:13px}
 
-  /* ---------- Left column: wallet & quick controls ---------- */
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:14px; border-radius:var(--radius); box-shadow: 0 6px 22px rgba(0,0,0,0.45);}
-  .left .balance{font-size:1.6rem; font-weight:700; display:flex; align-items:baseline; gap:8px}
-  .small{font-size:0.85rem; color:var(--muted)}
+  /* left column - games list column */
+  .left { background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:var(--card-radius); padding:14px; border:1px solid rgba(255,255,255,0.02); height:calc(100vh - 120px); overflow:auto }
+  .wallet{margin-bottom:12px}
+  .balance{font-size:20px;font-weight:800;color:var(--gold)}
+  .game-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .game-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer}
+  .game-btn.active{background:linear-gradient(90deg, rgba(72,217,255,0.06), rgba(123,97,255,0.03)); color:var(--accent); border-color:rgba(72,217,255,0.06); box-shadow:0 8px 24px rgba(0,0,0,0.45)}
+  .game-icon{width:38px;height:38;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.02);font-weight:800}
 
-  .controls{margin-top:12px; display:flex; gap:8px; flex-direction:column}
-  input[type=number], input[type=text], select{width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit}
-  .btn{background:linear-gradient(180deg,var(--accent), rgba(106,209,255,0.8)); color:#021826; font-weight:700; padding:8px 12px; border-radius:8px; border:none; cursor:pointer}
-  .btn.ghost{background:transparent; color:var(--muted); border:1px dashed rgba(255,255,255,0.03)}
+  /* center - large game area (use most of screen) */
+  .center { min-height:600px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:var(--card-radius); padding:18px; border:1px solid rgba(255,255,255,0.02); display:flex; flex-direction:column; gap:16px; }
+  .home-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; align-items:stretch }
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:12px; align-items:flex-start; border:1px solid rgba(255,255,255,0.02); cursor:pointer; transition: transform 200ms ease, box-shadow 200ms ease }
+  .card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6) }
+  .card .title{font-weight:800; font-size:16px}
+  .card .desc{color:var(--muted); font-size:13px}
 
-  /* ---------- Center: main game area ---------- */
-  .center{min-height:520px; display:flex; flex-direction:column; gap:12px}
-  .tabs{display:flex; gap:8px}
-  .tab{padding:8px 12px; border-radius:10px; background:transparent; border:1px solid transparent; color:var(--muted); cursor:pointer}
-  .tab.active{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:var(--accent); border-color:rgba(106,209,255,0.08)}
-  .game-area{margin-top:6px; padding:16px; border-radius:var(--radius); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); min-height:420px; display:flex; flex-direction:column; gap:12px; }
+  /* focused game uses most area */
+  .focused{ display:flex; gap:18px; align-items:flex-start; }
+  .focused .big{flex:1; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:12px; padding:18px; min-height:420px; border:1px solid rgba(255,255,255,0.02)}
+  .focused .side-mini{ width:260px; display:flex; flex-direction:column; gap:10px }
 
-  /* ---------- Crash specific ---------- */
-  .crash-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
-  .multiplier{font-family:var(--mono); font-size:2.4rem; font-weight:800; color:var(--accent)}
-  .crash-canvas{height:120px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:10px; overflow:hidden; display:flex; align-items:flex-end; padding:8px}
-  .crash-graph{width:100%; height:100%}
+  .big h2{margin:0;font-size:20px}
+  .muted{color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:10px;align-items:center;margin-top:12px}
+  .controls input[type=number]{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
 
-  /* ---------- Mini cards ---------- */
-  .mini{display:flex; gap:8px; align-items:center}
-  .chip{background:var(--gold); color:#051019; padding:6px 10px; border-radius:8px; font-weight:700}
+  /* crash canvas large */
+  #crashCanvas{ width:100%; height:320px; border-radius:8px; background:linear-gradient(180deg, rgba(72,217,255,0.02), transparent) }
 
-  /* ---------- Right: recent wins / provably-fair ---------- */
-  .ticker{height:220px; overflow:hidden; padding:8px; border-radius:8px; background:rgba(255,255,255,0.01)}
-  .win-row{display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px; margin-bottom:6px; font-size:0.95rem}
-  .win-green{color:#b7f7c1}
-  .small-muted{color:var(--muted); font-size:0.85rem}
+  /* dice large */
+  .dice-area{ display:flex; gap:18px; align-items:center; justify-content:center; padding:18px }
+  .dice-face{ font-size:64px; padding:12px 18px; background:rgba(255,255,255,0.02); border-radius:12px }
 
-  /* ---------- Slots styles ---------- */
-  .slots{display:flex; gap:12px; align-items:center; justify-content:center}
-  .reel{width:80px; height:120px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:800; box-shadow: inset 0 -8px 18px rgba(0,0,0,0.6)}
-  .reel.spin{animation:spinReel 0.7s cubic-bezier(.2,.9,.3,1)}
+  /* mines big grid */
+  .mines-grid{ display:grid; grid-template-columns: repeat(8, 1fr); gap:8px }
+  .mine-cell{ height:56px; border-radius:8px; background:rgba(255,255,255,0.02); display:grid;place-items:center; cursor:pointer; font-weight:700; color:var(--muted) }
+  .mine-open{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:#fff }
 
-  @keyframes spinReel{
-    0%{transform:translateY(-40px) scaleY(1.02)}
-    100%{transform:translateY(0) scaleY(1)}
+  /* slots big reels */
+  .reel-big{ width:120px; height:160px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); display:grid; place-items:center; font-size:48px; font-weight:800 }
+
+  /* right column - info */
+  .right { background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:var(--card-radius); padding:14px; border:1px solid rgba(255,255,255,0.02); height:calc(100vh - 120px); overflow:auto }
+  .ticker { margin-top:8px; display:flex; flex-direction:column; gap:8px }
+  .ticker .row{ display:flex; justify-content:space-between; align-items:center; padding:8px; border-radius:8px; background:rgba(0,0,0,0.18) }
+
+  /* responsive */
+  @media (max-width:1100px){
+    .wrap{ grid-template-columns: 1fr; padding:12px }
+    .left, .right { height:auto }
+    .home-grid{ grid-template-columns: repeat(2, 1fr) }
+    .mines-grid{ grid-template-columns: repeat(6, 1fr) }
   }
-
-  /* ---------- Mines grid ---------- */
-  .mines-grid{display:grid; grid-template-columns: repeat(6, 1fr); gap:6px}
-  .mine-cell{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:8px; height:48px; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none}
-  .mine-open{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
-
-  /* ---------- Responsive ---------- */
-  @media (max-width:1000px){
-    .app{grid-template-columns: 1fr; padding:12px}
-    header{flex-direction:column; align-items:flex-start}
-  }
-
-  /* ---------- Footer tiny ---------- */
-  footer{grid-column:1/-1; text-align:center; margin-top:12px; color:var(--muted); font-size:0.85rem}
 </style>
 </head>
 <body>
-<div style="max-width:1200px;margin:0 auto;padding-bottom:24px">
-  <header>
-    <div class="brand">
-      <div class="logo">RC</div>
-      <div>
-        <h1>RainClone <span class="small" style="margin-left:8px">demo • client-only</span></h1>
-        <div class="sub">Fake currency, improved UI, provably-fair demo</div>
+<header>
+  <div class="brand">
+    <div class="logo">RC</div>
+    <div>
+      <h1>RainClone</h1>
+      <div class="subtitle">Cleaner layout — focused game, clearer flow</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="muted">Balance</div>
+    <div class="balance" id="topBalance">0 RC</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- LEFT: vertical game column -->
+  <aside class="left">
+    <div class="wallet">
+      <div class="muted">Wallet</div>
+      <div class="balance" id="wallet">0 RC</div>
+      <div class="muted" style="margin-top:6px">Demo balance stored in localStorage</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="muted">Games</div>
+      <div class="game-list" id="gameList">
+        <button class="game-btn active" data-game="home"><div class="game-icon">🏠</div> Games Home</button>
+        <button class="game-btn" data-game="crash"><div class="game-icon">📈</div> Crash</button>
+        <button class="game-btn" data-game="dice"><div class="game-icon">🎲</div> Dice</button>
+        <button class="game-btn" data-game="mines"><div class="game-icon">💣</div> Mines</button>
+        <button class="game-btn" data-game="slots"><div class="game-icon">🎰</div> Slots</button>
       </div>
     </div>
 
-    <div style="display:flex; gap:10px; align-items:center">
-      <div class="small-muted">Balance</div>
-      <div class="chip" id="headerBalance">0 RC</div>
-    </div>
-  </header>
-
-  <div class="app">
-    <!-- LEFT -->
-    <div class="left">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="small">Wallet</div>
-            <div class="balance" id="balanceDisplay">0 <span style="font-size:0.7rem;color:var(--muted);">RC</span></div>
-          </div>
-          <button class="btn ghost" id="resetBtn" title="Reset local demo">Reset</button>
-        </div>
-
-        <div class="controls">
-          <label class="small-muted">Quick bet</label>
-          <input id="quickBet" type="number" min="1" value="50" />
-          <label class="small-muted">Auto Bet: rounds</label>
-          <input id="autoRounds" type="number" min="1" value="10" />
-          <div style="display:flex; gap:8px;">
-            <button class="btn" id="addFunds">+ Add 1000 RC</button>
-            <button class="btn ghost" id="saveBtn">Save</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0; border:none; height:1px; background:rgba(255,255,255,0.02)">
-
-        <div class="small-muted">Quick actions</div>
-        <div style="display:flex; gap:8px; margin-top:8px">
-          <button class="tab" data-game="crash">Crash</button>
-          <button class="tab" data-game="dice">Dice</button>
-          <button class="tab" data-game="mines">Mines</button>
-          <button class="tab" data-game="slots">Slots</button>
-        </div>
-
-        <hr style="margin:12px 0; border:none; height:1px; background:rgba(255,255,255,0.02)">
-        <div class="small-muted">Bet History</div>
-        <div id="history" style="max-height:200px; overflow:auto; margin-top:8px"></div>
+    <div style="margin-top:16px">
+      <div class="muted">Quick actions</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="quickAdd" type="number" min="1" value="100" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+        <button id="addBtn" class="game-btn" style="justify-content:center">+ Add</button>
       </div>
     </div>
 
-    <!-- CENTER -->
-    <div class="center">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; gap:10px; align-items:center">
-            <div class="tabs" id="tabs">
-              <button class="tab active" data-game="crash">Crash</button>
-              <button class="tab" data-game="dice">Dice</button>
-              <button class="tab" data-game="mines">Mines</button>
-              <button class="tab" data-game="slots">Slots</button>
-            </div>
-            <div class="small-muted">Focused game</div>
-          </div>
+    <div style="margin-top:16px">
+      <div class="muted">History</div>
+      <div id="history" style="margin-top:8px;max-height:300px;overflow:auto;color:var(--muted);font-size:13px"></div>
+    </div>
+  </aside>
 
-          <div style="display:flex; gap:8px; align-items:center">
-            <div class="small-muted">Auto-bet</div>
-            <label style="display:flex;gap:6px;align-items:center">
-              <input id="autoToggle" type="checkbox" /> <span class="small-muted" style="margin-left:4px">On</span>
-            </label>
-            <div class="small-muted">Multiplier/Target:</div>
-            <input id="autoTarget" type="number" min="1.01" step="0.01" value="2.00" style="width:90px" />
-          </div>
-        </div>
-
-        <div class="game-area" id="gameArea">
-          <!-- Crash game -->
-          <div id="crashGame">
-            <div class="crash-top">
-              <div>
-                <div class="small-muted">Round</div>
-                <div style="display:flex;gap:8px;align-items:center">
-                  <div class="mini"><div class="small-muted">Status</div><div id="crashStatus" style="margin-left:8px" class="small-muted">Idle</div></div>
-                  <div class="mini"><div class="small-muted">Round ID</div><div id="roundId" style="margin-left:8px" class="small-muted mono">—</div></div>
-                </div>
-              </div>
-              <div style="text-align:right">
-                <div class="small-muted">Multiplier</div>
-                <div class="multiplier" id="multText">1.00x</div>
-              </div>
-            </div>
-
-            <div class="crash-canvas">
-              <canvas id="crashCanvas" class="crash-graph"></canvas>
-            </div>
-
-            <div style="display:flex; gap:12px; align-items:center; justify-content:space-between;">
-              <div style="display:flex; gap:8px; align-items:center;">
-                <div class="small-muted">Bet</div>
-                <input id="crashBet" type="number" min="1" value="50" style="width:110px" />
-                <div class="small-muted">Auto cashout</div>
-                <input id="cashoutAt" type="number" min="1.01" step="0.01" value="2.00" style="width:90px" />
-              </div>
-
-              <div style="display:flex; gap:8px;">
-                <button class="btn" id="placeBetCrash">Place & Start</button>
-                <button class="btn ghost" id="cashoutBtn">Cashout</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Dice -->
-          <div id="diceGame" style="display:none">
-            <div style="display:flex; gap:12px; align-items:center; justify-content:space-between;">
-              <div>
-                <div class="small-muted">Pick target (1-6)</div>
-                <select id="dicePick">
-                  <option value="4">4 — win if roll ≥ 4</option>
-                  <option value="5">5 — win if roll ≥ 5</option>
-                  <option value="6">6 — win if roll = 6</option>
-                </select>
-              </div>
-              <div>
-                <div class="small-muted">Bet</div>
-                <input id="diceBet" type="number" min="1" value="50" style="width:120px" />
-              </div>
-              <div>
-                <button class="btn" id="diceRoll">Roll</button>
-              </div>
-            </div>
-            <div style="margin-top:8px">
-              <div id="diceResult" class="small-muted">Roll result will appear here.</div>
-            </div>
-          </div>
-
-          <!-- Mines -->
-          <div id="minesGame" style="display:none">
-            <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px;">
-              <div>
-                <div class="small-muted">Bombs</div>
-                <select id="bombCount">
-                  <option value="3">3 bombs (easier)</option>
-                  <option value="5" selected>5 bombs</option>
-                  <option value="8">8 bombs (hard)</option>
-                </select>
-              </div>
-              <div>
-                <div class="small-muted">Bet</div>
-                <input id="minesBet" type="number" min="1" value="50" style="width:120px" />
-              </div>
-              <div>
-                <button class="btn" id="startMines">Start</button>
-                <button class="btn ghost" id="cashoutMines">Cashout</button>
-              </div>
-            </div>
-            <div class="mines-grid" id="minesGrid"></div>
-            <div style="margin-top:8px" class="small-muted">Open cells to increase multiplier. Hit a bomb = lose.</div>
-          </div>
-
-          <!-- Slots -->
-          <div id="slotsGame" style="display:none">
-            <div style="display:flex; gap:12px; align-items:center; justify-content:space-between;">
-              <div>
-                <div class="small-muted">Bet</div>
-                <input id="slotsBet" type="number" min="1" value="50" style="width:120px" />
-              </div>
-              <div>
-                <button class="btn" id="spinSlots">Spin</button>
-              </div>
-            </div>
-            <div class="slots" style="margin-top:12px">
-              <div class="reel" id="r1">🍒</div>
-              <div class="reel" id="r2">🍋</div>
-              <div class="reel" id="r3">🔔</div>
-            </div>
-            <div style="margin-top:10px" id="slotsResult" class="small-muted">Try your luck — matching 3 gives big wins.</div>
-          </div>
+  <!-- CENTER: big focused area -->
+  <main class="center" id="mainArea">
+    <!-- Games Home -->
+    <div id="homeView">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Games Home</h2>
+          <div class="muted">Choose a game — the game will open using most of the screen.</div>
         </div>
       </div>
 
-      <!-- Bottom: extra settings -->
-      <div style="display:flex; gap:12px">
-        <div class="card" style="flex:1">
-          <div style="display:flex; justify-content:space-between; align-items:center">
-            <div>
-              <div class="small-muted">Provably-fair demo</div>
-              <div class="small-muted">Click "New Server Seed" to change server seed (demo only)</div>
-            </div>
-            <div>
-              <button class="btn ghost" id="newSeedBtn">New Server Seed</button>
-              <button class="btn" id="revealSeedBtn">Reveal Last Server Seed</button>
-            </div>
-          </div>
+      <div class="home-grid" style="margin-top:16px">
+        <div class="card" data-open="crash">
+          <div class="title">Crash</div>
+          <div class="desc">Place a bet, cash out before it crashes. Fast-paced multiplier game.</div>
+          <div class="muted">Autocashout and manual cashout supported.</div>
+        </div>
+
+        <div class="card" data-open="dice">
+          <div class="title">Dice</div>
+          <div class="desc">Simple roll-based game. Pick your target, roll high to win.</div>
+          <div class="muted">Low complexity — quick results.</div>
+        </div>
+
+        <div class="card" data-open="mines">
+          <div class="title">Mines</div>
+          <div class="desc">Pick safe tiles. Hitting a bomb ends the round.</div>
+          <div class="muted">Risk vs reward — the more you open, the more you get.</div>
+        </div>
+
+        <div class="card" data-open="slots">
+          <div class="title">Slots</div>
+          <div class="desc">Spin 3 reels — match symbols to win.</div>
+          <div class="muted">Big rewards for 3-in-a-row.</div>
+        </div>
+
+        <div class="card" data-open="crash">
+          <div class="title">Try Crash</div>
+          <div class="desc">Fast rounds — good for practicing cashouts.</div>
+        </div>
+
+        <div class="card" data-open="mines">
+          <div class="title">Try Mines</div>
+          <div class="desc">Slower paced — think carefully about each click.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOCUSED GAME AREA (hidden by default) -->
+    <div id="gameView" style="display:none" class="focused">
+      <div class="big" id="gameBig">
+        <!-- dynamic content inserted here -->
+      </div>
+      <div class="side-mini">
+        <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
+          <div class="muted">Round Info</div>
+          <div id="roundInfo" style="font-weight:800;margin-top:6px">—</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
+          <div class="muted">Quick Controls</div>
           <div style="margin-top:8px">
-            <div class="small-muted">Last server seed (SHA256):</div>
-            <div id="serverHash" class="small-muted mono">—</div>
-            <div class="small-muted" style="margin-top:6px">Last revealed seed:</div>
-            <div id="serverReveal" class="small-muted mono">—</div>
+            <div class="muted">Bet</div>
+            <input id="sideBet" type="number" value="50" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="sidePlace" class="game-btn" style="flex:1;justify-content:center">Place</button>
+              <button id="sideCash" class="game-btn" style="flex:1;justify-content:center">Cashout</button>
+            </div>
           </div>
         </div>
 
-        <div class="card" style="width:320px">
-          <div class="small-muted">Round ticker / recent wins</div>
+        <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
+          <div class="muted">Recent wins</div>
           <div class="ticker" id="ticker"></div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT -->
-    <div>
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center">
-          <div>
-            <div class="small-muted">Leaderboard</div>
-            <div id="leaderboard" style="margin-top:8px"></div>
-          </div>
-          <div>
-            <div class="small-muted">Your stats</div>
-            <div class="small-muted" id="stats">Wins:0 Losses:0</div>
-          </div>
-        </div>
+  </main>
 
-        <hr style="margin:12px 0; border:none; height:1px; background:rgba(255,255,255,0.02)">
+  <!-- RIGHT: small stats/ticker -->
+  <aside class="right">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div class="muted">Leaderboard</div><div id="leaders" style="margin-top:8px"></div></div>
+      <div><div class="muted">Stats</div><div id="stats" style="margin-top:8px">W:0 L:0</div></div>
+    </div>
 
-        <div class="small-muted">Settings</div>
-        <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px">
-          <label><input id="soundToggle" type="checkbox" checked /> Sound (demo)</label>
-          <label><input id="reduceMotion" type="checkbox" /> Reduce motion</label>
-        </div>
+    <div style="margin-top:14px">
+      <div class="muted">Provably-fair (demo)</div>
+      <div class="muted" id="provableHash" style="margin-top:6px">—</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="newSeed" class="game-btn">New Server Seed</button>
+        <button id="revealSeed" class="game-btn">Reveal</button>
       </div>
     </div>
-  </div>
 
-  <footer>
-    This is a demo. No real money. Everything runs locally in your browser. Modify branding and initial balance in the file comments.
-  </footer>
+    <div style="margin-top:14px">
+      <div class="muted">Options</div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <label style="display:flex;gap:6px;align-items:center"><input id="persist" type="checkbox" checked> Save</label>
+        <button id="reset" class="game-btn">Reset</button>
+      </div>
+    </div>
+  </aside>
 </div>
 
 <script>
-/* -------------------------
-  RainClone — Client-side Casino Demo
-  - All logic runs in-browser. No real money.
-  - Change initialBalance below if you want.
---------------------------*/
-(() => {
-  const initialBalance = 2000; // change default starting RC here
-  // -- state
-  let state = {
-    balance: 0,
-    history: [],
-    leaderboard: [],
-    stats: {wins:0, losses:0},
-    provable: { serverSeed: null, serverHash: null, lastReveal: null },
-    crash: { running:false, multiplier:1.0, roundId: null, lastRound: null },
-    auto: { enabled:false, target:2.0, roundsLeft:0 }
-  };
+/* Simple focused UI script
+   - click left column or home cards to open a focused game
+   - games available: crash, dice, mines, slots
+   - stores demo balance in localStorage (if Save checked)
+*/
 
-  // ---------- utilities ----------
-  const $ = id => document.getElementById(id);
-  const fmt = n => Math.round(n*100)/100;
-  const rand = (min, max) => Math.floor(Math.random()*(max-min+1))+min;
-  const sha256hex = async (s) => {
-    const enc = new TextEncoder().encode(s);
-    const hash = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
-  };
+// -- state & persistence
+const initial = { balance: 1500, history: [], leaders: [], wins:0, losses:0, provableSeed: null, provableHash: null };
+let state = JSON.parse(localStorage.getItem('rc_state') || 'null') || initial;
+const persistCheckbox = () => document.getElementById('persist').checked;
 
-  // ---------- persistence ----------
-  function saveLocal() {
-    localStorage.setItem('rainclone_state', JSON.stringify({
-      balance: state.balance, history: state.history.slice(0,100), leaderboard: state.leaderboard, provable: state.provable, stats: state.stats
-    }));
+// UI refs
+const el = id => document.getElementById(id);
+const topBalance = el('topBalance'), wallet = el('wallet'), historyEl = el('history'), leadersEl = el('leaders'), statsEl = el('stats'), ticker = el('ticker'), provableHash = el('provableHash');
+const mainArea = el('mainArea'), homeView = el('homeView'), gameView = el('gameView'), gameBig = el('gameBig'), gameList = document.querySelectorAll('.game-btn');
+
+// update UI
+function updateHeader(){
+  topBalance.innerText = `${state.balance} RC`;
+  wallet.innerText = `${state.balance} RC`;
+  statsEl.innerText = `W:${state.wins} L:${state.losses}`;
+  provableHash.innerText = state.provableHash || '—';
+  renderHistory();
+  renderLeaders();
+}
+function saveState(){ if(persistCheckbox()) localStorage.setItem('rc_state', JSON.stringify(state)); }
+function resetState(){ localStorage.removeItem('rc_state'); location.reload(); }
+
+// history
+function pushHist(text){
+  const item = { text, time: new Date().toLocaleTimeString() };
+  state.history.unshift(item);
+  if(state.history.length>100) state.history.pop();
+  saveState(); renderHistory();
+}
+function renderHistory(){
+  historyEl.innerHTML = '';
+  state.history.slice(0,12).forEach(h=>{
+    const d = document.createElement('div');
+    d.style.padding='6px'; d.style.borderBottom='1px solid rgba(255,255,255,0.02)'; d.innerHTML = `<div style="display:flex;justify-content:space-between"><div>${h.text}</div><div class="muted" style="font-size:12px">${h.time}</div></div>`;
+    historyEl.appendChild(d);
+  });
+}
+
+// leaders
+function renderLeaders(){
+  leadersEl.innerHTML = '';
+  if(!state.leaders.length) { leadersEl.innerHTML = '<div class="muted">No big wins</div>'; return; }
+  state.leaders.slice(0,6).forEach(l => {
+    const d = document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.padding='6px 0'; d.innerHTML = `<div>${l.name}</div><div class="muted">${l.win}</div>`;
+    leadersEl.appendChild(d);
+  });
+}
+
+// provable demo
+function newSeed(){
+  const seed = (Math.random().toString(36).slice(2)+Date.now().toString(36));
+  state.provableSeed = seed;
+  // sha-256 using subtle
+  crypto.subtle.digest('SHA-256', new TextEncoder().encode(seed)).then(h=>{
+    state.provableHash = Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    provableHash.innerText = state.provableHash;
+    saveState();
+    pushHist('New server seed created (demo)');
+  });
+}
+function revealSeed(){
+  if(!state.provableSeed) return alert('No seed yet');
+  alert('Server seed (demo): ' + state.provableSeed + '\nHash: ' + state.provableHash);
+}
+
+// default render
+updateHeader();
+
+// -- Left column interactions & home cards
+document.querySelectorAll('.game-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    document.querySelectorAll('.game-btn').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    openGame(btn.dataset.game);
+  });
+});
+document.querySelectorAll('.card[data-open]').forEach(card=>{
+  card.addEventListener('click', ()=> {
+    const target = card.dataset.open;
+    document.querySelectorAll('.game-btn').forEach(x => x.classList.remove('active'));
+    document.querySelector(`[data-game="${target}"]`).classList.add('active');
+    openGame(target);
+  });
+});
+
+el('addBtn').addEventListener('click', ()=>{
+  const v = parseFloat(el('quickAdd').value)||0;
+  state.balance += v; pushHist(`Added ${v} RC`); updateHeader(); saveState();
+});
+el('reset').addEventListener('click', ()=> { if(confirm('Reset demo data?')) resetState(); });
+el('newSeed').addEventListener('click', newSeed);
+el('revealSeed').addEventListener('click', revealSeed);
+
+// open game logic
+function openGame(name){
+  homeView.style.display = name === 'home' ? 'block' : 'none';
+  gameView.style.display = name === 'home' ? 'none' : 'flex';
+  gameBig.innerHTML = ''; // clear previous
+  el('roundInfo').innerText = name.charAt(0).toUpperCase() + name.slice(1);
+  if(name === 'crash') renderCrash();
+  else if(name === 'dice') renderDice();
+  else if(name === 'mines') renderMines();
+  else if(name === 'slots') renderSlots();
+  saveState();
+}
+
+// ------- Crash implementation (simplified, smooth) -------
+function renderCrash(){
+  gameBig.innerHTML = `
+    <h2>Crash — Focused</h2>
+    <div class="muted">Place a bet and cash out before the multiplier crashes.</div>
+    <canvas id="crashCanvasLarge" style="margin-top:12px;border-radius:8px;width:100%;height:320px;background:linear-gradient(180deg, rgba(72,217,255,0.02), transparent)"></canvas>
+    <div class="controls" style="margin-top:12px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="muted">Bet</div>
+        <input id="crashBetInput" type="number" value="50" style="width:120px">
+        <div class="muted">Auto cashout</div>
+        <input id="crashAutoInput" type="number" value="2.00" step="0.01" style="width:110px">
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button id="crashStart" class="game-btn">Place & Start</button>
+        <button id="crashCash" class="game-btn">Cashout</button>
+      </div>
+    </div>
+    <div id="crashText" style="margin-top:10px" class="muted">Status: idle</div>
+  `;
+  const canvas = document.getElementById('crashCanvasLarge');
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); draw(1); }
+  window.addEventListener('resize', resize); resize();
+
+  let running=false, multiplier=1, crashPoint=0, bet=0;
+
+  function draw(m){
+    ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    // background
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+    ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    // bar representing height
+    const h = canvas.clientHeight;
+    const w = canvas.clientWidth;
+    const norm = Math.min(1, Math.log(m+1)/Math.log(10)); // normalize for visual
+    const barHeight = 20 + (h-40) * norm;
+    ctx.fillStyle = 'rgba(72,217,255,0.10)';
+    ctx.fillRect(20, h - barHeight, w-40, barHeight);
+    // multiplier text
+    ctx.fillStyle = '#e8f2f7'; ctx.font = '20px sans-serif'; ctx.fillText(m.toFixed(2) + 'x', 30, 30);
   }
-  function loadLocal(){
-    const raw = localStorage.getItem('rainclone_state');
-    if(raw) {
-      try{
-        const d = JSON.parse(raw);
-        state.balance = d.balance ?? initialBalance;
-        state.history = d.history ?? [];
-        state.leaderboard = d.leaderboard ?? [];
-        state.provable = d.provable ?? state.provable;
-        state.stats = d.stats ?? state.stats;
-      }catch(e){ state.balance = initialBalance; }
-    }else state.balance = initialBalance;
-    updateAll();
-  }
 
-  // ---------- UI helpers ----------
-  function updateAll(){
-    $('balanceDisplay').innerText = `${fmt(state.balance)} `;
-    $('headerBalance').innerText = `${fmt(state.balance)} RC`;
-    renderHistory();
-    renderLeaderboard();
-    $('stats').innerText = `Wins:${state.stats.wins} Losses:${state.stats.losses}`;
-    $('serverHash').innerText = state.provable.serverHash || '—';
-    $('serverReveal').innerText = state.provable.lastReveal || '—';
-  }
-
-  function pushHistory(entry){
-    state.history.unshift(entry);
-    if(state.history.length>200) state.history.pop();
-    renderHistory();
-    saveLocal();
-    // push to ticker and leaderboard
-    const ticker = $('ticker');
-    const el = document.createElement('div'); el.className='win-row';
-    el.innerHTML = `<div style="font-weight:700">${entry.game}</div><div class="small-muted">${entry.outcome}</div><div class="${entry.win? 'win-green' : ''}">${entry.amount>0? '+'+fmt(entry.amount): fmt(entry.amount)}</div>`;
-    ticker.prepend(el);
-    // leaderboard update simple
-    if(entry.win){
-      state.leaderboard.push({name: 'Player', amt: entry.amount});
-      state.leaderboard.sort((a,b)=>b.amt-a.amt);
-      state.leaderboard = state.leaderboard.slice(0,10);
-      renderLeaderboard();
-    }
-  }
-
-  function renderHistory(){
-    const h = $('history'); h.innerHTML = '';
-    state.history.slice(0,12).forEach(it=>{
-      const r = document.createElement('div'); r.style.padding='8px'; r.style.borderBottom='1px solid rgba(255,255,255,0.02)';
-      r.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:700">${it.game}</div><div class="small-muted">${it.time}</div></div><div class="small-muted">${it.outcome} <span style="float:right">${it.amount>0? '+'+fmt(it.amount): fmt(it.amount)}</span></div>`;
-      h.appendChild(r);
-    });
-  }
-
-  function renderLeaderboard(){
-    const el = $('leaderboard'); el.innerHTML='';
-    if(state.leaderboard.length===0){ el.innerHTML = '<div class="small-muted">No big wins yet</div>'; return; }
-    state.leaderboard.forEach((l,i)=>{
-      const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0';
-      row.innerHTML = `<div>${i+1}. ${l.name}</div><div class="small-muted">${fmt(l.amt)}</div>`;
-      el.appendChild(row);
-    });
-  }
-
-  // ---------- Provably-fair demo ----------
-  async function newServerSeed(){
-    const seed = Math.random().toString(36).slice(2)+Date.now().toString(36);
-    const h = await sha256hex(seed);
-    state.provable.serverSeed = seed;
-    state.provable.serverHash = h;
-    saveLocal(); updateAll();
-  }
-  async function revealServerSeed(){
-    if(!state.provable.serverSeed){ alert('No server seed generated yet.'); return; }
-    state.provable.lastReveal = state.provable.serverSeed;
-    // show simple verify example: combine server seed + client seed to derive a random number
-    saveLocal(); updateAll();
-    alert('Revealed server seed (demo):\n'+state.provable.serverSeed + '\n\nHash: ' + state.provable.serverHash);
-  }
-
-  // ---------- Game: Crash ----------
-  const crashCanvas = $('crashCanvas');
-  const crashCtx = crashCanvas.getContext('2d');
-  function resizeCrashCanvas(){ crashCanvas.width = crashCanvas.clientWidth * devicePixelRatio; crashCanvas.height = crashCanvas.clientHeight * devicePixelRatio; crashCtx.scale(devicePixelRatio, devicePixelRatio); }
-  window.addEventListener('resize', resizeCrashCanvas);
-
-  let crashAnimId = null;
-  function startCrashRound(bet, autoCashout){
-    if(state.crash.running) return;
-    if(bet>state.balance){ alert('Not enough balance'); return; }
-    state.balance -= bet; updateAll(); saveLocal();
-
-    // create deterministicish random crash point using server seed + round id
-    const roundId = Math.random().toString(36).substr(2,8);
-    state.crash.roundId = roundId; $('roundId').innerText = roundId;
-    state.crash.running = true;
-    state.crash.multiplier = 1.0;
-    $('crashStatus').innerText = 'Running';
-    $('multText').innerText = '1.00x';
-
-    // generate crashPoint with bias: common low crashes, rare big ones
-    const r = Math.random();
-    const crashPoint = Math.max(1.0, Math.round((1 + (Math.pow(1.0 / (1 - r), 0.6) * 10)) * 100)/100); // skewed heavy tail
-    // To make some rounds crash early:
-    const early = Math.random() < 0.12;
-    const finalCrash = early ? (1 + Math.random()*0.3) : crashPoint;
-
-    let start = null; function frame(ts){
-      if(!start) start = ts;
-      const t = (ts - start)/1000;
-      // multiplier growth (exponential feeling)
-      state.crash.multiplier = Math.max(1.0, 1 + Math.pow(t*0.8, 1.7));
-      // draw graph
-      drawCrash();
-      $('multText').innerText = state.crash.multiplier.toFixed(2) + 'x';
-
-      // auto-cashout
-      if(autoCashout && state.crash.multiplier >= autoCashout){
+  function startRound(autoAt){
+    if(running) return;
+    bet = parseFloat(document.getElementById('crashBetInput').value) || 0;
+    if(bet <= 0 || bet > state.balance){ alert('Invalid bet or insufficient funds'); return; }
+    state.balance -= bet; updateHeader(); saveState();
+    // determine crash point
+    crashPoint = 1 + Math.random()*6; // simple distribution for demo
+    multiplier = 1; running = true;
+    document.getElementById('crashText').innerText = 'Running... crash at hidden';
+    pushHist(`Crash start: bet ${bet} RC`);
+    let last = performance.now();
+    function frame(now){
+      const dt = (now - last)/1000; last = now;
+      multiplier += dt * (0.9 + Math.log(multiplier+1)*0.6);
+      draw(multiplier);
+      document.getElementById('crashText').innerText = `Running — ${multiplier.toFixed(2)}x`;
+      // auto cashout
+      if(autoAt && multiplier >= autoAt){
         // win
-        const win = Math.round((bet * (autoCashout-1)) * 100) / 100;
-        state.balance += bet + win;
-        pushHistory({game:'Crash', outcome:'Auto-cashed out', amount: +fmt(win), time: new Date().toLocaleTimeString(), win:true});
-        state.crash.running = false;
-        $('crashStatus').innerText = 'Finished (autocashed)';
-        updateAll(); saveLocal();
-        return cancelAnimationFrame(crashAnimId);
+        const profit = Math.round((bet*(autoAt-1))*100)/100;
+        state.balance += bet + profit;
+        state.wins = (state.wins||0) + 1;
+        pushHist(`Crash auto cashout @${autoAt}x +${profit} RC`);
+        running = false; updateHeader(); saveState(); return;
       }
-
-      // decide crash moment by time > threshold derived from finalCrash
-      if(state.crash.multiplier >= finalCrash){
+      if(multiplier >= crashPoint){
         // crashed
-        state.crash.running = false;
-        $('crashStatus').innerText = 'Crashed at ' + finalCrash.toFixed(2) + 'x';
-        pushHistory({game:'Crash', outcome:'Crashed', amount: -bet, time: new Date().toLocaleTimeString(), win:false});
-        updateAll(); saveLocal();
-        return cancelAnimationFrame(crashAnimId);
+        state.losses = (state.losses||0) + 1;
+        pushHist(`Crash crashed at ${multiplier.toFixed(2)}x -${bet} RC`);
+        running=false; updateHeader(); saveState(); return;
       }
-      crashAnimId = requestAnimationFrame(frame);
+      if(running) requestAnimationFrame(frame);
     }
-    crashAnimId = requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
 
-  function cashoutCrash(){
-    if(!state.crash.running){ return alert('No running crash round'); }
-    const bet = parseFloat($('crashBet').value);
-    const received = (state.crash.multiplier-1) * bet;
-    const gain = Math.round(received*100)/100;
-    state.balance += bet + gain; // return bet + profit
-    pushHistory({game:'Crash', outcome:'Manual cashout @'+state.crash.multiplier.toFixed(2)+'x', amount: +fmt(gain), time: new Date().toLocaleTimeString(), win:true});
-    state.crash.running = false;
-    $('crashStatus').innerText = 'Finished (cashed)';
-    updateAll(); saveLocal();
-    if(crashAnimId) cancelAnimationFrame(crashAnimId);
-  }
+  document.getElementById('crashStart').addEventListener('click', ()=> {
+    const auto = parseFloat(document.getElementById('crashAutoInput').value) || null;
+    startRound(auto);
+  });
+  document.getElementById('crashCash').addEventListener('click', ()=> {
+    // simplified: manual cashout uses current multiplier approximate
+    if(!running){ alert('No running round'); return; }
+    const cur = multiplier;
+    const profit = Math.round((bet*(cur-1))*100)/100;
+    state.balance += bet + profit; state.wins = (state.wins||0) + 1;
+    pushHist(`Crash manual cashout @${cur.toFixed(2)}x +${profit} RC`);
+    running=false; updateHeader(); saveState();
+  });
+}
 
-  // simple graph draw
-  function drawCrash(){
-    const w = crashCanvas.clientWidth; const h = crashCanvas.clientHeight; crashCtx.clearRect(0,0,w,h);
-    // background grid
-    crashCtx.fillStyle = 'rgba(255,255,255,0.02)'; crashCtx.fillRect(0,0,w,h);
-    // multiplier bar
-    const m = Math.min(10, state.crash.multiplier);
-    const barH = (m/10) * h;
-    crashCtx.fillStyle = 'linear-gradient(180deg,#6ad1ff,#f0c95f)';
-    crashCtx.fillStyle = 'rgba(106,209,255,0.12)';
-    crashCtx.fillRect(0, h - barH, w * 0.6, barH);
-    // moving marker
-    crashCtx.fillStyle = 'rgba(106,209,255,0.9)';
-    crashCtx.beginPath(); crashCtx.arc(Math.min(w-10, state.crash.multiplier*30), h - barH - 6, 6, 0, Math.PI*2); crashCtx.fill();
-  }
+function renderDice(){
+  gameBig.innerHTML = `
+    <h2>Dice — Focused</h2>
+    <div class="muted">Pick a target (4-6). Roll 1-6. Higher roll wins depending on your target.</div>
+    <div class="dice-area" style="margin-top:12px">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div class="muted">Your pick</div>
+        <select id="dicePick" style="padding:8px;border-radius:8px">
+          <option value="4">≥ 4</option><option value="5">≥ 5</option><option value="6">= 6</option>
+        </select>
+        <div style="margin-top:8px" class="muted">Bet</div>
+        <input id="diceBet" type="number" value="50" style="width:120px;padding:8px;border-radius:8px">
+        <button id="diceRollBtn" class="game-btn" style="margin-top:10px">Roll</button>
+      </div>
 
-  // ---------- Game: Dice ----------
-  function rollDice(){
-    const bet = parseFloat($('diceBet').value);
-    const pick = parseInt($('dicePick').value,10);
-    if(bet>state.balance){ alert('Not enough balance'); return; }
-    state.balance -= bet; updateAll();
-    const roll = rand(1,6);
-    let win=false; let profit=0;
-    if(pick===6){
-      if(roll===6){ win=true; profit = bet*5; }
-    } else {
-      if(roll>=pick){ win=true; profit = bet*(6/(6-(pick-1))) - bet; /* simplified odds */ }
-    }
-    if(win){
-      state.balance += bet + profit;
-      pushHistory({game:'Dice', outcome:`Rolled ${roll} — WIN`, amount:+fmt(profit), time: new Date().toLocaleTimeString(), win:true});
-      state.stats.wins += 1;
-    } else {
-      pushHistory({game:'Dice', outcome:`Rolled ${roll} — LOSE`, amount:-bet, time: new Date().toLocaleTimeString(), win:false});
-      state.stats.losses += 1;
-    }
-    updateAll(); saveLocal();
-    $('diceResult').innerText = `Rolled: ${roll} — ${win ? 'WIN' : 'LOSE'} ${win? ('+'+fmt(profit)) : ('-'+fmt(bet))}`;
-  }
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="muted">Result</div>
+        <div id="diceFace" class="dice-face">—</div>
+        <div id="diceMsg" class="muted" style="margin-top:8px">Roll to play</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('diceRollBtn').addEventListener('click', ()=>{
+    const pick = parseInt(document.getElementById('dicePick').value,10);
+    const bet = parseFloat(document.getElementById('diceBet').value)||0;
+    if(bet>state.balance){ alert('Insufficient funds'); return; }
+    state.balance -= bet; updateHeader();
+    const roll = Math.floor(Math.random()*6)+1;
+    let win=false, profit=0;
+    if(pick===6){ if(roll===6){ win=true; profit = bet*5; } }
+    else { if(roll>=pick){ win=true; profit = Math.round((bet * (6/(6-(pick-1)) - 1))*100)/100; } }
+    document.getElementById('diceFace').innerText = roll;
+    if(win){ state.balance += bet + profit; state.wins = (state.wins||0)+1; pushHist(`Dice win +${profit} RC`); document.getElementById('diceMsg').innerText = `WIN +${profit} RC`; }
+    else { state.losses = (state.losses||0)+1; pushHist(`Dice lose -${bet} RC`); document.getElementById('diceMsg').innerText = `LOSE -${bet} RC`; }
+    updateHeader(); saveState();
+  });
+}
 
-  // ---------- Game: Mines ----------
-  let minesState = { grid: [], bombs:new Set(), opened:new Set(), currentBet:0, multiplier:1.0, running:false };
-  function startMines(){
-    const bet = parseFloat($('minesBet').value);
-    const bombs = parseInt($('bombCount').value,10);
-    if(bet>state.balance){ alert('Not enough balance'); return; }
-    state.balance -= bet; updateAll();
-    minesState.currentBet = bet; minesState.opened = new Set(); minesState.bombs = new Set();
-    minesState.running = true;
-    // generate bombs
-    while(minesState.bombs.size < bombs){
-      minesState.bombs.add(rand(0,35)); // 6x6 grid: 0..35
-    }
-    // update grid UI
-    const grid = $('minesGrid'); grid.innerHTML='';
-    for(let i=0;i<36;i++){
-      const cell = document.createElement('div'); cell.className='mine-cell'; cell.dataset.idx=i;
-      cell.innerText = '';
-      cell.addEventListener('click', ()=> openMineCell(i, cell));
+function renderMines(){
+  gameBig.innerHTML = `
+    <h2>Mines — Focused</h2>
+    <div class="muted">Pick safe tiles. Hitting a bomb loses the round.</div>
+    <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+      <div>
+        <div class="muted">Bombs</div>
+        <select id="bombsSel" style="padding:8px;border-radius:8px">
+          <option value="3">3</option><option value="5" selected>5</option><option value="8">8</option>
+        </select>
+      </div>
+      <div>
+        <div class="muted">Bet</div>
+        <input id="minesBet" type="number" value="50" style="width:120px;padding:8px;border-radius:8px">
+      </div>
+      <div style="margin-left:auto">
+        <button id="minesStart" class="game-btn">Start</button>
+        <button id="minesCash" class="game-btn">Cashout</button>
+      </div>
+    </div>
+    <div class="mines-grid" id="minesGrid" style="margin-top:12px"></div>
+    <div id="minesMsg" class="muted" style="margin-top:10px"></div>
+  `;
+  const grid = el('minesGrid');
+  let bombs=new Set(), opened=new Set(), bet=0, running=false;
+  function makeGrid(){
+    grid.innerHTML='';
+    for(let i=0;i<48;i++){
+      const cell = document.createElement('div'); cell.className='mine-cell'; cell.dataset.i = i; cell.innerText = '';
+      cell.addEventListener('click', ()=> {
+        if(!running) return;
+        if(opened.has(i)) return;
+        opened.add(i);
+        if(bombs.has(i)){
+          cell.classList.add('mine-open'); cell.innerText='💣'; running=false; state.losses = (state.losses||0)+1; pushHist(`Mines hit bomb -${bet} RC`); updateHeader(); saveState(); el('minesMsg').innerText = 'Boom — you hit a bomb.';
+        } else {
+          cell.classList.add('mine-open'); cell.innerText='•'; const mul = 1 + (opened.size * 0.12);
+          el('minesMsg').innerText = `Safe — multiplier x${mul.toFixed(2)} — open more or cashout.`;
+        }
+      });
       grid.appendChild(cell);
     }
   }
+  makeGrid();
+  el('minesStart').addEventListener('click', ()=>{
+    bet = parseFloat(el('minesBet').value)||0; if(bet>state.balance){ alert('Not enough'); return; }
+    state.balance -= bet; updateHeader(); running = true; opened.clear();
+    bombs.clear();
+    const count = parseInt(el('bombsSel').value,10);
+    while(bombs.size < count) bombs.add(Math.floor(Math.random()*48));
+    grid.querySelectorAll('.mine-cell').forEach(c => { c.classList.remove('mine-open'); c.innerText=''; });
+    pushHist(`Mines started -${bet} RC`);
+    saveState();
+  });
+  el('minesCash').addEventListener('click', ()=>{
+    if(!running){ alert('No running mines'); return; }
+    const mul = 1 + (opened.size * 0.12); const profit = Math.round((bet * (mul-1))*100)/100;
+    state.balance += bet + profit; state.wins=(state.wins||0)+1; running=false; pushHist(`Mines cashed x${mul.toFixed(2)} +${profit} RC`); updateHeader(); saveState(); el('minesMsg').innerText='Cashed out!';
+  });
+}
 
-  function openMineCell(idx, el){
-    if(!minesState.running) return;
-    if(minesState.opened.has(idx)) return;
-    if(minesState.bombs.has(idx)){
-      // boom - lose bet
-      el.classList.add('mine-open'); el.innerText='💣';
-      minesState.running=false;
-      pushHistory({game:'Mines', outcome:'Hit bomb', amount:-minesState.currentBet, time:new Date().toLocaleTimeString(), win:false});
-      state.stats.losses += 1;
-      updateAll(); saveLocal();
-      return;
-    } else {
-      minesState.opened.add(idx);
-      el.classList.add('mine-open'); el.innerText='•';
-      // multiplier grows with safely opened cells
-      const opened = minesState.opened.size;
-      const mul = 1 + (opened * 0.15);
-      minesState.multiplier = mul;
-      // if user wants, they can press Cashout to take current multiplier
-    }
-  }
-
-  function cashoutMines(){
-    if(!minesState.running){ alert('No active mines round'); return; }
-    const profit = Math.round(minesState.currentBet * (minesState.multiplier-1) * 100)/100;
-    state.balance += minesState.currentBet + profit;
-    pushHistory({game:'Mines', outcome:`Cashed out x${minesState.multiplier.toFixed(2)}`, amount:+fmt(profit), time:new Date().toLocaleTimeString(), win:true});
-    minesState.running=false;
-    state.stats.wins += 1;
-    updateAll(); saveLocal();
-  }
-
-  // ---------- Game: Slots ----------
+function renderSlots(){
+  gameBig.innerHTML = `
+    <h2>Slots — Focused</h2>
+    <div class="muted">Spin 3 reels. Match symbols for wins.</div>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:12px">
+      <div style="display:flex;gap:12px">
+        <div class="reel-big" id="sr1">🍒</div>
+        <div class="reel-big" id="sr2">🍋</div>
+        <div class="reel-big" id="sr3">🔔</div>
+      </div>
+      <div style="margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div class="muted">Bet</div>
+        <input id="slotsBet" type="number" value="50" style="width:120px;padding:8px;border-radius:8px">
+        <button id="spinBtn" class="game-btn">Spin</button>
+        <div id="slotsMsg" class="muted" style="margin-top:6px">Match 3 for jackpot.</div>
+      </div>
+    </div>
+  `;
   const symbols = ['🍒','🍋','🔔','⭐','7️⃣'];
-  function spinSlots(){
-    const bet = parseFloat($('slotsBet').value);
-    if(bet>state.balance){ alert('Not enough balance'); return; }
-    state.balance -= bet; updateAll();
-    // animate reels (simple)
-    const r1 = $('r1'), r2 = $('r2'), r3 = $('r3');
-    r1.classList.add('spin'); r2.classList.add('spin'); r3.classList.add('spin');
-    setTimeout(()=>{ r1.classList.remove('spin'); r1.innerText = symbols[rand(0,symbols.length-1)]; }, 220);
-    setTimeout(()=>{ r2.classList.remove('spin'); r2.innerText = symbols[rand(0,symbols.length-1)]; }, 360);
-    setTimeout(()=>{ r3.classList.remove('spin'); r3.innerText = symbols[rand(0,symbols.length-1)]; evaluateSlots(bet); }, 520);
-  }
-  function evaluateSlots(bet){
-    const a = $('r1').innerText, b = $('r2').innerText, c = $('r3').innerText;
-    let profit = 0, outcome='Lose';
-    if(a===b && b===c){
-      // 3 match — big win
-      const mult = a==='7️⃣' ? 50 : 10;
-      profit = bet * mult;
-      outcome = 'Jackpot';
-    } else if (a===b || b===c || a===c){
-      profit = bet * 2; outcome = 'Small win';
+  const r1 = el('sr1'), r2 = el('sr2'), r3 = el('sr3');
+  el('spinBtn').addEventListener('click', ()=>{
+    const bet = parseFloat(el('slotsBet').value)||0;
+    if(bet>state.balance){ alert('Not enough'); return; }
+    state.balance -= bet; updateHeader();
+    // animate sim
+    r1.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+    r2.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+    r3.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+    // evaluate
+    let win=false, profit=0;
+    if(r1.innerText === r2.innerText && r2.innerText === r3.innerText){
+      profit = r1.innerText === '7️⃣' ? bet * 50 : bet * 10; win=true;
+    } else if (r1.innerText === r2.innerText || r2.innerText === r3.innerText || r1.innerText === r3.innerText){
+      profit = bet * 2; win=true;
     }
-    if(profit>0){
-      state.balance += bet + profit;
-      pushHistory({game:'Slots', outcome: outcome, amount:+fmt(profit), time:new Date().toLocaleTimeString(), win:true});
-      state.stats.wins += 1;
-      $('slotsResult').innerText = `${outcome}! +${fmt(profit)}`;
-    } else {
-      pushHistory({game:'Slots', outcome:'Lose', amount:-bet, time:new Date().toLocaleTimeString(), win:false});
-      state.stats.losses += 1;
-      $('slotsResult').innerText = 'No match — try again.';
-    }
-    updateAll(); saveLocal();
-  }
+    if(win){ state.balance += bet + profit; state.wins=(state.wins||0)+1; pushHist(`Slots win +${profit} RC`); el('slotsMsg').innerText = `Win +${profit} RC`; } else { state.losses=(state.losses||0)+1; pushHist(`Slots lose -${bet} RC`); el('slotsMsg').innerText = `No match`; }
+    updateHeader(); saveState();
+  });
+}
 
-  // ---------- Auto-bet loop ----------
-  let autoLoopActive = false;
-  async function runAutoBet(){
-    if(autoLoopActive) return;
-    autoLoopActive = true;
-    const rounds = parseInt($('autoRounds').value,10) || 1;
-    state.auto.roundsLeft = rounds;
-    const target = parseFloat($('autoTarget').value) || 2.0;
-    const bet = parseFloat($('quickBet').value) || 10;
-    while(state.auto.roundsLeft > 0 && $('autoToggle').checked && state.balance >= bet){
-      // for demo, auto runs crash with auto cashout if reached
-      startCrashRound(bet, target);
-      // wait until the crash stops
-      await new Promise(res => {
-        const iv = setInterval(()=>{
-          if(!state.crash.running){
-            clearInterval(iv);
-            res();
-          }
-        }, 200);
-      });
-      state.auto.roundsLeft--;
-      // small wait between rounds
-      await new Promise(r=>setTimeout(r, 350));
-    }
-    autoLoopActive = false;
-  }
+// start on home
+openGame('home');
+updateHeader();
 
-  // ---------- Bind UI ----------
-  function bind(){
-    // tabs
-    document.querySelectorAll('.tab').forEach(t=>{
-      t.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-        const g = t.dataset.game || t.getAttribute('data-game');
-        document.querySelectorAll('#gameArea > div').forEach(d=>d.style.display='none');
-        $(`${g}Game`).style.display='block';
-      });
-    });
+// wire side quick place/cash (generic)
+el('sidePlace').addEventListener('click', ()=> {
+  const active = [...document.querySelectorAll('.game-btn')].find(b => b.classList.contains('active'));
+  if(active) openGame(active.dataset.game);
+});
+el('sideCash').addEventListener('click', ()=> alert('Use the game cashout controls in the focused view'));
 
-    $('placeBetCrash').addEventListener('click', ()=> {
-      const bet = parseFloat($('crashBet').value);
-      const cash = parseFloat($('cashoutAt').value) || null;
-      startCrashRound(bet, cash);
-    });
-    $('cashoutBtn').addEventListener('click', cashoutCrash);
-    $('diceRoll').addEventListener('click', rollDice);
-    $('startMines').addEventListener('click', startMines);
-    $('cashoutMines').addEventListener('click', cashoutMines);
-    $('spinSlots').addEventListener('click', spinSlots);
-    $('addFunds').addEventListener('click', ()=>{ state.balance += 1000; updateAll(); saveLocal(); });
-    $('resetBtn').addEventListener('click', ()=>{ if(confirm('Reset demo state?')){ localStorage.removeItem('rainclone_state'); location.reload(); }});
-    $('saveBtn').addEventListener('click', ()=>{ saveLocal(); alert('Saved to localStorage.'); });
-    $('newSeedBtn').addEventListener('click', ()=> newServerSeed());
-    $('revealSeedBtn').addEventListener('click', ()=> revealServerSeed());
-    $('autoToggle').addEventListener('change', ()=> { if($('autoToggle').checked) runAutoBet(); });
-    $('quickBet').addEventListener('change', ()=> {});
-    $('autoTarget').addEventListener('change', ()=> state.auto.target = parseFloat($('autoTarget').value));
-    $('autoRounds').addEventListener('change', ()=> {});
-    $('soundToggle').addEventListener('change', ()=> {});
-    // dice default
-    $('dicePick').value = '4';
-  }
+// persist checkbox handling
+el('persist').addEventListener('change', ()=> saveState());
 
-  // ---------- initialize ----------
-  async function init(){
-    bind();
-    resizeCrashCanvas();
-    // create initial server seed
-    if(!state.provable.serverHash) await newServerSeed();
-    loadLocal();
-    updateAll();
-    // wire reveal button
-  }
-  init().catch(e=>console.error(e));
+// quick ticker render (recent history)
+function updateTicker(){
+  ticker.innerHTML = '';
+  state.history.slice(0,6).forEach(h=>{
+    const r = document.createElement('div'); r.className='row'; r.innerHTML = `<div style="font-weight:700">${h.text}</div><div class="muted">${h.time}</div>`;
+    ticker.appendChild(r);
+  });
+}
+setInterval(()=>{ updateHeader(); updateTicker(); }, 800);
 
-  // save state on unload
-  window.addEventListener('beforeunload', saveLocal);
-
-})();
+// on load attempt new seed for provable if none
+if(!state.provableSeed) {
+  const s = (Math.random().toString(36).slice(2)+Date.now().toString(36));
+  state.provableSeed=s;
+  crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(h=>{
+    state.provableHash = Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    saveState();
+    updateHeader();
+  });
+}
 </script>
 </body>
 </html>

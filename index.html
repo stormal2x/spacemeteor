@@ -6,20 +6,13 @@
   <title>Jewsino - Fake Currency Casino</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: Arial, sans-serif; }
-
-    body {
-      background-color: #111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+    html, body { height: 100%; font-family: Arial, sans-serif; background-color: #0d0d0d; color: #fff; }
 
     header {
-      text-align: center;
+      background: #1a1a1a;
       padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #333;
     }
 
     h1 {
@@ -27,19 +20,40 @@
       color: gold;
     }
 
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: #ccc;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      color: gold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .game-card {
+      background: #1c1c1c;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
     .balance {
       margin-top: 10px;
       font-size: 1.2rem;
-    }
-
-    .game {
-      background: #222;
-      border: 2px solid #444;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-      width: 300px;
-      text-align: center;
+      color: #0f0;
     }
 
     button {
@@ -60,33 +74,87 @@
 <body>
   <header>
     <h1>🎰 Jewsino 🎰</h1>
+    <nav>
+      <a href="#dice">Dice</a>
+      <a href="#coinflip">Coin Flip</a>
+      <a href="#slots">Slots</a>
+    </nav>
     <div class="balance">Balance: <span id="balance">1000</span> J-Credits</div>
   </header>
 
-  <div class="game">
-    <h2>Fake Dice Roll</h2>
-    <p>Bet Amount: <input type="number" id="bet" value="100" min="1" /></p>
-    <button onclick="rollDice()">Roll 🎲</button>
-    <p id="result"></p>
+  <div class="container">
+    <div class="game-card" id="dice">
+      <h2>🎲 Dice Roll</h2>
+      <p>Bet Amount: <input type="number" id="betDice" value="100" min="1" /></p>
+      <button onclick="rollDice()">Roll</button>
+      <p id="resultDice"></p>
+    </div>
+
+    <div class="game-card" id="coinflip">
+      <h2>🪙 Coin Flip</h2>
+      <p>Bet Amount: <input type="number" id="betCoin" value="100" min="1" /></p>
+      <button onclick="flipCoin()">Flip</button>
+      <p id="resultCoin"></p>
+    </div>
+
+    <div class="game-card" id="slots">
+      <h2>🎰 Slots</h2>
+      <p>Bet Amount: <input type="number" id="betSlots" value="100" min="1" /></p>
+      <button onclick="playSlots()">Spin</button>
+      <p id="resultSlots"></p>
+    </div>
   </div>
 
   <script>
     let balance = 1000;
+
+    function updateBalance() {
+      document.getElementById('balance').textContent = balance;
+    }
+
     function rollDice() {
-      const bet = parseInt(document.getElementById('bet').value);
-      if (bet > balance || bet <= 0) {
-        document.getElementById('result').textContent = "Invalid bet amount.";
-        return;
-      }
+      const bet = parseInt(document.getElementById('betDice').value);
+      if (bet > balance || bet <= 0) return;
       const roll = Math.floor(Math.random() * 6) + 1;
       if (roll >= 4) {
         balance += bet;
-        document.getElementById('result').textContent = `You rolled a ${roll}! You win ${bet} J-Credits!`;
+        document.getElementById('resultDice').textContent = `You rolled a ${roll}! You win ${bet} J-Credits!`;
       } else {
         balance -= bet;
-        document.getElementById('result').textContent = `You rolled a ${roll}! You lose ${bet} J-Credits.`;
+        document.getElementById('resultDice').textContent = `You rolled a ${roll}! You lose ${bet} J-Credits.`;
       }
-      document.getElementById('balance').textContent = balance;
+      updateBalance();
+    }
+
+    function flipCoin() {
+      const bet = parseInt(document.getElementById('betCoin').value);
+      if (bet > balance || bet <= 0) return;
+      const outcome = Math.random() < 0.5 ? 'Heads' : 'Tails';
+      if (Math.random() < 0.5) {
+        balance += bet;
+        document.getElementById('resultCoin').textContent = `${outcome}! You win ${bet} J-Credits!`;
+      } else {
+        balance -= bet;
+        document.getElementById('resultCoin').textContent = `${outcome}! You lose ${bet} J-Credits.`;
+      }
+      updateBalance();
+    }
+
+    function playSlots() {
+      const bet = parseInt(document.getElementById('betSlots').value);
+      if (bet > balance || bet <= 0) return;
+      const symbols = ['🍒', '🍋', '🍊', '⭐', '💎'];
+      const slot1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const slot2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const slot3 = symbols[Math.floor(Math.random() * symbols.length)];
+      if (slot1 === slot2 && slot2 === slot3) {
+        balance += bet * 5;
+        document.getElementById('resultSlots').textContent = `${slot1} ${slot2} ${slot3} Jackpot! You win ${bet * 5} J-Credits!`;
+      } else {
+        balance -= bet;
+        document.getElementById('resultSlots').textContent = `${slot1} ${slot2} ${slot3} You lose ${bet} J-Credits.`;
+      }
+      updateBalance();
     }
   </script>
 </body>

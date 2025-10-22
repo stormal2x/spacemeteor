@@ -1,22 +1,562 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 DripShop - Ropa Dura Streetwear</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Montserrat',sans-serif;background:#0d0d0d;color:#fff}h1,h2,h3{font-family:'Bebas Neue',cursive;letter-spacing:2px}.container{max-width:1400px;margin:0 auto;padding:0 20px}header{position:sticky;top:0;z-index:1000;background:rgba(13,13,13,.98);border-bottom:2px solid #ff0050}.header-content{display:flex;justify-content:space-between;align-items:center;padding:20px 0}.logo h1{font-size:36px;background:linear-gradient(45deg,#ff0050,#ff8c00,#ffeb3b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.logo p{font-size:11px;color:#888;font-weight:700;letter-spacing:3px}nav{display:flex;gap:30px}nav a{color:#fff;text-decoration:none;font-weight:600;transition:.3s;font-size:14px;text-transform:uppercase}nav a:hover{color:#ff0050}.cart-btn{background:linear-gradient(135deg,#ff0050,#ff8c00);border:none;padding:12px 20px;border-radius:25px;cursor:pointer;font-weight:700;color:#fff;text-transform:uppercase;position:relative}.cart-count{position:absolute;top:-8px;right:-8px;background:#000;color:#ff0050;font-size:12px;font-weight:900;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #ff0050;animation:pulse 2s infinite}@keyframes pulse{50%{transform:scale(1.1)}}.hero{padding:120px 0;text-align:center}.hero h1{font-size:120px;font-weight:900;margin-bottom:20px;text-transform:uppercase;background:linear-gradient(45deg,#fff,#ff0050,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.hero-subtitle{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:3px}.hero p{font-size:18px;color:#aaa;margin:20px 0 50px}.btn{padding:18px 40px;border-radius:30px;font-weight:900;font-size:15px;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin:10px}.btn-primary{background:linear-gradient(135deg,#ff0050,#ff8c00);color:#fff}.btn-secondary{background:transparent;color:#fff;border:2px solid #fff}.categories{padding:80px 0}.categories h2{font-size:56px;margin-bottom:40px;text-align:center;text-transform:uppercase;background:linear-gradient(45deg,#ff0050,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.category-buttons{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;margin-bottom:60px}.category-btn{padding:15px 30px;border-radius:30px;font-weight:700;border:2px solid #333;cursor:pointer;background:#1a1a1a;color:#ccc;text-transform:uppercase;font-size:13px}.category-btn.active{background:linear-gradient(135deg,#ff0050,#ff8c00);color:#fff;border-color:#ff0050}.products-section{padding:40px 0 100px}.section-title{font-size:42px;margin-bottom:40px;text-transform:uppercase}.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;margin-bottom:80px}.product-card{background:#1a1a1a;border-radius:15px;overflow:hidden;border:2px solid #222;transition:.3s;position:relative;cursor:pointer}.product-card:hover{transform:translateY(-10px);border-color:#ff0050}.product-card.featured{border-color:#ff0050}.featured-badge{position:absolute;top:15px;left:15px;background:linear-gradient(135deg,#ff0050,#ff8c00);padding:8px 16px;border-radius:20px;font-size:11px;font-weight:900;z-index:10;text-transform:uppercase}.new-badge{position:absolute;top:15px;right:15px;background:#ffeb3b;color:#000;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:900;z-index:10;text-transform:uppercase}.product-image{width:100%;height:350px;object-fit:cover;background:#111}.product-info{padding:25px}.product-name{font-size:22px;font-weight:900;margin-bottom:10px;text-transform:uppercase}.product-description{font-size:13px;color:#888;margin-bottom:20px}.product-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px}.product-price{font-size:28px;font-weight:900;background:linear-gradient(45deg,#ff0050,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.add-to-cart{background:linear-gradient(135deg,#ff0050,#ff8c00);color:#fff;border:none;padding:12px 25px;border-radius:25px;font-weight:900;cursor:pointer;text-transform:uppercase;font-size:12px}.sizes{display:flex;gap:8px;margin-bottom:15px}.size-btn{padding:8px 12px;background:#222;border:1px solid #333;border-radius:8px;font-size:12px;font-weight:700;color:#ccc}.cart-sidebar{position:fixed;right:-100%;top:0;width:100%;max-width:450px;height:100vh;background:#1a1a1a;z-index:2000;transition:right .3s;display:flex;flex-direction:column;border-left:2px solid #ff0050}.cart-sidebar.open{right:0}.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1999;display:none}.cart-overlay.show{display:block}.cart-header{padding:30px;background:linear-gradient(135deg,#ff0050,#ff8c00);display:flex;justify-content:space-between;align-items:center}.cart-header h2{font-size:32px;text-transform:uppercase}.close-cart{background:rgba(0,0,0,.3);border:none;padding:12px;border-radius:50%;cursor:pointer;color:#fff;width:40px;height:40px;font-size:20px;font-weight:900}.cart-items{flex:1;overflow-y:auto;padding:30px;background:#1a1a1a}.cart-item{background:#222;border-radius:15px;padding:20px;margin-bottom:20px}.cart-item-content{display:flex;gap:20px}.cart-item-image{width:90px;height:90px;border-radius:10px;object-fit:cover}.cart-item-name{font-weight:700;margin-bottom:8px;text-transform:uppercase;font-size:14px}.cart-item-price{background:linear-gradient(45deg,#ff0050,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;font-size:18px}.cart-item-controls{display:flex;gap:10px;align-items:center;margin-top:15px}.qty-btn{background:#333;border:none;width:35px;height:35px;border-radius:8px;color:#fff;cursor:pointer;font-weight:900;font-size:16px}.qty-display{width:45px;text-align:center;font-weight:700}.remove-btn{margin-left:auto;background:rgba(255,0,80,.2);border:1px solid #ff0050;padding:10px;border-radius:8px;color:#ff0050;cursor:pointer;font-weight:700;font-size:12px}.cart-empty{text-align:center;padding:80px 20px;color:#666}.cart-footer{padding:30px;background:#111;border-top:2px solid #ff0050}.cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.cart-total-price{font-size:38px;font-weight:900;background:linear-gradient(45deg,#ff0050,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.checkout-btn{width:100%;padding:20px;background:linear-gradient(135deg,#ff0050,#ff8c00);color:#fff;border:none;border-radius:30px;font-weight:900;font-size:16px;cursor:pointer;text-transform:uppercase}footer{background:#000;padding:60px 0;border-top:2px solid #ff0050;text-align:center}footer p{color:#666}@media(max-width:768px){.hero h1{font-size:56px}nav{display:none}}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana Casino - Web3 Gaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .slot {
+            width: 80px;
+            height: 80px;
+            font-size: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .slot.spinning {
+            animation: spin 0.1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+        
+        .dice {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.6s;
+        }
+        
+        .dice.rolling {
+            animation: roll 0.5s ease-in-out;
+        }
+        
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(720deg); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .winner-glow {
+            animation: glow 1.5s ease-in-out;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
-<body>
-<header><div class="container"><div class="header-content"><div class="logo"><h1>DRIPSHOP</h1><p>STREETWEAR</p></div><nav><a href="#productos">Shop</a><a href="#nuevos">Nuevos</a><a href="#ofertas">Ofertas</a></nav><button class="cart-btn" onclick="toggleCart()">🛒 <span class="cart-count" id="cartCount">0</span></button></div></div></header>
-<section class="hero"><div class="container"><h1>DRIP SHOP</h1><div class="hero-subtitle">Ropa Dura Streetwear</div><p>La mejor ropa urbana. Hoodies, camisetas, pantalones cargo y accesorios de alta calidad.</p><button class="btn btn-primary" onclick="document.getElementById('productos').scrollIntoView({behavior:'smooth'})">🔥 VER COLECCIÓN</button><button class="btn btn-secondary">OFERTAS</button></div></section>
-<section class="categories" id="productos"><div class="container"><h2>Categorías</h2><div class="category-buttons"><button class="category-btn active" onclick="filterCategory('all')">TODO</button><button class="category-btn" onclick="filterCategory('hoodies')">HOODIES</button><button class="category-btn" onclick="filterCategory('camisetas')">CAMISETAS</button><button class="category-btn" onclick="filterCategory('pantalones')">PANTALONES</button><button class="category-btn" onclick="filterCategory('accesorios')">ACCESORIOS</button></div></div></section>
-<section class="products-section"><div class="container"><div id="featuredProducts"></div><div id="regularProducts"></div></div></section>
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
-<div class="cart-sidebar" id="cartSidebar"><div class="cart-header"><div><h2>CARRITO</h2><p id="cartItemsCount" style="font-size:12px;margin-top:5px">0 artículos</p></div><button class="close-cart" onclick="toggleCart()">✕</button></div><div class="cart-items" id="cartItems"><div class="cart-empty"><p style="font-size:48px">🛍️</p><p>Tu carrito está vacío</p></div></div><div class="cart-footer" id="cartFooter" style="display:none"><div class="cart-total"><span>Total:</span><span class="cart-total-price" id="totalPrice">€0.00</span></div><button class="checkout-btn" onclick="checkout()">💳 PAGAR</button></div></div>
-<footer><div class="container"><p style="font-size:24px;font-weight:900">DRIPSHOP</p><p>© 2025 - Ropa Dura Streetwear</p></div></footer>
-<script>
-const products=[{id:1,name:"Hoodie Oversized Negro",category:"hoodies",price:59.99,description:"Hoodie oversized 100% algodón premium. Corte amplio streetwear.",image:"https://images.pexels.com/photos/8148577/pexels-photo-8148577.jpeg?w=400",featured:true,stock:25,new:true},{id:2,name:"Hoodie Tech Wear Gris",category:"hoodies",price:69.99,description:"Hoodie técnico con bolsillos cargo. Estilo techwear urbano.",image:"https://images.pexels.com/photos/7148393/pexels-photo-7148393.jpeg?w=400",featured:true,stock:18,new:true},{id:3,name:"Hoodie Básico Blanco",category:"hoodies",price:49.99,description:"Hoodie clásico blanco. Básico esencial streetwear.",image:"https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?w=400",featured:false,stock:40},{id:4,name:"Hoodie Vintage Marrón",category:"hoodies",price:64.99,description:"Hoodie efecto vintage lavado. Color marrón tendencia 2025.",image:"https://images.pexels.com/photos/6311392/pexels-photo-6311392.jpeg?w=400",featured:false,stock:22},{id:5,name:"Camiseta Oversized Negro",category:"camisetas",price:29.99,description:"Camiseta oversized 100% algodón. Corte amplio.",image:"https://images.pexels.com/photos/8148579/pexels-photo-8148579.jpeg?w=400",featured:true,stock:50,new:true},{id:6,name:"Camiseta Graphic Print",category:"camisetas",price:34.99,description:"Camiseta estampado exclusivo. Diseño urban art edición limitada.",image:"https://images.pexels.com/photos/8148583/pexels-photo-8148583.jpeg?w=400",featured:true,stock:35,new:true},{id:7,name:"Camiseta Básica Blanca",category:"camisetas",price:24.99,description:"Pack 2 camisetas básicas blancas. Essential.",image:"https://images.pexels.com/photos/8148575/pexels-photo-8148575.jpeg?w=400",featured:false,stock:60},{id:8,name:"Camiseta Tie Dye",category:"camisetas",price:39.99,description:"Camiseta tie dye artesanal. Cada pieza única.",image:"https://images.pexels.com/photos/8148591/pexels-photo-8148591.jpeg?w=400",featured:false,stock:20},{id:9,name:"Cargo Pants Negro",category:"pantalones",price:79.99,description:"Pantalón cargo múltiples bolsillos. Tejido resistente militar.",image:"https://images.pexels.com/photos/7679454/pexels-photo-7679454.jpeg?w=400",featured:true,stock:30,new:true},{id:10,name:"Jeans Baggy Vintage",category:"pantalones",price:84.99,description:"Jeans baggy fit desgastado. Estilo Y2K tendencia.",image:"https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?w=400",featured:true,stock:25,new:true},{id:11,name:"Joggers Tech Premium",category:"pantalones",price:69.99,description:"Joggers técnicos con cierre tobillo. Deportivo elegante.",image:"https://images.pexels.com/photos/7679448/pexels-photo-7679448.jpeg?w=400",featured:false,stock:35},{id:12,name:"Pantalón Wide Leg",category:"pantalones",price:74.99,description:"Pantalón wide leg corte recto. Comodidad oversized.",image:"https://images.pexels.com/photos/7679461/pexels-photo-7679461.jpeg?w=400",featured:false,stock:28},{id:13,name:"Gorra Trucker Negro",category:"accesorios",price:24.99,description:"Gorra trucker malla trasera. Logo bordado streetwear.",image:"https://images.pexels.com/photos/1149601/pexels-photo-1149601.jpeg?w=400",featured:true,stock:45},{id:14,name:"Riñonera Crossbody",category:"accesorios",price:34.99,description:"Riñonera bandolera convertible. Material impermeable.",image:"https://images.pexels.com/photos/6069830/pexels-photo-6069830.jpeg?w=400",featured:true,stock:40,new:true},{id:15,name:"Beanie Oversized",category:"accesorios",price:19.99,description:"Gorro beanie oversized. Tejido suave look urbano.",image:"https://images.pexels.com/photos/6608270/pexels-photo-6608270.jpeg?w=400",featured:false,stock:55},{id:16,name:"Mochila Urban XXL",category:"accesorios",price:59.99,description:"Mochila urbana gran capacidad. Compartimento laptop.",image:"https://images.pexels.com/photos/1545998/pexels-photo-1545998.jpeg?w=400",featured:false,stock:20},{id:17,name:"Calcetines Premium Pack",category:"accesorios",price:14.99,description:"Pack 3 pares calcetines largos. Algodón logo bordado.",image:"https://images.pexels.com/photos/7679/feet-socks-living-room-cozy.jpg?w=400",featured:false,stock:100},{id:18,name:"Cinturón Táctico Negro",category:"accesorios",price:29.99,description:"Cinturón táctico hebilla metálica. Ajustable resistente.",image:"https://images.pexels.com/photos/1152270/pexels-photo-1152270.jpeg?w=400",featured:false,stock:38}];let cart=[],currentCategory='all';function renderProducts(){const f=products.filter(p=>p.featured&&(currentCategory==='all'||p.category===currentCategory)),r=products.filter(p=>!p.featured&&(currentCategory==='all'||p.category===currentCategory));document.getElementById('featuredProducts').innerHTML=f.length?`<h2 class="section-title">🔥 DESTACADOS</h2><div class="products-grid">${f.map(createProductCard).join('')}</div>`:'';document.getElementById('regularProducts').innerHTML=r.length?`<h2 class="section-title">TODOS</h2><div class="products-grid">${r.map(createProductCard).join('')}</div>`:'';}function createProductCard(p){return`<div class="product-card${p.featured?' featured':''}"><div class="featured-badge" style="display:${p.featured?'block':'none'}">🔥</div><div class="new-badge" style="display:${p.new?'block':'none'}">✨ NUEVO</div><img src="${p.image}" class="product-image"><div class="product-info"><h3 class="product-name">${p.name}</h3><p class="product-description">${p.description}</p><div class="sizes"><span class="size-btn">S</span><span class="size-btn">M</span><span class="size-btn">L</span><span class="size-btn">XL</span></div><div class="product-footer"><div class="product-price">€${p.price.toFixed(2)}</div><button class="add-to-cart" onclick="addToCart(${p.id})"${p.stock===0?' disabled':''}>🛒 AÑADIR</button></div></div></div>`;}function addToCart(id){const p=products.find(x=>x.id===id);if(!p||p.stock===0)return;const e=cart.find(i=>i.id===id);e?e.quantity++:cart.push({...p,quantity:1});updateCart();toggleCart();setTimeout(()=>toggleCart(),2000);}function updateCart(){const c=cart.reduce((t,i)=>t+i.quantity,0),total=cart.reduce((t,i)=>t+(i.price*i.quantity),0);document.getElementById('cartCount').textContent=c;document.getElementById('cartItemsCount').textContent=`${cart.length} artículo${cart.length!=1?'s':''}`;document.getElementById('totalPrice').textContent=`€${total.toFixed(2)}`;if(cart.length===0){document.getElementById('cartItems').innerHTML='<div class="cart-empty"><p style="font-size:48px">🛍️</p><p>Carrito vacío</p></div>';document.getElementById('cartFooter').style.display='none';}else{document.getElementById('cartItems').innerHTML=cart.map(i=>`<div class="cart-item"><div class="cart-item-content"><img src="${i.image}" class="cart-item-image"><div><div class="cart-item-name">${i.name}</div><div class="cart-item-price">€${i.price.toFixed(2)}</div><div class="cart-item-controls"><button class="qty-btn" onclick="updateQuantity(${i.id},-1)">-</button><span class="qty-display">${i.quantity}</span><button class="qty-btn" onclick="updateQuantity(${i.id},1)">+</button><button class="remove-btn" onclick="removeFromCart(${i.id})">🗑️</button></div></div></div></div>`).join('');document.getElementById('cartFooter').style.display='block';}}function updateQuantity(id,c){const i=cart.find(x=>x.id===id);if(i){i.quantity+=c;i.quantity<=0?removeFromCart(id):updateCart();}}function removeFromCart(id){cart=cart.filter(i=>i.id!==id);updateCart();}function toggleCart(){document.getElementById('cartSidebar').classList.toggle('open');document.getElementById('cartOverlay').classList.toggle('show');}function filterCategory(cat){currentCategory=cat;document.querySelectorAll('.category-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderProducts();}function checkout(){alert('🔥 Función de pago próximamente!\n\nTotal: €'+cart.reduce((t,i)=>t+(i.price*i.quantity),0).toFixed(2)+'\n\n¡Gracias por tu compra!');}renderProducts();
-</script>
+<body class="p-4">
+    <div id="toast-container"></div>
+    
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto">
+        <div class="glass rounded-2xl p-6 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">🎰 Solana Casino</h1>
+                    <p class="text-gray-200">Provably fair Web3 gaming on Solana</p>
+                </div>
+                <div id="wallet-section">
+                    <button id="connect-wallet" class="btn-primary text-white px-8 py-3 rounded-xl font-semibold text-lg">
+                        Connect Wallet
+                    </button>
+                    <div id="wallet-info" class="hidden">
+                        <div class="stat-card rounded-xl p-4 text-white">
+                            <div class="text-sm text-gray-200 mb-1">Wallet Balance</div>
+                            <div class="text-2xl font-bold" id="balance">0 SOL</div>
+                            <div class="text-xs text-gray-300 mt-2 truncate w-64" id="wallet-address"></div>
+                            <button id="disconnect-wallet" class="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="stat-card rounded-xl p-4 text-white">
+                <div class="text-sm text-gray-200 mb-1">Total Wagered</div>
+                <div class="text-2xl font-bold" id="total-wagered">0 SOL</div>
+            </div>
+            <div class="stat-card rounded-xl p-4 text-white">
+                <div class="text-sm text-gray-200 mb-1">Total Won</div>
+                <div class="text-2xl font-bold text-green-300" id="total-won">0 SOL</div>
+            </div>
+            <div class="stat-card rounded-xl p-4 text-white">
+                <div class="text-sm text-gray-200 mb-1">Games Played</div>
+                <div class="text-2xl font-bold" id="games-played">0</div>
+            </div>
+        </div>
+        
+        <!-- Games -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Slot Machine -->
+            <div class="glass rounded-2xl p-8">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">🎰 Slot Machine</h2>
+                <div class="flex justify-center gap-4 mb-8">
+                    <div class="slot" id="slot1">🍒</div>
+                    <div class="slot" id="slot2">🍋</div>
+                    <div class="slot" id="slot3">🍊</div>
+                </div>
+                <div class="mb-6">
+                    <label class="text-white text-sm font-semibold mb-2 block">Bet Amount (SOL)</label>
+                    <input type="number" id="slot-bet" value="0.1" step="0.01" min="0.01" 
+                           class="w-full px-4 py-3 rounded-xl bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/60">
+                </div>
+                <button id="spin-btn" class="btn-primary w-full text-white px-6 py-4 rounded-xl font-bold text-xl">
+                    SPIN (0.1 SOL)
+                </button>
+                <div class="mt-4 text-center">
+                    <div id="slot-result" class="text-white font-semibold text-lg"></div>
+                </div>
+                <div class="mt-6 bg-white/10 rounded-xl p-4">
+                    <h4 class="text-white font-semibold mb-2">Payouts:</h4>
+                    <div class="text-sm text-gray-200 space-y-1">
+                        <div>🍒🍒🍒 - 10x</div>
+                        <div>🍋🍋🍋 - 8x</div>
+                        <div>🍊🍊🍊 - 6x</div>
+                        <div>💎💎💎 - 20x (Jackpot!)</div>
+                        <div>Any 2 match - 2x</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dice Game -->
+            <div class="glass rounded-2xl p-8">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">🎲 Dice Roll</h2>
+                <div class="flex justify-center mb-8">
+                    <div class="dice" id="dice">🎲</div>
+                </div>
+                <div class="mb-4">
+                    <label class="text-white text-sm font-semibold mb-2 block">Bet Amount (SOL)</label>
+                    <input type="number" id="dice-bet" value="0.1" step="0.01" min="0.01" 
+                           class="w-full px-4 py-3 rounded-xl bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/60">
+                </div>
+                <div class="mb-6">
+                    <label class="text-white text-sm font-semibold mb-2 block">Predict: Roll Over</label>
+                    <input type="range" id="dice-prediction" value="50" min="1" max="99" 
+                           class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-white/20">
+                    <div class="flex justify-between text-white text-sm mt-2">
+                        <span>1</span>
+                        <span class="font-bold text-lg" id="prediction-value">50</span>
+                        <span>99</span>
+                    </div>
+                    <div class="text-center text-yellow-300 font-semibold mt-2" id="dice-multiplier">
+                        Win Multiplier: 1.98x
+                    </div>
+                </div>
+                <button id="roll-btn" class="btn-primary w-full text-white px-6 py-4 rounded-xl font-bold text-xl">
+                    ROLL DICE (0.1 SOL)
+                </button>
+                <div class="mt-4 text-center">
+                    <div id="dice-result" class="text-white font-semibold text-lg"></div>
+                </div>
+                <div class="mt-6 bg-white/10 rounded-xl p-4">
+                    <h4 class="text-white font-semibold mb-2">How to Play:</h4>
+                    <div class="text-sm text-gray-200 space-y-1">
+                        <div>1. Choose your bet amount</div>
+                        <div>2. Set prediction threshold (1-99)</div>
+                        <div>3. Roll the dice</div>
+                        <div>4. Win if roll is over your prediction!</div>
+                        <div class="text-yellow-300 mt-2">Higher risk = Higher reward</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-8 text-center text-white/70 text-sm">
+            <p>⚠️ Demo Mode - Transactions are simulated for testing purposes</p>
+            <p class="mt-2">Built with Solana Web3.js | Provably Fair Gaming</p>
+        </div>
+    </div>
+
+    <script>
+        // Solana Web3 Setup
+        const { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } = solanaWeb3;
+        
+        let wallet = null;
+        let connection = null;
+        let balance = 0;
+        
+        // Stats
+        let stats = {
+            totalWagered: 0,
+            totalWon: 0,
+            gamesPlayed: 0
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+            setupEventListeners();
+            updateStats();
+        });
+        
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            toast.className = `toast ${colors[type]} text-white px-6 py-4 rounded-xl shadow-lg`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="font-semibold">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-xl">&times;</button>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+        
+        // Wallet Connection
+        async function connectWallet() {
+            try {
+                const { solana } = window;
+                
+                if (!solana) {
+                    showToast('Please install Phantom wallet!', 'error');
+                    window.open('https://phantom.app/', '_blank');
+                    return;
+                }
+                
+                const response = await solana.connect();
+                wallet = response.publicKey.toString();
+                
+                // Get balance
+                const publicKey = new PublicKey(wallet);
+                const balanceLamports = await connection.getBalance(publicKey);
+                balance = balanceLamports / LAMPORTS_PER_SOL;
+                
+                document.getElementById('connect-wallet').classList.add('hidden');
+                document.getElementById('wallet-info').classList.remove('hidden');
+                document.getElementById('wallet-address').textContent = wallet;
+                updateBalance();
+                
+                showToast('Wallet connected successfully!', 'success');
+            } catch (err) {
+                console.error('Connection error:', err);
+                showToast('Failed to connect wallet', 'error');
+            }
+        }
+        
+        function disconnectWallet() {
+            wallet = null;
+            balance = 0;
+            document.getElementById('connect-wallet').classList.remove('hidden');
+            document.getElementById('wallet-info').classList.add('hidden');
+            showToast('Wallet disconnected', 'info');
+        }
+        
+        function updateBalance() {
+            document.getElementById('balance').textContent = `${balance.toFixed(4)} SOL`;
+        }
+        
+        function updateStats() {
+            document.getElementById('total-wagered').textContent = `${stats.totalWagered.toFixed(4)} SOL`;
+            document.getElementById('total-won').textContent = `${stats.totalWon.toFixed(4)} SOL`;
+            document.getElementById('games-played').textContent = stats.gamesPlayed;
+        }
+        
+        // Slot Machine
+        const symbols = ['🍒', '🍋', '🍊', '💎', '⭐', '🍇'];
+        
+        async function spinSlots() {
+            if (!wallet) {
+                showToast('Please connect your wallet first!', 'warning');
+                return;
+            }
+            
+            const betAmount = parseFloat(document.getElementById('slot-bet').value);
+            
+            if (betAmount <= 0 || betAmount > balance) {
+                showToast('Invalid bet amount!', 'error');
+                return;
+            }
+            
+            // Deduct bet
+            balance -= betAmount;
+            stats.totalWagered += betAmount;
+            stats.gamesPlayed++;
+            updateBalance();
+            updateStats();
+            
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'SPINNING...';
+            
+            const slots = [
+                document.getElementById('slot1'),
+                document.getElementById('slot2'),
+                document.getElementById('slot3')
+            ];
+            
+            // Start spinning animation
+            slots.forEach(slot => slot.classList.add('spinning'));
+            
+            // Simulate spinning
+            const spinDuration = 2000;
+            const results = [];
+            
+            for (let i = 0; i < 3; i++) {
+                await new Promise(resolve => setTimeout(resolve, 500 + i * 200));
+                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                results.push(symbol);
+                slots[i].classList.remove('spinning');
+                slots[i].textContent = symbol;
+            }
+            
+            // Calculate win
+            let winMultiplier = 0;
+            const resultText = document.getElementById('slot-result');
+            
+            if (results[0] === results[1] && results[1] === results[2]) {
+                // All match
+                if (results[0] === '💎') winMultiplier = 20;
+                else if (results[0] === '🍒') winMultiplier = 10;
+                else if (results[0] === '🍋') winMultiplier = 8;
+                else if (results[0] === '🍊') winMultiplier = 6;
+                else winMultiplier = 5;
+                
+                const winAmount = betAmount * winMultiplier;
+                balance += winAmount;
+                stats.totalWon += winAmount;
+                
+                slots.forEach(slot => slot.classList.add('winner-glow'));
+                setTimeout(() => slots.forEach(slot => slot.classList.remove('winner-glow')), 1500);
+                
+                resultText.textContent = `🎉 WINNER! +${winAmount.toFixed(4)} SOL (${winMultiplier}x)`;
+                resultText.className = 'text-yellow-300 font-bold text-xl';
+                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
+            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                // Two match
+                winMultiplier = 2;
+                const winAmount = betAmount * winMultiplier;
+                balance += winAmount;
+                stats.totalWon += winAmount;
+                
+                resultText.textContent = `✨ Two Match! +${winAmount.toFixed(4)} SOL (${winMultiplier}x)`;
+                resultText.className = 'text-green-300 font-semibold text-lg';
+                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
+            } else {
+                resultText.textContent = `❌ No match. Try again!`;
+                resultText.className = 'text-red-300 font-semibold text-lg';
+            }
+            
+            updateBalance();
+            updateStats();
+            
+            spinBtn.disabled = false;
+            spinBtn.textContent = `SPIN (${betAmount} SOL)`;
+        }
+        
+        // Dice Game
+        const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+        
+        function updateDiceMultiplier() {
+            const prediction = parseInt(document.getElementById('dice-prediction').value);
+            document.getElementById('prediction-value').textContent = prediction;
+            
+            // Calculate multiplier (house edge 2%)
+            const winChance = (100 - prediction) / 100;
+            const multiplier = (0.98 / winChance).toFixed(2);
+            document.getElementById('dice-multiplier').textContent = `Win Multiplier: ${multiplier}x`;
+        }
+        
+        async function rollDice() {
+            if (!wallet) {
+                showToast('Please connect your wallet first!', 'warning');
+                return;
+            }
+            
+            const betAmount = parseFloat(document.getElementById('dice-bet').value);
+            const prediction = parseInt(document.getElementById('dice-prediction').value);
+            
+            if (betAmount <= 0 || betAmount > balance) {
+                showToast('Invalid bet amount!', 'error');
+                return;
+            }
+            
+            // Deduct bet
+            balance -= betAmount;
+            stats.totalWagered += betAmount;
+            stats.gamesPlayed++;
+            updateBalance();
+            updateStats();
+            
+            const rollBtn = document.getElementById('roll-btn');
+            rollBtn.disabled = true;
+            rollBtn.textContent = 'ROLLING...';
+            
+            const diceElement = document.getElementById('dice');
+            diceElement.classList.add('rolling');
+            
+            // Animate dice
+            const rollAnimation = setInterval(() => {
+                diceElement.textContent = diceSymbols[Math.floor(Math.random() * 6)];
+            }, 50);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            clearInterval(rollAnimation);
+            
+            // Final roll (1-100)
+            const roll = Math.floor(Math.random() * 100) + 1;
+            const diceValue = Math.ceil(roll / 16.67); // Convert to 1-6 for display
+            diceElement.textContent = diceSymbols[diceValue - 1];
+            diceElement.classList.remove('rolling');
+            
+            const resultText = document.getElementById('dice-result');
+            const winChance = (100 - prediction) / 100;
+            const multiplier = 0.98 / winChance;
+            
+            if (roll > prediction) {
+                // Win
+                const winAmount = betAmount * multiplier;
+                balance += winAmount;
+                stats.totalWon += winAmount;
+                
+                diceElement.classList.add('winner-glow');
+                setTimeout(() => diceElement.classList.remove('winner-glow'), 1500);
+                
+                resultText.textContent = `🎉 YOU WIN! Rolled ${roll} > ${prediction} | +${winAmount.toFixed(4)} SOL`;
+                resultText.className = 'text-yellow-300 font-bold text-xl';
+                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
+            } else {
+                resultText.textContent = `❌ YOU LOSE! Rolled ${roll} ≤ ${prediction}`;
+                resultText.className = 'text-red-300 font-semibold text-lg';
+            }
+            
+            updateBalance();
+            updateStats();
+            
+            rollBtn.disabled = false;
+            rollBtn.textContent = `ROLL DICE (${betAmount} SOL)`;
+        }
+        
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+            document.getElementById('disconnect-wallet').addEventListener('click', disconnectWallet);
+            
+            // Slot Machine
+            document.getElementById('spin-btn').addEventListener('click', spinSlots);
+            document.getElementById('slot-bet').addEventListener('input', (e) => {
+                document.getElementById('spin-btn').textContent = `SPIN (${e.target.value} SOL)`;
+            });
+            
+            // Dice
+            document.getElementById('roll-btn').addEventListener('click', rollDice);
+            document.getElementById('dice-bet').addEventListener('input', (e) => {
+                document.getElementById('roll-btn').textContent = `ROLL DICE (${e.target.value} SOL)`;
+            });
+            document.getElementById('dice-prediction').addEventListener('input', updateDiceMultiplier);
+            
+            updateDiceMultiplier();
+        }
+        
+        // Check for Phantom wallet
+        window.addEventListener('load', () => {
+            if (window.solana) {
+                window.solana.on('connect', () => {
+                    console.log('Wallet connected');
+                });
+                
+                window.solana.on('disconnect', () => {
+                    disconnectWallet();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

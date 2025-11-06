@@ -10,6 +10,7 @@ let settings = JSON.parse(localStorage.getItem('settings')) || {
 };
 
 let currentMonth = new Date();
+let selectedTradeDate = null; // yyyy-mm-dd string when user selects a day from calendar
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -431,12 +432,14 @@ function handleTradeSubmit(event) {
     const screenshotFile = formData.get('screenshot');
     const screenshotName = screenshotFile && screenshotFile.name ? screenshotFile.name : null;
     
+    const todayIso = new Date().toISOString().split('T')[0];
+    const tradeDateIso = selectedTradeDate || todayIso;
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
         type: formData.get('type'),
-        tradeDate: new Date().toISOString().split('T')[0], // Auto-generate today's date
-        entryDate: new Date().toISOString().split('T')[0], // Keep for compatibility
-        exitDate: new Date().toISOString().split('T')[0], // Keep for compatibility
+        tradeDate: tradeDateIso,
+        entryDate: tradeDateIso, // Keep for compatibility
+        exitDate: tradeDateIso, // Keep for compatibility
         entryPrice: formData.get('entryPrice'),
         exitPrice: formData.get('exitPrice'),
         quantity: formData.get('quantity'),
@@ -463,8 +466,9 @@ function handleTradeSubmit(event) {
     
     showToast('Trade added successfully! 🚀', 'success');
     
-    // Switch to calendar view
+    // Clear selected day and switch to calendar view
     setTimeout(() => {
+        selectedTradeDate = null;
         switchSection('calendar');
         document.querySelector('[data-section="calendar"]').classList.add('active');
         document.querySelector('[data-section="add-trade"]').classList.remove('active');
@@ -475,6 +479,8 @@ function handleTradeSubmit(event) {
 function loadCalendar() {
     const grid = document.getElementById('calendarGrid');
     const monthLabel = document.getElementById('currentMonth');
+    const monthSelect = document.getElementById('calendarMonthSelect');
+    const yearSelect = document.getElementById('calendarYearSelect');
     
     if (!grid) return;
     
@@ -484,6 +490,35 @@ function loadCalendar() {
     if (monthLabel) {
         monthLabel.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
+    // Populate selectors
+    if (monthSelect && monthSelect.options.length === 0) {
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        monthNames.forEach((m, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = m;
+            monthSelect.appendChild(opt);
+        });
+        monthSelect.addEventListener('change', (e) => {
+            currentMonth = new Date(year, parseInt(e.target.value, 10), 1);
+            loadCalendar();
+        });
+    }
+    if (yearSelect && yearSelect.options.length === 0) {
+        const start = year - 5, end = year + 5;
+        for (let y = start; y <= end; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        }
+        yearSelect.addEventListener('change', (e) => {
+            currentMonth = new Date(parseInt(e.target.value, 10), month, 1);
+            loadCalendar();
+        });
+    }
+    if (monthSelect) monthSelect.value = String(month);
+    if (yearSelect) yearSelect.value = String(year);
     
     // Calculate month stats
     const monthTrades = trades.filter(trade => {
@@ -509,6 +544,14 @@ function loadCalendar() {
     
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Precompute daily totals for heatmap
+    const dayTotals = Array.from({length: daysInMonth + 1}, () => 0);
+    monthTrades.forEach(trade => {
+        const d = new Date(trade.tradeDate || trade.entryDate).getDate();
+        dayTotals[d] += calculatePnL(trade);
+    });
+    const maxAbs = dayTotals.reduce((m,v) => Math.max(m, Math.abs(v)), 0);
     
     grid.innerHTML = '';
     
@@ -544,14 +587,41 @@ function loadCalendar() {
         const dayEl = document.createElement('div');
         dayEl.className = 'calendar-day';
         
+        // Heatmap class
+        if (dayTrades.length > 0 && maxAbs > 0) {
+            const bucket = Math.min(5, Math.max(1, Math.ceil((Math.abs(dayPnL) / maxAbs) * 5)));
+            if (dayPnL >= 0) dayEl.classList.add(`heat-positive-${bucket}`);
+            else dayEl.classList.add(`heat-negative-${bucket}`);
+        }
+        
+        // Selected day visual
+        const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        if (selectedTradeDate === iso) dayEl.classList.add('selected');
+        
+        // Tooltip
         if (dayTrades.length > 0) {
-            dayEl.classList.add(dayPnL >= 0 ? 'profit' : 'loss');
+            const winsCount = dayTrades.filter(t => calculatePnL(t) > 0).length;
+            dayEl.title = `${iso}\nTrades: ${dayTrades.length} | Wins: ${winsCount}\nPnL: ${formatCurrency(dayPnL)}`;
+        } else {
+            dayEl.title = `${iso}\nNo trades`;
         }
         
         dayEl.innerHTML = `
             <div class="calendar-day-number">${day}</div>
             ${dayTrades.length > 0 ? `<div class="calendar-day-pnl">${formatCurrency(dayPnL)}</div>` : ''}
         `;
+        // Click to select this date and jump to add-trade
+        dayEl.dataset.date = iso;
+        dayEl.addEventListener('click', () => {
+            selectedTradeDate = iso;
+            // Rerender selection highlight
+            document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+            dayEl.classList.add('selected');
+            // Prefill and go to add trade
+            switchSection('add-trade');
+            const qtyInput = document.getElementById('tradeQuantity');
+            if (qtyInput) qtyInput.focus();
+        });
         
         grid.appendChild(dayEl);
     }
@@ -564,6 +634,12 @@ function previousMonth() {
 
 function nextMonth() {
     currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
+    loadCalendar();
+}
+
+function goToToday() {
+    currentMonth = new Date();
+    selectedTradeDate = null;
     loadCalendar();
 }
 

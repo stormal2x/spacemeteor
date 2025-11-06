@@ -79,18 +79,21 @@
         <section id="calendar" class="content-section active">
             <div class="section-header">
                 <h1>Trade Calendar</h1>
-                <div class="header-actions">
-                    <button class="btn-icon" onclick="previousMonth()">
+                <div class="header-actions calendar-controls">
+                    <button class="btn-icon" onclick="previousMonth()" title="Previous Month">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M15 18l-6-6 6-6"/>
                         </svg>
                     </button>
                     <span id="currentMonth" class="month-label"></span>
-                    <button class="btn-icon" onclick="nextMonth()">
+                    <button class="btn-icon" onclick="nextMonth()" title="Next Month">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
                     </button>
+                    <select id="calendarMonthSelect" class="select-input small"></select>
+                    <select id="calendarYearSelect" class="select-input small"></select>
+                    <button class="btn-secondary small" onclick="goToToday()">Today</button>
                 </div>
             </div>
 

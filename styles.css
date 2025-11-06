@@ -5,6 +5,97 @@
     box-sizing: border-box;
 }
 
+/* Calendar Enhancements */
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.select-input.small {
+    padding: 8px 10px;
+    font-size: 13px;
+    height: 36px;
+}
+
+.btn-secondary.small {
+    padding: 8px 12px;
+    font-size: 13px;
+    height: 36px;
+}
+
+.calendar-container {
+    margin-top: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    min-height: 90px;
+    padding: 8px;
+    transition: var(--transition);
+}
+
+.calendar-day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow);
+}
+
+.calendar-day.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.25);
+}
+
+.calendar-day-number {
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.calendar-day-pnl {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* Heatmap levels for profit days */
+.heat-positive-1 { background: linear-gradient(180deg, rgba(16,185,129,0.10), rgba(16,185,129,0.08)); }
+.heat-positive-2 { background: linear-gradient(180deg, rgba(16,185,129,0.16), rgba(16,185,129,0.12)); }
+.heat-positive-3 { background: linear-gradient(180deg, rgba(16,185,129,0.22), rgba(16,185,129,0.16)); }
+.heat-positive-4 { background: linear-gradient(180deg, rgba(16,185,129,0.30), rgba(16,185,129,0.22)); }
+.heat-positive-5 { background: linear-gradient(180deg, rgba(16,185,129,0.38), rgba(16,185,129,0.28)); }
+
+/* Heatmap levels for loss days */
+.heat-negative-1 { background: linear-gradient(180deg, rgba(239,68,68,0.10), rgba(239,68,68,0.08)); }
+.heat-negative-2 { background: linear-gradient(180deg, rgba(239,68,68,0.16), rgba(239,68,68,0.12)); }
+.heat-negative-3 { background: linear-gradient(180deg, rgba(239,68,68,0.22), rgba(239,68,68,0.16)); }
+.heat-negative-4 { background: linear-gradient(180deg, rgba(239,68,68,0.30), rgba(239,68,68,0.22)); }
+.heat-negative-5 { background: linear-gradient(180deg, rgba(239,68,68,0.38), rgba(239,68,68,0.28)); }
+
+/* Day headers in grid */
+.calendar-grid > div:nth-child(-n+7) {
+    background: transparent !important;
+    border: none;
+    min-height: auto;
+    padding: 6px 0;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+}
+
+@media (max-width: 768px) {
+    .calendar-day { min-height: 72px; }
+}
+
 :root {
     --primary: #6366f1;
     --primary-dark: #4f46e5;

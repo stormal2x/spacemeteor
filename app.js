@@ -16,7 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     loadCalendar(); // Calendar is now the default page
     applySettings();
+    initPositionCalculator();
 });
+
+function initPositionCalculator() {
+    const calcInputs = ['calcAccountSize', 'calcRiskPercent', 'calcEntry', 'calcSL'];
+    
+    calcInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', calculatePositionSize);
+        }
+    });
+    
+    // Sync calculator with trade form
+    const tradeEntry = document.getElementById('tradeEntry');
+    const tradeSL = document.getElementById('tradeSL');
+    const calcEntry = document.getElementById('calcEntry');
+    const calcSL = document.getElementById('calcSL');
+    
+    if (tradeEntry && calcEntry) {
+        tradeEntry.addEventListener('input', () => {
+            calcEntry.value = tradeEntry.value;
+            calculatePositionSize();
+        });
+    }
+    
+    if (tradeSL && calcSL) {
+        tradeSL.addEventListener('input', () => {
+            calcSL.value = tradeSL.value;
+            calculatePositionSize();
+        });
+    }
+}
 
 // Navigation
 function initNavigation() {
@@ -357,6 +389,29 @@ function deleteTrade(index) {
     }
 }
 
+// Position Size Calculator
+function calculatePositionSize() {
+    const accountSize = parseFloat(document.getElementById('calcAccountSize')?.value) || 0;
+    const riskPercent = parseFloat(document.getElementById('calcRiskPercent')?.value) || 0;
+    const entryPrice = parseFloat(document.getElementById('calcEntry')?.value) || 0;
+    const stopLoss = parseFloat(document.getElementById('calcSL')?.value) || 0;
+    
+    if (accountSize && riskPercent && entryPrice && stopLoss && entryPrice !== stopLoss) {
+        const riskAmount = (accountSize * riskPercent) / 100;
+        const riskPerShare = Math.abs(entryPrice - stopLoss);
+        const positionSize = Math.floor(riskAmount / riskPerShare);
+        
+        document.getElementById('calcPositionSize').textContent = positionSize.toLocaleString();
+        document.getElementById('calcRiskAmount').textContent = formatCurrency(riskAmount);
+        
+        // Auto-fill quantity
+        const qtyInput = document.getElementById('tradeQuantity');
+        if (qtyInput && positionSize > 0) {
+            qtyInput.value = positionSize;
+        }
+    }
+}
+
 // Add Trade Form
 function handleTradeSubmit(event) {
     event.preventDefault();
@@ -364,20 +419,37 @@ function handleTradeSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
     
+    // Collect mistakes
+    const mistakes = [];
+    form.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+        if (cb.name.startsWith('mistake_')) {
+            mistakes.push(cb.value);
+        }
+    });
+    
+    // Handle screenshot (for now, just store filename)
+    const screenshotFile = formData.get('screenshot');
+    const screenshotName = screenshotFile && screenshotFile.name ? screenshotFile.name : null;
+    
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
         type: formData.get('type'),
-        tradeDate: formData.get('tradeDate'),
-        entryDate: formData.get('tradeDate'), // Keep for compatibility
-        exitDate: formData.get('tradeDate'), // Keep for compatibility
+        tradeDate: new Date().toISOString().split('T')[0], // Auto-generate today's date
+        entryDate: new Date().toISOString().split('T')[0], // Keep for compatibility
+        exitDate: new Date().toISOString().split('T')[0], // Keep for compatibility
         entryPrice: formData.get('entryPrice'),
         exitPrice: formData.get('exitPrice'),
         quantity: formData.get('quantity'),
         stopLoss: formData.get('stopLoss') || null,
         takeProfit: formData.get('takeProfit') || null,
+        session: formData.get('session') || null,
+        emotion: formData.get('emotion') || null,
+        confidence: formData.get('confidence') || null,
+        mistakes: mistakes.length > 0 ? mistakes.join(', ') : null,
         strategy: formData.get('strategy'),
         tags: formData.get('tags'),
         notes: formData.get('notes'),
+        screenshot: screenshotName,
         createdAt: new Date().toISOString()
     };
     
@@ -385,7 +457,11 @@ function handleTradeSubmit(event) {
     saveTrades();
     
     form.reset();
-    showToast('Trade added successfully!', 'success');
+    // Reset calculator
+    document.getElementById('calcPositionSize').textContent = '0';
+    document.getElementById('calcRiskAmount').textContent = '$0.00';
+    
+    showToast('Trade added successfully! 🚀', 'success');
     
     // Switch to calendar view
     setTimeout(() => {

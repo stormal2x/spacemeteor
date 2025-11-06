@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TradePro Journal</title>
+    <title>Dashboard - SpaceMeteor Journal</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="dashboard-body">
@@ -16,7 +16,7 @@
                 <circle cx="30" cy="25" r="3" fill="#6366f1"/>
                 <circle cx="40" cy="10" r="3" fill="#6366f1"/>
             </svg>
-            <h2>TradePro</h2>
+            <h2>SpaceMeteor</h2>
         </div>
 
         <nav class="sidebar-nav">
@@ -178,6 +178,37 @@
 
             <div class="form-card">
                 <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
+                    <!-- Position Size Calculator -->
+                    <div class="calculator-card">
+                        <h3>📊 Position Size Calculator</h3>
+                        <div class="calculator-grid">
+                            <div class="calc-input">
+                                <label>Account Size</label>
+                                <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
+                            </div>
+                            <div class="calc-input">
+                                <label>Risk %</label>
+                                <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10">
+                            </div>
+                            <div class="calc-input">
+                                <label>Entry Price</label>
+                                <input type="number" id="calcEntry" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="calc-input">
+                                <label>Stop Loss</label>
+                                <input type="number" id="calcSL" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="calc-result">
+                                <label>Position Size</label>
+                                <div class="calc-output" id="calcPositionSize">0</div>
+                            </div>
+                            <div class="calc-result">
+                                <label>Risk Amount</label>
+                                <div class="calc-output" id="calcRiskAmount">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Symbol *</label>
@@ -193,18 +224,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Trade Date *</label>
-                            <input type="date" name="tradeDate" required>
-                        </div>
-
-                        <div class="form-group">
                             <label>Quantity *</label>
-                            <input type="number" name="quantity" step="0.01" placeholder="0" required>
+                            <input type="number" name="quantity" step="0.01" placeholder="0" required id="tradeQuantity">
                         </div>
 
                         <div class="form-group">
                             <label>Entry Price *</label>
-                            <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required>
+                            <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required id="tradeEntry">
                         </div>
 
                         <div class="form-group">
@@ -213,13 +239,51 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Stop Loss (optional)</label>
-                            <input type="number" name="stopLoss" step="0.01" placeholder="0.00">
+                            <label>Stop Loss</label>
+                            <input type="number" name="stopLoss" step="0.01" placeholder="0.00" id="tradeSL">
                         </div>
 
                         <div class="form-group">
-                            <label>Take Profit (optional)</label>
+                            <label>Take Profit</label>
                             <input type="number" name="takeProfit" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Session Time</label>
+                            <select name="session">
+                                <option value="">Select Session</option>
+                                <option value="asian">🌏 Asian Session</option>
+                                <option value="london">🇬🇧 London Session</option>
+                                <option value="newyork">🗽 New York Session</option>
+                                <option value="overlap">⚡ London/NY Overlap</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>How Did You Feel? 🧠</label>
+                            <select name="emotion">
+                                <option value="">Select Emotion</option>
+                                <option value="confident">😎 Confident</option>
+                                <option value="calm">😌 Calm & Focused</option>
+                                <option value="excited">🤩 Excited</option>
+                                <option value="anxious">😰 Anxious</option>
+                                <option value="fearful">😨 Fearful</option>
+                                <option value="greedy">🤑 Greedy</option>
+                                <option value="revenge">😤 Revenge Trading</option>
+                                <option value="fomo">😱 FOMO</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Confidence Level</label>
+                            <select name="confidence">
+                                <option value="">How sure were you?</option>
+                                <option value="5">⭐⭐⭐⭐⭐ Very High</option>
+                                <option value="4">⭐⭐⭐⭐ High</option>
+                                <option value="3">⭐⭐⭐ Medium</option>
+                                <option value="2">⭐⭐ Low</option>
+                                <option value="1">⭐ Very Low</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -233,13 +297,31 @@
                         </div>
 
                         <div class="form-group full-width">
+                            <label>Mistakes Made? 🚫</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_sized" value="oversized"> Oversized Position</label>
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_sl" value="no-sl"> No Stop Loss</label>
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_plan" value="no-plan"> No Trade Plan</label>
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_exit" value="early-exit"> Exited Too Early</label>
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_hold" value="held-long"> Held Too Long</label>
+                                <label class="checkbox-label"><input type="checkbox" name="mistake_rules" value="broke-rules"> Broke My Rules</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
                             <label>Trade Notes</label>
-                            <textarea name="notes" rows="4" placeholder="What was your setup? How did you feel? What did you learn?"></textarea>
+                            <textarea name="notes" rows="4" placeholder="What was your setup? What did you learn? What would you do differently?"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Trade Screenshot (optional)</label>
+                            <input type="file" name="screenshot" accept="image/*" class="file-input">
+                            <small style="color: var(--text-secondary);">Upload a chart screenshot or trade setup image</small>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">Save Trade</button>
+                        <button type="submit" class="btn-primary">💾 Save Trade</button>
                         <button type="button" class="btn-secondary" onclick="document.getElementById('tradeForm').reset()">Clear Form</button>
                     </div>
                 </form>
@@ -545,8 +627,9 @@
 
             <div class="settings-card">
                 <h3>About</h3>
-                <p>TradePro Journal v1.0</p>
+                <p>SpaceMeteor Journal v1.0</p>
                 <p>Track, analyze, and improve your trading performance.</p>
+                <p>🚀 Your journey to profitability starts here.</p>
             </div>
         </section>
     </main>

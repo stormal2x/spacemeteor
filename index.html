@@ -3,560 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Casino - Web3 Gaming</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-        
-        * { font-family: 'Inter', sans-serif; }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        
-        .slot {
-            width: 80px;
-            height: 80px;
-            font-size: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s;
-        }
-        
-        .slot.spinning {
-            animation: spin 0.1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-100px); }
-        }
-        
-        .dice {
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.6s;
-        }
-        
-        .dice.rolling {
-            animation: roll 0.5s ease-in-out;
-        }
-        
-        @keyframes roll {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(720deg); }
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .winner-glow {
-            animation: glow 1.5s ease-in-out;
-        }
-        
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
-            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
-        }
-        
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            min-width: 300px;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
+    <title>TradePro Journal - Your Trading Companion</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="p-4">
-    <div id="toast-container"></div>
-    
-    <!-- Header -->
-    <div class="max-w-6xl mx-auto">
-        <div class="glass rounded-2xl p-6 mb-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h1 class="text-4xl font-bold text-white mb-2">🎰 Solana Casino</h1>
-                    <p class="text-gray-200">Provably fair Web3 gaming on Solana</p>
-                </div>
-                <div id="wallet-section">
-                    <button id="connect-wallet" class="btn-primary text-white px-8 py-3 rounded-xl font-semibold text-lg">
-                        Connect Wallet
-                    </button>
-                    <div id="wallet-info" class="hidden">
-                        <div class="stat-card rounded-xl p-4 text-white">
-                            <div class="text-sm text-gray-200 mb-1">Wallet Balance</div>
-                            <div class="text-2xl font-bold" id="balance">0 SOL</div>
-                            <div class="text-xs text-gray-300 mt-2 truncate w-64" id="wallet-address"></div>
-                            <button id="disconnect-wallet" class="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                                Disconnect
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="stat-card rounded-xl p-4 text-white">
-                <div class="text-sm text-gray-200 mb-1">Total Wagered</div>
-                <div class="text-2xl font-bold" id="total-wagered">0 SOL</div>
-            </div>
-            <div class="stat-card rounded-xl p-4 text-white">
-                <div class="text-sm text-gray-200 mb-1">Total Won</div>
-                <div class="text-2xl font-bold text-green-300" id="total-won">0 SOL</div>
-            </div>
-            <div class="stat-card rounded-xl p-4 text-white">
-                <div class="text-sm text-gray-200 mb-1">Games Played</div>
-                <div class="text-2xl font-bold" id="games-played">0</div>
-            </div>
-        </div>
-        
-        <!-- Games -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Slot Machine -->
-            <div class="glass rounded-2xl p-8">
-                <h2 class="text-3xl font-bold text-white mb-6 text-center">🎰 Slot Machine</h2>
-                <div class="flex justify-center gap-4 mb-8">
-                    <div class="slot" id="slot1">🍒</div>
-                    <div class="slot" id="slot2">🍋</div>
-                    <div class="slot" id="slot3">🍊</div>
-                </div>
-                <div class="mb-6">
-                    <label class="text-white text-sm font-semibold mb-2 block">Bet Amount (SOL)</label>
-                    <input type="number" id="slot-bet" value="0.1" step="0.01" min="0.01" 
-                           class="w-full px-4 py-3 rounded-xl bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/60">
-                </div>
-                <button id="spin-btn" class="btn-primary w-full text-white px-6 py-4 rounded-xl font-bold text-xl">
-                    SPIN (0.1 SOL)
-                </button>
-                <div class="mt-4 text-center">
-                    <div id="slot-result" class="text-white font-semibold text-lg"></div>
-                </div>
-                <div class="mt-6 bg-white/10 rounded-xl p-4">
-                    <h4 class="text-white font-semibold mb-2">Payouts:</h4>
-                    <div class="text-sm text-gray-200 space-y-1">
-                        <div>🍒🍒🍒 - 10x</div>
-                        <div>🍋🍋🍋 - 8x</div>
-                        <div>🍊🍊🍊 - 6x</div>
-                        <div>💎💎💎 - 20x (Jackpot!)</div>
-                        <div>Any 2 match - 2x</div>
-                    </div>
-                </div>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 35L20 20L30 25L40 10" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="20" cy="20" r="3" fill="#6366f1"/>
+                    <circle cx="30" cy="25" r="3" fill="#6366f1"/>
+                    <circle cx="40" cy="10" r="3" fill="#6366f1"/>
+                </svg>
+                <h1>TradePro Journal</h1>
             </div>
             
-            <!-- Dice Game -->
-            <div class="glass rounded-2xl p-8">
-                <h2 class="text-3xl font-bold text-white mb-6 text-center">🎲 Dice Roll</h2>
-                <div class="flex justify-center mb-8">
-                    <div class="dice" id="dice">🎲</div>
-                </div>
-                <div class="mb-4">
-                    <label class="text-white text-sm font-semibold mb-2 block">Bet Amount (SOL)</label>
-                    <input type="number" id="dice-bet" value="0.1" step="0.01" min="0.01" 
-                           class="w-full px-4 py-3 rounded-xl bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/60">
-                </div>
-                <div class="mb-6">
-                    <label class="text-white text-sm font-semibold mb-2 block">Predict: Roll Over</label>
-                    <input type="range" id="dice-prediction" value="50" min="1" max="99" 
-                           class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-white/20">
-                    <div class="flex justify-between text-white text-sm mt-2">
-                        <span>1</span>
-                        <span class="font-bold text-lg" id="prediction-value">50</span>
-                        <span>99</span>
-                    </div>
-                    <div class="text-center text-yellow-300 font-semibold mt-2" id="dice-multiplier">
-                        Win Multiplier: 1.98x
-                    </div>
-                </div>
-                <button id="roll-btn" class="btn-primary w-full text-white px-6 py-4 rounded-xl font-bold text-xl">
-                    ROLL DICE (0.1 SOL)
+            <div class="hero-text">
+                <h2>Your <span class="highlight">#1 key tool</span> to profitability</h2>
+                <p>Track, analyze, and improve your trading performance with powerful insights and analytics.</p>
+            </div>
+
+            <div class="login-form">
+                <button class="btn-primary" onclick="freeAccess()">
+                    <span>Get Free Access</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
                 </button>
-                <div class="mt-4 text-center">
-                    <div id="dice-result" class="text-white font-semibold text-lg"></div>
+                
+                <div class="divider">
+                    <span>or</span>
                 </div>
-                <div class="mt-6 bg-white/10 rounded-xl p-4">
-                    <h4 class="text-white font-semibold mb-2">How to Play:</h4>
-                    <div class="text-sm text-gray-200 space-y-1">
-                        <div>1. Choose your bet amount</div>
-                        <div>2. Set prediction threshold (1-99)</div>
-                        <div>3. Roll the dice</div>
-                        <div>4. Win if roll is over your prediction!</div>
-                        <div class="text-yellow-300 mt-2">Higher risk = Higher reward</div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <input type="email" placeholder="Email address" required>
                     </div>
+                    <div class="input-group">
+                        <input type="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn-secondary">Sign In</button>
+                </form>
+
+                <div class="footer-text">
+                    <p>Track trades · Analyze performance · Achieve consistency</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="mt-8 text-center text-white/70 text-sm">
-            <p>⚠️ Demo Mode - Transactions are simulated for testing purposes</p>
-            <p class="mt-2">Built with Solana Web3.js | Provably Fair Gaming</p>
+
+            <div class="features-preview">
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18"/>
+                        <path d="m19 9-5 5-4-4-3 3"/>
+                    </svg>
+                    <span>Performance Analytics</span>
+                </div>
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                    </svg>
+                    <span>Trade Calendar</span>
+                </div>
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    <span>Trade Notes</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Solana Web3 Setup
-        const { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } = solanaWeb3;
-        
-        let wallet = null;
-        let connection = null;
-        let balance = 0;
-        
-        // Stats
-        let stats = {
-            totalWagered: 0,
-            totalWon: 0,
-            gamesPlayed: 0
-        };
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
-            setupEventListeners();
-            updateStats();
-        });
-        
-        // Toast notifications
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = {
-                success: 'bg-green-500',
-                error: 'bg-red-500',
-                info: 'bg-blue-500',
-                warning: 'bg-yellow-500'
-            };
-            
-            toast.className = `toast ${colors[type]} text-white px-6 py-4 rounded-xl shadow-lg`;
-            toast.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <span class="font-semibold">${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-xl">&times;</button>
-                </div>
-            `;
-            
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 5000);
-        }
-        
-        // Wallet Connection
-        async function connectWallet() {
-            try {
-                const { solana } = window;
-                
-                if (!solana) {
-                    showToast('Please install Phantom wallet!', 'error');
-                    window.open('https://phantom.app/', '_blank');
-                    return;
-                }
-                
-                const response = await solana.connect();
-                wallet = response.publicKey.toString();
-                
-                // Get balance
-                const publicKey = new PublicKey(wallet);
-                const balanceLamports = await connection.getBalance(publicKey);
-                balance = balanceLamports / LAMPORTS_PER_SOL;
-                
-                document.getElementById('connect-wallet').classList.add('hidden');
-                document.getElementById('wallet-info').classList.remove('hidden');
-                document.getElementById('wallet-address').textContent = wallet;
-                updateBalance();
-                
-                showToast('Wallet connected successfully!', 'success');
-            } catch (err) {
-                console.error('Connection error:', err);
-                showToast('Failed to connect wallet', 'error');
-            }
-        }
-        
-        function disconnectWallet() {
-            wallet = null;
-            balance = 0;
-            document.getElementById('connect-wallet').classList.remove('hidden');
-            document.getElementById('wallet-info').classList.add('hidden');
-            showToast('Wallet disconnected', 'info');
-        }
-        
-        function updateBalance() {
-            document.getElementById('balance').textContent = `${balance.toFixed(4)} SOL`;
-        }
-        
-        function updateStats() {
-            document.getElementById('total-wagered').textContent = `${stats.totalWagered.toFixed(4)} SOL`;
-            document.getElementById('total-won').textContent = `${stats.totalWon.toFixed(4)} SOL`;
-            document.getElementById('games-played').textContent = stats.gamesPlayed;
-        }
-        
-        // Slot Machine
-        const symbols = ['🍒', '🍋', '🍊', '💎', '⭐', '🍇'];
-        
-        async function spinSlots() {
-            if (!wallet) {
-                showToast('Please connect your wallet first!', 'warning');
-                return;
-            }
-            
-            const betAmount = parseFloat(document.getElementById('slot-bet').value);
-            
-            if (betAmount <= 0 || betAmount > balance) {
-                showToast('Invalid bet amount!', 'error');
-                return;
-            }
-            
-            // Deduct bet
-            balance -= betAmount;
-            stats.totalWagered += betAmount;
-            stats.gamesPlayed++;
-            updateBalance();
-            updateStats();
-            
-            const spinBtn = document.getElementById('spin-btn');
-            spinBtn.disabled = true;
-            spinBtn.textContent = 'SPINNING...';
-            
-            const slots = [
-                document.getElementById('slot1'),
-                document.getElementById('slot2'),
-                document.getElementById('slot3')
-            ];
-            
-            // Start spinning animation
-            slots.forEach(slot => slot.classList.add('spinning'));
-            
-            // Simulate spinning
-            const spinDuration = 2000;
-            const results = [];
-            
-            for (let i = 0; i < 3; i++) {
-                await new Promise(resolve => setTimeout(resolve, 500 + i * 200));
-                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-                results.push(symbol);
-                slots[i].classList.remove('spinning');
-                slots[i].textContent = symbol;
-            }
-            
-            // Calculate win
-            let winMultiplier = 0;
-            const resultText = document.getElementById('slot-result');
-            
-            if (results[0] === results[1] && results[1] === results[2]) {
-                // All match
-                if (results[0] === '💎') winMultiplier = 20;
-                else if (results[0] === '🍒') winMultiplier = 10;
-                else if (results[0] === '🍋') winMultiplier = 8;
-                else if (results[0] === '🍊') winMultiplier = 6;
-                else winMultiplier = 5;
-                
-                const winAmount = betAmount * winMultiplier;
-                balance += winAmount;
-                stats.totalWon += winAmount;
-                
-                slots.forEach(slot => slot.classList.add('winner-glow'));
-                setTimeout(() => slots.forEach(slot => slot.classList.remove('winner-glow')), 1500);
-                
-                resultText.textContent = `🎉 WINNER! +${winAmount.toFixed(4)} SOL (${winMultiplier}x)`;
-                resultText.className = 'text-yellow-300 font-bold text-xl';
-                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
-            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                // Two match
-                winMultiplier = 2;
-                const winAmount = betAmount * winMultiplier;
-                balance += winAmount;
-                stats.totalWon += winAmount;
-                
-                resultText.textContent = `✨ Two Match! +${winAmount.toFixed(4)} SOL (${winMultiplier}x)`;
-                resultText.className = 'text-green-300 font-semibold text-lg';
-                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
-            } else {
-                resultText.textContent = `❌ No match. Try again!`;
-                resultText.className = 'text-red-300 font-semibold text-lg';
-            }
-            
-            updateBalance();
-            updateStats();
-            
-            spinBtn.disabled = false;
-            spinBtn.textContent = `SPIN (${betAmount} SOL)`;
-        }
-        
-        // Dice Game
-        const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-        
-        function updateDiceMultiplier() {
-            const prediction = parseInt(document.getElementById('dice-prediction').value);
-            document.getElementById('prediction-value').textContent = prediction;
-            
-            // Calculate multiplier (house edge 2%)
-            const winChance = (100 - prediction) / 100;
-            const multiplier = (0.98 / winChance).toFixed(2);
-            document.getElementById('dice-multiplier').textContent = `Win Multiplier: ${multiplier}x`;
-        }
-        
-        async function rollDice() {
-            if (!wallet) {
-                showToast('Please connect your wallet first!', 'warning');
-                return;
-            }
-            
-            const betAmount = parseFloat(document.getElementById('dice-bet').value);
-            const prediction = parseInt(document.getElementById('dice-prediction').value);
-            
-            if (betAmount <= 0 || betAmount > balance) {
-                showToast('Invalid bet amount!', 'error');
-                return;
-            }
-            
-            // Deduct bet
-            balance -= betAmount;
-            stats.totalWagered += betAmount;
-            stats.gamesPlayed++;
-            updateBalance();
-            updateStats();
-            
-            const rollBtn = document.getElementById('roll-btn');
-            rollBtn.disabled = true;
-            rollBtn.textContent = 'ROLLING...';
-            
-            const diceElement = document.getElementById('dice');
-            diceElement.classList.add('rolling');
-            
-            // Animate dice
-            const rollAnimation = setInterval(() => {
-                diceElement.textContent = diceSymbols[Math.floor(Math.random() * 6)];
-            }, 50);
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            clearInterval(rollAnimation);
-            
-            // Final roll (1-100)
-            const roll = Math.floor(Math.random() * 100) + 1;
-            const diceValue = Math.ceil(roll / 16.67); // Convert to 1-6 for display
-            diceElement.textContent = diceSymbols[diceValue - 1];
-            diceElement.classList.remove('rolling');
-            
-            const resultText = document.getElementById('dice-result');
-            const winChance = (100 - prediction) / 100;
-            const multiplier = 0.98 / winChance;
-            
-            if (roll > prediction) {
-                // Win
-                const winAmount = betAmount * multiplier;
-                balance += winAmount;
-                stats.totalWon += winAmount;
-                
-                diceElement.classList.add('winner-glow');
-                setTimeout(() => diceElement.classList.remove('winner-glow'), 1500);
-                
-                resultText.textContent = `🎉 YOU WIN! Rolled ${roll} > ${prediction} | +${winAmount.toFixed(4)} SOL`;
-                resultText.className = 'text-yellow-300 font-bold text-xl';
-                showToast(`You won ${winAmount.toFixed(4)} SOL!`, 'success');
-            } else {
-                resultText.textContent = `❌ YOU LOSE! Rolled ${roll} ≤ ${prediction}`;
-                resultText.className = 'text-red-300 font-semibold text-lg';
-            }
-            
-            updateBalance();
-            updateStats();
-            
-            rollBtn.disabled = false;
-            rollBtn.textContent = `ROLL DICE (${betAmount} SOL)`;
-        }
-        
-        // Event Listeners
-        function setupEventListeners() {
-            document.getElementById('connect-wallet').addEventListener('click', connectWallet);
-            document.getElementById('disconnect-wallet').addEventListener('click', disconnectWallet);
-            
-            // Slot Machine
-            document.getElementById('spin-btn').addEventListener('click', spinSlots);
-            document.getElementById('slot-bet').addEventListener('input', (e) => {
-                document.getElementById('spin-btn').textContent = `SPIN (${e.target.value} SOL)`;
-            });
-            
-            // Dice
-            document.getElementById('roll-btn').addEventListener('click', rollDice);
-            document.getElementById('dice-bet').addEventListener('input', (e) => {
-                document.getElementById('roll-btn').textContent = `ROLL DICE (${e.target.value} SOL)`;
-            });
-            document.getElementById('dice-prediction').addEventListener('input', updateDiceMultiplier);
-            
-            updateDiceMultiplier();
-        }
-        
-        // Check for Phantom wallet
-        window.addEventListener('load', () => {
-            if (window.solana) {
-                window.solana.on('connect', () => {
-                    console.log('Wallet connected');
-                });
-                
-                window.solana.on('disconnect', () => {
-                    disconnectWallet();
-                });
-            }
-        });
-    </script>
+    <script src="auth.js"></script>
 </body>
 </html>

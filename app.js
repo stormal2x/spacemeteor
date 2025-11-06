@@ -14,7 +14,7 @@ let currentMonth = new Date();
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
-    loadDashboard();
+    loadCalendar(); // Calendar is now the default page
     applySettings();
 });
 
@@ -45,14 +45,14 @@ function switchSection(sectionName) {
         
         // Load section-specific content
         switch(sectionName) {
-            case 'overview':
-                loadDashboard();
+            case 'calendar':
+                loadCalendar();
                 break;
             case 'trades':
                 loadAllTrades();
                 break;
-            case 'calendar':
-                loadCalendar();
+            case 'performance':
+                loadPerformance();
                 break;
             case 'analytics':
                 loadAnalytics();
@@ -64,11 +64,58 @@ function switchSection(sectionName) {
     }
 }
 
-// Dashboard Overview
+// Dashboard Overview (kept for compatibility)
 function loadDashboard() {
     calculateStats();
     loadRecentTrades();
     initCharts();
+}
+
+// Performance Section (new main stats page)
+function loadPerformance() {
+    calculatePerformanceStats();
+    loadRecentTrades();
+    initCharts();
+}
+
+function calculatePerformanceStats() {
+    const timeframe = document.getElementById('perfTimeframe')?.value || 'month';
+    const filteredTrades = filterTradesByTimeframe(trades, timeframe);
+    
+    // Calculate total P&L
+    const totalPnL = filteredTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
+    
+    // Calculate win rate
+    const wins = filteredTrades.filter(trade => calculatePnL(trade) > 0).length;
+    const winRate = filteredTrades.length > 0 ? (wins / filteredTrades.length * 100).toFixed(1) : 0;
+    
+    // Calculate average RR
+    const avgRR = calculateAvgRR(filteredTrades);
+    
+    // Calculate profit factor
+    const winningTrades = filteredTrades.filter(trade => calculatePnL(trade) > 0);
+    const losingTrades = filteredTrades.filter(trade => calculatePnL(trade) < 0);
+    
+    const totalWins = winningTrades.reduce((sum, t) => sum + calculatePnL(t), 0);
+    const totalLosses = Math.abs(losingTrades.reduce((sum, t) => sum + calculatePnL(t), 0));
+    
+    const profitFactor = totalLosses > 0 ? (totalWins / totalLosses).toFixed(2) : '0.00';
+    
+    // Update DOM
+    updateElement('totalPnL', formatCurrency(totalPnL));
+    updateElement('pnlChange', `${totalPnL >= 0 ? '+' : ''}${((totalPnL / settings.startingCapital) * 100).toFixed(1)}%`);
+    updateElement('winRate', `${winRate}%`);
+    updateElement('winRateChange', `${wins}/${filteredTrades.length} trades`);
+    updateElement('perfAvgRR', avgRR);
+    updateElement('profitFactor', `PF: ${profitFactor}`);
+    updateElement('totalTrades', filteredTrades.length);
+    updateElement('tradesChange', `+${filteredTrades.length} this period`);
+    
+    // Update stat change classes
+    const pnlChangeEl = document.getElementById('pnlChange');
+    if (pnlChangeEl) {
+        pnlChangeEl.className = 'stat-change ' + (totalPnL >= 0 ? 'positive' : 'negative');
+    }
 }
 
 function calculateStats() {
@@ -156,12 +203,51 @@ function calculatePnLPercentage(trade) {
     return ((pnl / cost) * 100).toFixed(2);
 }
 
+function calculateRR(trade) {
+    // Calculate Risk/Reward ratio
+    if (!trade.stopLoss || !trade.takeProfit) {
+        // Calculate actual RR from entry and exit
+        const pnl = calculatePnL(trade);
+        const entryPrice = parseFloat(trade.entryPrice);
+        const exitPrice = parseFloat(trade.exitPrice);
+        
+        if (trade.type === 'long') {
+            const reward = Math.abs(exitPrice - entryPrice);
+            const risk = Math.abs(entryPrice - (entryPrice * 0.98)); // Assume 2% risk if no SL
+            return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+        } else {
+            const reward = Math.abs(entryPrice - exitPrice);
+            const risk = Math.abs((entryPrice * 1.02) - entryPrice); // Assume 2% risk if no SL
+            return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+        }
+    }
+    
+    const entryPrice = parseFloat(trade.entryPrice);
+    const stopLoss = parseFloat(trade.stopLoss);
+    const takeProfit = parseFloat(trade.takeProfit);
+    
+    const risk = Math.abs(entryPrice - stopLoss);
+    const reward = Math.abs(takeProfit - entryPrice);
+    
+    return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+}
+
+function calculateAvgRR(tradesList) {
+    if (tradesList.length === 0) return '0.00';
+    
+    const totalRR = tradesList.reduce((sum, trade) => {
+        return sum + parseFloat(calculateRR(trade));
+    }, 0);
+    
+    return (totalRR / tradesList.length).toFixed(2);
+}
+
 function loadRecentTrades() {
     const tbody = document.getElementById('recentTradesBody');
     if (!tbody) return;
     
     if (trades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No trades yet. Add your first trade to get started!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No trades yet. Add your first trade to get started!</td></tr>';
         return;
     }
     
@@ -170,16 +256,18 @@ function loadRecentTrades() {
     tbody.innerHTML = recentTrades.map(trade => {
         const pnl = calculatePnL(trade);
         const pnlPercent = calculatePnLPercentage(trade);
+        const rr = calculateRR(trade);
         
         return `
             <tr>
-                <td>${formatDate(trade.entryDate)}</td>
+                <td>${formatDate(trade.tradeDate || trade.entryDate)}</td>
                 <td><strong>${trade.symbol}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${formatCurrency(trade.entryPrice)}</td>
                 <td>${formatCurrency(trade.exitPrice)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${pnlPercent}%</td>
+                <td><strong>${rr}</strong></td>
             </tr>
         `;
     }).join('');
@@ -191,7 +279,7 @@ function loadAllTrades() {
     if (!tbody) return;
     
     if (trades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No trades found. Start by adding your first trade!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">No trades found. Start by adding your first trade!</td></tr>';
         return;
     }
     
@@ -200,10 +288,11 @@ function loadAllTrades() {
     tbody.innerHTML = filteredTrades.reverse().map((trade, index) => {
         const pnl = calculatePnL(trade);
         const pnlPercent = calculatePnLPercentage(trade);
+        const rr = calculateRR(trade);
         
         return `
             <tr>
-                <td>${formatDate(trade.entryDate)}</td>
+                <td>${formatDate(trade.tradeDate || trade.entryDate)}</td>
                 <td><strong>${trade.symbol}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${formatCurrency(trade.entryPrice)}</td>
@@ -211,6 +300,7 @@ function loadAllTrades() {
                 <td>${trade.quantity}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${pnlPercent}%</td>
+                <td><strong>${rr}</strong></td>
                 <td>${trade.strategy || '-'}</td>
                 <td>
                     <button class="action-btn" onclick="viewTrade(${trades.indexOf(trade)})">View</button>
@@ -277,14 +367,17 @@ function handleTradeSubmit(event) {
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
         type: formData.get('type'),
-        entryDate: formData.get('entryDate'),
-        exitDate: formData.get('exitDate'),
+        tradeDate: formData.get('tradeDate'),
+        entryDate: formData.get('tradeDate'), // Keep for compatibility
+        exitDate: formData.get('tradeDate'), // Keep for compatibility
         entryPrice: formData.get('entryPrice'),
         exitPrice: formData.get('exitPrice'),
         quantity: formData.get('quantity'),
+        stopLoss: formData.get('stopLoss') || null,
+        takeProfit: formData.get('takeProfit') || null,
         strategy: formData.get('strategy'),
+        tags: formData.get('tags'),
         notes: formData.get('notes'),
-        reviewed: formData.get('reviewed') === 'on',
         createdAt: new Date().toISOString()
     };
     
@@ -294,10 +387,10 @@ function handleTradeSubmit(event) {
     form.reset();
     showToast('Trade added successfully!', 'success');
     
-    // Switch to trades view
+    // Switch to calendar view
     setTimeout(() => {
-        switchSection('trades');
-        document.querySelector('[data-section="trades"]').classList.add('active');
+        switchSection('calendar');
+        document.querySelector('[data-section="calendar"]').classList.add('active');
         document.querySelector('[data-section="add-trade"]').classList.remove('active');
     }, 1000);
 }
@@ -312,7 +405,31 @@ function loadCalendar() {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
     
-    monthLabel.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (monthLabel) {
+        monthLabel.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+    
+    // Calculate month stats
+    const monthTrades = trades.filter(trade => {
+        const tradeDate = new Date(trade.tradeDate || trade.entryDate);
+        return tradeDate.getMonth() === month && tradeDate.getFullYear() === year;
+    });
+    
+    const monthPnL = monthTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
+    const wins = monthTrades.filter(trade => calculatePnL(trade) > 0).length;
+    const winRate = monthTrades.length > 0 ? (wins / monthTrades.length * 100).toFixed(1) : 0;
+    const avgRR = calculateAvgRR(monthTrades);
+    const tradingDaysSet = new Set(monthTrades.map(t => new Date(t.tradeDate || t.entryDate).getDate()));
+    const tradingDays = tradingDaysSet.size;
+    
+    // Update stats
+    updateElement('monthPnL', formatCurrency(monthPnL));
+    updateElement('monthPnlPercent', `${monthPnL >= 0 ? '+' : ''}${((monthPnL / settings.startingCapital) * 100).toFixed(1)}%`);
+    updateElement('calendarWinRate', `${winRate}%`);
+    updateElement('calendarWins', `${wins} wins`);
+    updateElement('avgRR', avgRR);
+    updateElement('tradingDays', tradingDays);
+    updateElement('monthTrades', `${monthTrades.length} trades`);
     
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -340,7 +457,7 @@ function loadCalendar() {
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         const dayTrades = trades.filter(trade => {
-            const tradeDate = new Date(trade.entryDate);
+            const tradeDate = new Date(trade.tradeDate || trade.entryDate);
             return tradeDate.getDate() === day && 
                    tradeDate.getMonth() === month && 
                    tradeDate.getFullYear() === year;
@@ -437,12 +554,16 @@ function calculateAdvancedMetrics() {
         }
     });
     
+    // Average RR
+    const avgRR = calculateAvgRR(trades);
+    
     // Update DOM
     updateElement('sharpeRatio', sharpeRatio);
     updateElement('maxDrawdown', maxDrawdown.toFixed(2) + '%');
     updateElement('avgHoldingTime', Math.round(avgHoldingTime) + 'h');
     updateElement('bestTrade', formatCurrency(bestTrade));
     updateElement('worstTrade', formatCurrency(worstTrade));
+    updateElement('analyticsAvgRR', avgRR);
     updateElement('currentStreak', currentStreak > 0 ? `+${currentStreak} W` : `${currentStreak} L`);
     updateElement('longestWinStreak', longestWinStreak);
     updateElement('longestLossStreak', longestLossStreak);
@@ -769,5 +890,10 @@ setTimeout(() => {
     const timeframeSelect = document.getElementById('timeframe');
     if (timeframeSelect) {
         timeframeSelect.addEventListener('change', loadDashboard);
+    }
+    
+    const perfTimeframeSelect = document.getElementById('perfTimeframe');
+    if (perfTimeframeSelect) {
+        perfTimeframeSelect.addEventListener('change', loadPerformance);
     }
 }, 100);

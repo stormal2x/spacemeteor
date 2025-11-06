@@ -20,21 +20,12 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-section="overview">
+            <a href="#" class="nav-item active" data-section="calendar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18"/>
                 </svg>
-                <span>Overview</span>
-            </a>
-            <a href="#" class="nav-item" data-section="trades">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 3v18h18"/>
-                    <path d="m19 9-5 5-4-4-3 3"/>
-                </svg>
-                <span>My Trades</span>
+                <span>Calendar</span>
             </a>
             <a href="#" class="nav-item" data-section="add-trade">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,12 +34,19 @@
                 </svg>
                 <span>Add Trade</span>
             </a>
-            <a href="#" class="nav-item" data-section="calendar">
+            <a href="#" class="nav-item" data-section="trades">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                    <path d="M9 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="9 2 9 8 15 8"/>
                 </svg>
-                <span>Calendar</span>
+                <span>My Trades</span>
+            </a>
+            <a href="#" class="nav-item" data-section="performance">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="m19 9-5 5-4-4-3 3"/>
+                </svg>
+                <span>Performance</span>
             </a>
             <a href="#" class="nav-item" data-section="analytics">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -77,12 +75,233 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Overview Section -->
-        <section id="overview" class="content-section active">
+        <!-- Calendar Section (Main/Default) -->
+        <section id="calendar" class="content-section active">
             <div class="section-header">
-                <h1>Dashboard Overview</h1>
+                <h1>Trade Calendar</h1>
                 <div class="header-actions">
-                    <select id="timeframe" class="select-input">
+                    <button class="btn-icon" onclick="previousMonth()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <span id="currentMonth" class="month-label"></span>
+                    <button class="btn-icon" onclick="nextMonth()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Month P&L</p>
+                        <h3 class="stat-value" id="monthPnL">$0.00</h3>
+                        <span class="stat-change" id="monthPnlPercent">0.0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Win Rate</p>
+                        <h3 class="stat-value" id="calendarWinRate">0%</h3>
+                        <span class="stat-change" id="calendarWins">0 wins</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Avg R:R</p>
+                        <h3 class="stat-value" id="avgRR">0.00</h3>
+                        <span class="stat-change" id="rrDesc">Risk/Reward</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Trading Days</p>
+                        <h3 class="stat-value" id="tradingDays">0</h3>
+                        <span class="stat-change" id="monthTrades">0 trades</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+
+            <div class="calendar-legend">
+                <div class="legend-item">
+                    <span class="legend-dot profit"></span>
+                    <span>Profitable Day</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot loss"></span>
+                    <span>Loss Day</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot neutral"></span>
+                    <span>No Trades</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Trade Section -->
+        <section id="add-trade" class="content-section">
+            <div class="section-header">
+                <h1>Add New Trade</h1>
+            </div>
+
+            <div class="form-card">
+                <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Symbol *</label>
+                            <input type="text" name="symbol" placeholder="e.g., AAPL, BTC/USD" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trade Type *</label>
+                            <select name="type" required>
+                                <option value="long">Long</option>
+                                <option value="short">Short</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trade Date *</label>
+                            <input type="date" name="tradeDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantity *</label>
+                            <input type="number" name="quantity" step="0.01" placeholder="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entry Price *</label>
+                            <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Exit Price *</label>
+                            <input type="number" name="exitPrice" step="0.01" placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stop Loss (optional)</label>
+                            <input type="number" name="stopLoss" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Take Profit (optional)</label>
+                            <input type="number" name="takeProfit" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Strategy</label>
+                            <input type="text" name="strategy" placeholder="e.g., Breakout, Trend Following">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tags</label>
+                            <input type="text" name="tags" placeholder="e.g., tech, earnings, swing">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Trade Notes</label>
+                            <textarea name="notes" rows="4" placeholder="What was your setup? How did you feel? What did you learn?"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Trade</button>
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('tradeForm').reset()">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- My Trades Section -->
+        <section id="trades" class="content-section">
+            <div class="section-header">
+                <h1>My Trades</h1>
+                <div class="header-actions">
+                    <input type="search" class="search-input" placeholder="Search trades..." id="searchTrades">
+                    <button class="btn-primary" onclick="switchSection('add-trade')">Add Trade</button>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <select class="filter-select" id="filterType">
+                    <option value="all">All Types</option>
+                    <option value="long">Long</option>
+                    <option value="short">Short</option>
+                </select>
+                <select class="filter-select" id="filterOutcome">
+                    <option value="all">All Outcomes</option>
+                    <option value="win">Wins</option>
+                    <option value="loss">Losses</option>
+                </select>
+                <button class="btn-secondary" onclick="exportTrades()">Export CSV</button>
+            </div>
+
+            <div class="table-container">
+                <table class="trades-table" id="allTradesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th>Qty</th>
+                            <th>P&L</th>
+                            <th>%</th>
+                            <th>R:R</th>
+                            <th>Strategy</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allTradesBody">
+                        <tr>
+                            <td colspan="11" class="empty-state">No trades found. Start by adding your first trade!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Performance Section (NEW) -->
+        <section id="performance" class="content-section">
+            <div class="section-header">
+                <h1>Performance Overview</h1>
+                <div class="header-actions">
+                    <select id="perfTimeframe" class="select-input">
                         <option value="week">This Week</option>
                         <option value="month" selected>This Month</option>
                         <option value="year">This Year</option>
@@ -127,8 +346,8 @@
                         </svg>
                     </div>
                     <div class="stat-content">
-                        <p class="stat-label">Avg Win/Loss</p>
-                        <h3 class="stat-value" id="avgWinLoss">$0.00</h3>
+                        <p class="stat-label">Avg R:R</p>
+                        <h3 class="stat-value" id="perfAvgRR">0.00</h3>
                         <span class="stat-change" id="profitFactor">PF: 0.00</span>
                     </div>
                 </div>
@@ -160,7 +379,7 @@
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3>Performance Distribution</h3>
+                        <h3>Win/Loss Distribution</h3>
                     </div>
                     <div class="chart-container">
                         <canvas id="distributionChart"></canvas>
@@ -185,175 +404,15 @@
                                 <th>Exit</th>
                                 <th>P&L</th>
                                 <th>%</th>
+                                <th>R:R</th>
                             </tr>
                         </thead>
                         <tbody id="recentTradesBody">
                             <tr>
-                                <td colspan="7" class="empty-state">No trades yet. Add your first trade to get started!</td>
+                                <td colspan="8" class="empty-state">No trades yet. Add your first trade to get started!</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- My Trades Section -->
-        <section id="trades" class="content-section">
-            <div class="section-header">
-                <h1>My Trades</h1>
-                <div class="header-actions">
-                    <input type="search" class="search-input" placeholder="Search trades..." id="searchTrades">
-                    <button class="btn-primary" onclick="switchSection('add-trade')">Add Trade</button>
-                </div>
-            </div>
-
-            <div class="filters-bar">
-                <select class="filter-select" id="filterType">
-                    <option value="all">All Types</option>
-                    <option value="long">Long</option>
-                    <option value="short">Short</option>
-                </select>
-                <select class="filter-select" id="filterOutcome">
-                    <option value="all">All Outcomes</option>
-                    <option value="win">Wins</option>
-                    <option value="loss">Losses</option>
-                </select>
-                <button class="btn-secondary" onclick="exportTrades()">Export CSV</button>
-            </div>
-
-            <div class="table-container">
-                <table class="trades-table" id="allTradesTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Symbol</th>
-                            <th>Type</th>
-                            <th>Entry Price</th>
-                            <th>Exit Price</th>
-                            <th>Quantity</th>
-                            <th>P&L</th>
-                            <th>%</th>
-                            <th>Strategy</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allTradesBody">
-                        <tr>
-                            <td colspan="10" class="empty-state">No trades found. Start by adding your first trade!</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Add Trade Section -->
-        <section id="add-trade" class="content-section">
-            <div class="section-header">
-                <h1>Add New Trade</h1>
-            </div>
-
-            <div class="form-card">
-                <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Symbol</label>
-                            <input type="text" name="symbol" placeholder="e.g., AAPL" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Trade Type</label>
-                            <select name="type" required>
-                                <option value="long">Long</option>
-                                <option value="short">Short</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Entry Date</label>
-                            <input type="datetime-local" name="entryDate" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Exit Date</label>
-                            <input type="datetime-local" name="exitDate" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Entry Price</label>
-                            <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Exit Price</label>
-                            <input type="number" name="exitPrice" step="0.01" placeholder="0.00" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Quantity</label>
-                            <input type="number" name="quantity" step="0.01" placeholder="0" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Strategy</label>
-                            <input type="text" name="strategy" placeholder="e.g., Breakout, Trend Following">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>Trade Notes</label>
-                            <textarea name="notes" rows="4" placeholder="What was your reasoning? What did you learn?"></textarea>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>
-                                <input type="checkbox" name="reviewed">
-                                Mark as reviewed
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Save Trade</button>
-                        <button type="button" class="btn-secondary" onclick="document.getElementById('tradeForm').reset()">Clear Form</button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <!-- Calendar Section -->
-        <section id="calendar" class="content-section">
-            <div class="section-header">
-                <h1>Trade Calendar</h1>
-                <div class="header-actions">
-                    <button class="btn-icon" onclick="previousMonth()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M15 18l-6-6 6-6"/>
-                        </svg>
-                    </button>
-                    <span id="currentMonth" class="month-label"></span>
-                    <button class="btn-icon" onclick="nextMonth()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="calendar-container">
-                <div class="calendar-grid" id="calendarGrid"></div>
-            </div>
-
-            <div class="calendar-legend">
-                <div class="legend-item">
-                    <span class="legend-dot profit"></span>
-                    <span>Profitable Day</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot loss"></span>
-                    <span>Loss Day</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot neutral"></span>
-                    <span>No Trades</span>
                 </div>
             </div>
         </section>
@@ -387,6 +446,10 @@
                         <div class="metric-row">
                             <span>Worst Trade</span>
                             <strong id="worstTrade">$0.00</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>Average R:R Ratio</span>
+                            <strong id="analyticsAvgRR">0.00</strong>
                         </div>
                     </div>
                 </div>

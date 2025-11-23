@@ -1032,11 +1032,11 @@ body {
 
     .sidebar-header h2,
     .nav-item span {
-        display: none;
+        transform: translateX(0);
     }
 
     .main-content {
-        margin-left: 70px;
+        margin-left: 0;
         padding: 20px;
     }
 
@@ -1643,4 +1643,45 @@ body {
     .section-header-landing h2 {
         font-size: 32px;
     }
+}
+
+/* OTP Input Styles */
+.otp-input-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.otp-digit {
+    width: 45px;
+    height: 55px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    transition: var(--transition);
+    padding: 0;
+}
+
+.otp-digit:focus {
+    border-color: var(--primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+/* Hide number spinner */
+.otp-digit::-webkit-outer-spin-button,
+.otp-digit::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.otp-digit[type=number] {
+    -moz-appearance: textfield;
 }

@@ -52,6 +52,49 @@ async function handleLogin(event) {
     }
 }
 
+async function handleVerify(event) {
+    event.preventDefault();
+
+    if (!supabase) {
+        checkCredentials();
+        return;
+    }
+
+    const form = event.target;
+    const email = form.querySelector('input[type="email"]').value;
+    // Collect token from all digit inputs
+    const otpInputs = form.querySelectorAll('.otp-digit');
+    let token = '';
+    otpInputs.forEach(input => token += input.value);
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    if (token.length !== 6) {
+        alert('Please enter a valid 6-digit code');
+        return;
+    }
+
+    try {
+        submitBtn.textContent = 'Verifying...';
+        submitBtn.disabled = true;
+
+        const { data, error } = await supabase.auth.verifyOtp({
+            email: email,
+            token: token,
+            type: 'signup'
+        });
+
+        if (error) throw error;
+
+        alert('Verification successful! Logging you in...');
+        window.location.href = 'dashboard.html';
+    } catch (error) {
+        alert('Verification failed: ' + error.message);
+        submitBtn.innerHTML = `Verify Code <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+        submitBtn.disabled = false;
+    }
+}
+
 async function handleSignup(event) {
     event.preventDefault();
 
@@ -72,7 +115,17 @@ async function handleSignup(event) {
 
         if (error) throw error;
 
-        alert('Signup successful! Please check your email for verification.');
+        alert('Signup successful! Please check your email for the verification code.');
+
+        // Switch to verify mode automatically
+        if (window.toggleVerify) {
+            window.toggleVerify();
+            // Pre-fill email if possible, though input might be cleared by toggle logic depending on implementation
+            // Ideally we keep the email value
+            const emailInput = document.querySelector('input[type="email"]');
+            if (emailInput) emailInput.value = email;
+        }
+
     } catch (error) {
         alert('Signup failed: ' + error.message);
     }
@@ -122,4 +175,5 @@ document.addEventListener('DOMContentLoaded', () => {
 // Expose functions globally
 window.handleLogin = handleLogin;
 window.handleSignup = handleSignup;
+window.handleVerify = handleVerify;
 window.logout = logout;

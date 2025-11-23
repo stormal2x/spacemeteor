@@ -31,8 +31,20 @@
                 <div class="input-group">
                     <input type="email" placeholder="Email Address" required>
                 </div>
-                <div class="input-group">
+                <div class="input-group password-group">
                     <input type="password" placeholder="Password" required>
+                </div>
+
+                <!-- OTP Input (Hidden by default) -->
+                <div class="input-group otp-group" style="display: none;">
+                    <div class="otp-input-container">
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary">
@@ -47,9 +59,15 @@
                 <span>OR</span>
             </div>
 
-            <button class="btn-secondary" onclick="toggleSignup()">
-                Create New Account
-            </button>
+            <div class="auth-actions">
+                <button class="btn-secondary" onclick="toggleSignup()">
+                    Create New Account
+                </button>
+                <button class="btn-text" onclick="toggleVerify()"
+                    style="margin-top: 10px; background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; width: 100%;">
+                    I have a verification code
+                </button>
+            </div>
 
             <div class="footer-text">
                 <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
@@ -61,27 +79,113 @@
     <script src="auth.js"></script>
     <script>
         let isSignup = false;
+        let isVerify = false;
 
         function toggleSignup() {
             isSignup = !isSignup;
+            isVerify = false;
+            updateUI();
+        }
+
+        function toggleVerify() {
+            isVerify = !isVerify;
+            isSignup = false;
+            updateUI();
+        }
+
+        // OTP Input Logic
+        const otpInputs = document.querySelectorAll('.otp-digit');
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+
+                if (val) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            // Handle paste
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').slice(0, 6).split('');
+                if (pasteData.length > 0) {
+                    otpInputs.forEach((inp, i) => {
+                        if (pasteData[i]) inp.value = pasteData[i];
+                    });
+                    if (pasteData.length === 6) {
+                        otpInputs[5].focus();
+                    } else {
+                        otpInputs[pasteData.length].focus();
+                    }
+                }
+            });
+        });
+
+        function updateUI() {
             const form = document.querySelector('.login-form');
             const title = document.querySelector('.hero-text h2');
             const subtitle = document.querySelector('.hero-text p');
             const submitBtn = form.querySelector('button[type="submit"]');
             const toggleBtn = document.querySelector('.btn-secondary');
+            const verifyBtn = document.querySelector('.btn-text');
 
-            if (isSignup) {
+            const passwordGroup = document.querySelector('.password-group');
+            const otpGroup = document.querySelector('.otp-group');
+            const passwordInput = passwordGroup.querySelector('input');
+            const otpInputs = otpGroup.querySelectorAll('input');
+
+            // Reset inputs requirements
+            passwordInput.required = true;
+            otpInputs.forEach(input => input.required = false);
+            passwordGroup.style.display = 'block';
+            otpGroup.style.display = 'none';
+
+            if (isVerify) {
+                title.textContent = 'Verify Email';
+                subtitle.innerHTML = 'Enter the code sent to your email';
+                submitBtn.innerHTML = `Verify Code <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+                form.onsubmit = handleVerify;
+
+                toggleBtn.textContent = 'Back to Sign In';
+                toggleBtn.onclick = () => { isVerify = false; updateUI(); };
+                verifyBtn.style.display = 'none';
+
+                // Show OTP, Hide Password
+                passwordGroup.style.display = 'none';
+                passwordInput.required = false;
+                otpGroup.style.display = 'block';
+                otpInputs.forEach(input => input.required = true);
+                // Focus first input
+                setTimeout(() => otpInputs[0].focus(), 100);
+
+            } else if (isSignup) {
                 title.textContent = 'Create Account';
                 subtitle.innerHTML = 'Join thousands of profitable traders';
                 submitBtn.innerHTML = `Sign Up <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>`;
                 form.onsubmit = handleSignup;
                 toggleBtn.textContent = 'Already have an account? Sign In';
+                toggleBtn.onclick = toggleSignup;
+                verifyBtn.style.display = 'block';
+                verifyBtn.textContent = 'I have a verification code';
+
             } else {
                 title.textContent = 'Welcome Back';
                 subtitle.innerHTML = 'Sign in to continue your journey to <span class="highlight">profitability</span>';
                 submitBtn.innerHTML = `Sign In <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`;
                 form.onsubmit = handleLogin;
                 toggleBtn.textContent = 'Create New Account';
+                toggleBtn.onclick = toggleSignup;
+                verifyBtn.style.display = 'block';
+                verifyBtn.textContent = 'I have a verification code';
             }
         }
     </script>

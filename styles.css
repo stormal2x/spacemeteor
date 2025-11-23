@@ -59,13 +59,7 @@
     color: var(--text-secondary);
 }
 
-.calendar-day-pnl {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    font-weight: 700;
-    font-size: 13px;
-}
+
 
 /* Heatmap levels for profit days */
 .heat-positive-1 {
@@ -824,7 +818,6 @@ body {
 .calendar-day.profit .calendar-day-pnl {
     color: #34d399;
     text-shadow: 0 0 5px rgba(52, 211, 153, 0.5);
-    font-size: 13px;
 }
 
 .calendar-day.loss {

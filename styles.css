@@ -862,6 +862,8 @@ body {
     font-size: 24px;
     font-weight: 800;
     z-index: 2;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+    letter-spacing: -0.5px;
 }
 
 .calendar-day-trades {

@@ -34,7 +34,7 @@ async function fetchTrades() {
 
     if (error) {
         console.error('Error fetching trades:', error);
-        showToast('Failed to load trades', 'error');
+        showToast('Failed to load trades: ' + error.message, 'error');
     } else {
         trades = data || [];
         // Refresh views

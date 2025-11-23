@@ -15,9 +15,21 @@ function initSupabase() {
 }
 
 // Check credentials - No longer needed as they are hardcoded
+// Check credentials - No longer needed as they are hardcoded
 function checkCredentials() {
     // No-op
     return true;
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }
 
 async function handleLogin(event) {
@@ -46,7 +58,7 @@ async function handleLogin(event) {
 
         window.location.href = 'dashboard.html';
     } catch (error) {
-        alert('Login failed: ' + error.message);
+        showToast('Login failed: ' + error.message, 'error');
         submitBtn.textContent = 'Sign In';
         submitBtn.disabled = false;
     }
@@ -70,7 +82,7 @@ async function handleVerify(event) {
     const submitBtn = form.querySelector('button[type="submit"]');
 
     if (token.length !== 6) {
-        alert('Please enter a valid 6-digit code');
+        showToast('Please enter a valid 6-digit code', 'error');
         return;
     }
 
@@ -86,10 +98,10 @@ async function handleVerify(event) {
 
         if (error) throw error;
 
-        alert('Verification successful! Logging you in...');
+        showToast('Verification successful! Logging you in...', 'success');
         window.location.href = 'dashboard.html';
     } catch (error) {
-        alert('Verification failed: ' + error.message);
+        showToast('Verification failed: ' + error.message, 'error');
         submitBtn.innerHTML = `Verify Code <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
         submitBtn.disabled = false;
     }
@@ -115,7 +127,7 @@ async function handleSignup(event) {
 
         if (error) throw error;
 
-        alert('Signup successful! Please check your email for the verification code.');
+        showToast('Signup successful! Please check your email for the verification code.', 'success');
 
         // Switch to verify mode automatically
         if (window.toggleVerify) {
@@ -127,7 +139,7 @@ async function handleSignup(event) {
         }
 
     } catch (error) {
-        alert('Signup failed: ' + error.message);
+        showToast('Signup failed: ' + error.message, 'error');
     }
 }
 

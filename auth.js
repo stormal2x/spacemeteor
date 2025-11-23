@@ -36,7 +36,7 @@ async function handleLogin(event) {
     event.preventDefault();
 
     if (!supabase) {
-        checkCredentials();
+        showToast('System not initialized. Please refresh the page.', 'error');
         return;
     }
 
@@ -59,7 +59,7 @@ async function handleLogin(event) {
         window.location.href = 'dashboard.html';
     } catch (error) {
         showToast('Login failed: ' + error.message, 'error');
-        submitBtn.textContent = 'Sign In';
+        submitBtn.innerHTML = `Sign In <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`;
         submitBtn.disabled = false;
     }
 }
@@ -68,7 +68,7 @@ async function handleVerify(event) {
     event.preventDefault();
 
     if (!supabase) {
-        checkCredentials();
+        showToast('System not initialized. Please refresh the page.', 'error');
         return;
     }
 
@@ -111,7 +111,7 @@ async function handleSignup(event) {
     event.preventDefault();
 
     if (!supabase) {
-        checkCredentials();
+        showToast('System not initialized. Please refresh the page.', 'error');
         return;
     }
 
@@ -145,7 +145,7 @@ async function handleSignup(event) {
 
 async function resendCode() {
     if (!supabase) {
-        checkCredentials();
+        showToast('System not initialized. Please refresh the page.', 'error');
         return;
     }
 
@@ -176,7 +176,7 @@ async function logout() {
     }
     localStorage.removeItem('sb-access-token');
     localStorage.removeItem('sb-refresh-token');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 }
 
 async function checkAuth() {

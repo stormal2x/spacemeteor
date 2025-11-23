@@ -1675,28 +1675,7 @@ body {
     outline: none;
 }
 
-/* Form Animations */
-.login-box {
-    transition: all 0.3s ease;
-}
 
-.input-group,
-.auth-actions,
-.hero-text {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 /* Hide number spinner */
 .otp-digit::-webkit-outer-spin-button,

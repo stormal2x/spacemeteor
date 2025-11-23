@@ -1076,7 +1076,7 @@ function saveSettings() {
 
 function formatCurrency(amount) {
     const symbol = settings.currency === 'USD' ? '$' : settings.currency === 'EUR' ? '€' : settings.currency === 'GBP' ? '£' : '¥';
-    return symbol + parseFloat(amount).toFixed(2);
+    return symbol + parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatDate(dateString) {

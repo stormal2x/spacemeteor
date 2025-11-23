@@ -1653,7 +1653,7 @@ body {
     margin-bottom: 20px;
 }
 
-.otp-digit {
+.otp-input-container .otp-digit {
     width: 38px;
     height: 48px;
     border: 2px solid var(--border-color);
@@ -1667,7 +1667,7 @@ body {
     padding: 0;
 }
 
-.otp-digit:focus {
+.otp-input-container .otp-digit:focus {
     border-color: var(--primary);
     background: var(--bg-primary);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
@@ -1678,13 +1678,13 @@ body {
 
 
 /* Hide number spinner */
-.otp-digit::-webkit-outer-spin-button,
-.otp-digit::-webkit-inner-spin-button {
+.otp-input-container .otp-digit::-webkit-outer-spin-button,
+.otp-input-container .otp-digit::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.otp-digit[type=number] {
+.otp-input-container .otp-digit[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
 }

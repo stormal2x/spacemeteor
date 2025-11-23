@@ -81,8 +81,8 @@ async function handleVerify(event) {
 
     const submitBtn = form.querySelector('button[type="submit"]');
 
-    if (token.length !== 6) {
-        showToast('Please enter a valid 6-digit code', 'error');
+    if (token.length !== 8) {
+        showToast('Please enter a valid 8-digit code', 'error');
         return;
     }
 

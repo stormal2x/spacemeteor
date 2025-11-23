@@ -1648,19 +1648,19 @@ body {
 /* OTP Input Styles */
 .otp-input-container {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     justify-content: center;
     margin-bottom: 20px;
 }
 
 .otp-digit {
-    width: 45px;
-    height: 55px;
+    width: 38px;
+    height: 48px;
     border: 2px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 8px;
     background: var(--bg-tertiary);
     color: var(--text-primary);
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
     transition: var(--transition);
@@ -1673,6 +1673,29 @@ body {
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     transform: translateY(-2px);
     outline: none;
+}
+
+/* Form Animations */
+.login-box {
+    transition: all 0.3s ease;
+}
+
+.input-group,
+.auth-actions,
+.hero-text {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Hide number spinner */

@@ -143,6 +143,33 @@ async function handleSignup(event) {
     }
 }
 
+async function resendCode() {
+    if (!supabase) {
+        checkCredentials();
+        return;
+    }
+
+    const email = document.querySelector('input[type="email"]').value;
+    if (!email) {
+        showToast('Please enter your email address first', 'error');
+        return;
+    }
+
+    try {
+        showToast('Sending new code...', 'success');
+        const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email: email,
+        });
+
+        if (error) throw error;
+
+        showToast('New code sent! Check your email.', 'success');
+    } catch (error) {
+        showToast('Failed to resend: ' + error.message, 'error');
+    }
+}
+
 async function logout() {
     if (supabase) {
         await supabase.auth.signOut();
@@ -188,4 +215,5 @@ document.addEventListener('DOMContentLoaded', () => {
 window.handleLogin = handleLogin;
 window.handleSignup = handleSignup;
 window.handleVerify = handleVerify;
+window.resendCode = resendCode;
 window.logout = logout;

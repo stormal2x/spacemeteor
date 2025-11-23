@@ -47,6 +47,13 @@
                     </div>
                 </div>
 
+                <div class="resend-container" style="display: none; text-align: center; margin-bottom: 20px;">
+                    <button type="button" class="btn-text" onclick="resendCode()"
+                        style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px;">
+                        Didn't receive code? <span style="color: var(--primary);">Resend</span>
+                    </button>
+                </div>
+
                 <button type="submit" class="btn-primary">
                     Sign In
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -142,12 +149,14 @@
             const otpGroup = document.querySelector('.otp-group');
             const passwordInput = passwordGroup.querySelector('input');
             const otpInputs = otpGroup.querySelectorAll('input');
+            const resendContainer = document.querySelector('.resend-container');
 
             // Reset inputs requirements
             passwordInput.required = true;
             otpInputs.forEach(input => input.required = false);
             passwordGroup.style.display = 'block';
             otpGroup.style.display = 'none';
+            resendContainer.style.display = 'none';
 
             if (isVerify) {
                 title.textContent = 'Verify Email';
@@ -159,10 +168,11 @@
                 toggleBtn.onclick = () => { isVerify = false; updateUI(); };
                 verifyBtn.style.display = 'none';
 
-                // Show OTP, Hide Password
+                // Show OTP, Hide Password, Show Resend
                 passwordGroup.style.display = 'none';
                 passwordInput.required = false;
                 otpGroup.style.display = 'block';
+                resendContainer.style.display = 'block';
                 otpInputs.forEach(input => input.required = true);
                 // Focus first input
                 setTimeout(() => otpInputs[0].focus(), 100);

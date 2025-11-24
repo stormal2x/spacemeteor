@@ -37,6 +37,16 @@
                 </svg>
                 <span>Add Trade</span>
             </a>
+            <a href="#" class="nav-item" data-section="calculator">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="8" y1="10" x2="16" y2="10" />
+                    <line x1="8" y1="14" x2="16" y2="14" />
+                    <line x1="8" y1="18" x2="16" y2="18" />
+                </svg>
+                <span>Calculator</span>
+            </a>
             <a href="#" class="nav-item" data-section="trades">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z" />
@@ -183,61 +193,71 @@
             </div>
         </section>
 
+        <!-- Calculator Section -->
+        <section id="calculator" class="content-section">
+            <div class="section-header">
+                <h1>Position Size Calculator</h1>
+            </div>
+
+            <div class="calculator-container-centered">
+                <div class="calculator-panel large">
+                    <div class="calculator-header">
+                        <h3>🧮 Risk Management</h3>
+                        <p>Calculate your exact position size based on your risk tolerance.</p>
+                    </div>
+                    <div class="calculator-grid">
+                        <div class="calc-input">
+                            <label>Account Size</label>
+                            <div class="input-wrapper">
+                                <span>$</span>
+                                <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
+                            </div>
+                        </div>
+                        <div class="calc-input">
+                            <label>Risk %</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10">
+                                <span>%</span>
+                            </div>
+                        </div>
+                        <div class="calc-input">
+                            <label>Entry Price</label>
+                            <div class="input-wrapper">
+                                <span>$</span>
+                                <input type="number" id="calcEntry" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+                        <div class="calc-input">
+                            <label>Stop Loss</label>
+                            <div class="input-wrapper">
+                                <span>$</span>
+                                <input type="number" id="calcSL" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="calc-results-container">
+                            <div class="calc-result-box">
+                                <span class="result-label">Position Size</span>
+                                <span class="result-value" id="calcPositionSize">0</span>
+                                <span class="result-unit">Units</span>
+                            </div>
+                            <div class="calc-result-box">
+                                <span class="result-label">Risk Amount</span>
+                                <span class="result-value" id="calcRiskAmount">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Add Trade Section -->
         <section id="add-trade" class="content-section">
             <div class="section-header">
                 <h1>Add New Trade</h1>
             </div>
 
-            <!-- Standalone Position Size Calculator -->
-            <div class="calculator-panel">
-                <div class="calculator-header">
-                    <h3>🧮 Position Size Calculator</h3>
-                    <p>Calculate your risk before you enter.</p>
-                </div>
-                <div class="calculator-grid">
-                    <div class="calc-input">
-                        <label>Account Size</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
-                        </div>
-                    </div>
-                    <div class="calc-input">
-                        <label>Risk %</label>
-                        <div class="input-wrapper">
-                            <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10">
-                            <span>%</span>
-                        </div>
-                    </div>
-                    <div class="calc-input">
-                        <label>Entry Price</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="calcEntry" placeholder="0.00" step="0.01">
-                        </div>
-                    </div>
-                    <div class="calc-input">
-                        <label>Stop Loss</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="calcSL" placeholder="0.00" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-results-container">
-                        <div class="calc-result-box">
-                            <span class="result-label">Position Size</span>
-                            <span class="result-value" id="calcPositionSize">0</span>
-                            <span class="result-unit">Units</span>
-                        </div>
-                        <div class="calc-result-box">
-                            <span class="result-label">Risk Amount</span>
-                            <span class="result-value" id="calcRiskAmount">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Calculator moved to its own section -->
 
             <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
                 <div class="trade-form-grid">

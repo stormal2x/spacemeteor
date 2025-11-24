@@ -1550,6 +1550,65 @@ body {
     color: var(--text-secondary);
 }
 
+/* Centered Large Calculator Styles */
+.calculator-container-centered {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+    padding-top: 40px;
+}
+
+.calculator-panel.large {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.calculator-panel.large .calculator-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.calculator-panel.large .calculator-header h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.calculator-panel.large .calculator-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.calculator-panel.large .calculator-grid {
+    gap: 30px;
+}
+
+.calculator-panel.large .input-wrapper input {
+    font-size: 20px;
+    padding: 15px 20px;
+    padding-left: 35px;
+}
+
+.calculator-panel.large .result-value {
+    font-size: 42px;
+    color: var(--primary);
+}
+
+.calculator-panel.large .calc-results-container {
+    margin-top: 30px;
+    padding-top: 30px;
+}
+
+.calculator-panel.large .calc-result-box {
+    background: var(--bg-tertiary);
+    padding: 30px;
+}
+
 /* New Form Layout - Cards */
 .trade-form-grid {
     display: grid;

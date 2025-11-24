@@ -396,7 +396,7 @@ function loadAllTrades() {
                 <td>${trade.strategy || '-'}</td>
                 <td>
                     <button class="action-btn" onclick="viewTrade(${trades.indexOf(trade)})">View</button>
-                    ${trade.screenshot_url ? `<button class="action-btn" onclick="window.open('${trade.screenshot_url}', '_blank')">📷</button>` : ''}
+                    ${trade.screenshot_url ? `<button class="action-btn" onclick="openImageModal('${trade.screenshot_url}')">📷</button>` : ''}
                     <button class="action-btn delete" onclick="deleteTrade(${trade.id})">Delete</button>
                 </td>
             </tr>
@@ -1148,7 +1148,11 @@ function showToast(message, type = 'success') {
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    setTimeout(() => toast.remove(), 3000);
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => toast.remove(), 500); // Wait for animation to finish
+    }, 3000);
 }
 
 // Slider Gradient Animation
@@ -1194,6 +1198,51 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 // Initialization and Event Listeners
 // Initialize Supabase if available (handled in auth.js, but good to double check or wait)
+
+// Screenshot Preview Logic
+const screenshotInput = document.getElementById('screenshotInput');
+if (screenshotInput) {
+    screenshotInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage');
+                const container = document.getElementById('screenshotPreview');
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+function removeScreenshot() {
+    const input = document.getElementById('screenshotInput');
+    const container = document.getElementById('screenshotPreview');
+    input.value = '';
+    container.style.display = 'none';
+}
+
+// Image Modal Logic
+function openImageModal(src) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = "block";
+    modalImg.src = src;
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = "none";
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function (event) {
+    if (event.key === "Escape") {
+        closeImageModal();
+    }
+});
 
 // Load initial data
 loadCalendar();

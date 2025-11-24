@@ -426,8 +426,19 @@
                                 </label>
                             </div>
                         </div>
+                        <div id="screenshotPreview" class="screenshot-preview-container" style="display: none;">
+                            <img id="previewImage" src="" alt="Screenshot Preview">
+                            <button type="button" class="remove-screenshot" onclick="removeScreenshot()">×</button>
+                        </div>
                     </div>
+                </div>
 
+                </div>
+
+                <!-- Image Modal -->
+                <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+                    <span class="close-modal">&times;</span>
+                    <img class="modal-content" id="modalImage">
                 </div>
 
                 <div class="form-actions-floating">

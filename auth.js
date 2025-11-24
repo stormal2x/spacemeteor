@@ -56,7 +56,7 @@ async function handleLogin(event) {
 
         if (error) throw error;
 
-        window.location.href = 'dashboard.html';
+        window.location.href = '/dashboard';
     } catch (error) {
         showToast('Login failed: ' + error.message, 'error');
         submitBtn.innerHTML = `Sign In <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`;
@@ -99,7 +99,7 @@ async function handleVerify(event) {
         if (error) throw error;
 
         showToast('Verification successful! Logging you in...', 'success');
-        window.location.href = 'dashboard.html';
+        window.location.href = '/dashboard';
     } catch (error) {
         showToast('Verification failed: ' + error.message, 'error');
         submitBtn.innerHTML = `Verify Code <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -176,14 +176,14 @@ async function logout() {
     }
     localStorage.removeItem('sb-access-token');
     localStorage.removeItem('sb-refresh-token');
-    window.location.href = 'index.html';
+    window.location.href = '/';
 }
 
 async function checkAuth() {
     initSupabase();
 
     if (!supabase) {
-        if (window.location.pathname.includes('dashboard.html')) {
+        if (window.location.pathname.includes('dashboard')) {
             // If on dashboard and no creds, ask for them or redirect
             // For now, let's just ask
             checkCredentials();
@@ -193,10 +193,10 @@ async function checkAuth() {
 
     const { data: { session } } = await supabase.auth.getSession();
 
-    if (!session && window.location.pathname.includes('dashboard.html')) {
-        window.location.href = 'login.html';
-    } else if (session && (window.location.pathname.includes('index.html') || window.location.pathname.includes('login.html'))) {
-        window.location.href = 'dashboard.html';
+    if (!session && window.location.pathname.includes('dashboard')) {
+        window.location.href = '/login';
+    } else if (session && (window.location.pathname === '/' || window.location.pathname.includes('index') || window.location.pathname.includes('login'))) {
+        window.location.href = '/dashboard';
     }
 }
 
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // If we are on dashboard, ensure we are auth'd
     // If we are on dashboard or login, ensure we are auth'd (or not)
-    if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('login.html')) {
+    if (window.location.pathname.includes('dashboard') || window.location.pathname.includes('login')) {
         checkAuth();
     }
 });

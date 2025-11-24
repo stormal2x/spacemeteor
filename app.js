@@ -409,21 +409,23 @@ function applyFilters(trades) {
         const matchesOutcome = filterOutcome === 'all' ||
             (filterOutcome === 'win' && pnl > 0) ||
             (filterOutcome === 'loss' && pnl < 0);
-
         return matchesSearch && matchesType && matchesOutcome;
     });
 }
 
 // Add event listeners for filters
-setTimeout(() => {
-    const searchInput = document.getElementById('searchTrades');
-    const filterType = document.getElementById('filterType');
-    const filterOutcome = document.getElementById('filterOutcome');
+document.addEventListener('DOMContentLoaded', () => {
+    loadCalendar();
+    loadAllTrades();
+    updateStats();
+    initCalculator(); // Initialize calculator
 
-    if (searchInput) searchInput.addEventListener('input', loadAllTrades);
-    if (filterType) filterType.addEventListener('change', loadAllTrades);
-    if (filterOutcome) filterOutcome.addEventListener('change', loadAllTrades);
-}, 100);
+    // Setup filters
+    document.getElementById('filterType').addEventListener('change', loadAllTrades);
+    document.getElementById('filterOutcome').addEventListener('change', loadAllTrades);
+    document.getElementById('searchTrades').addEventListener('input', loadAllTrades);
+    document.getElementById('perfTimeframe').addEventListener('change', updateStats);
+});
 
 function viewTrade(index) {
     const trade = trades[index];
@@ -489,50 +491,45 @@ async function handleTradeSubmit(event) {
         }
     });
 
-    // Handle screenshot (for now, just store filename)
-    const screenshotFile = formData.get('screenshot');
-    const screenshotName = screenshotFile && screenshotFile.name ? screenshotFile.name : null;
 
-    const todayIso = new Date().toISOString().split('T')[0];
-    const tradeDateIso = selectedTradeDate || todayIso;
+    // Handle Multi-selects
+    const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
+    const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
+
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
         type: formData.get('type'),
-        tradeDate: tradeDateIso,
-        entryDate: tradeDateIso, // Keep for compatibility
-        exitDate: tradeDateIso, // Keep for compatibility
-        entryPrice: formData.get('entryPrice'),
-        exitPrice: formData.get('exitPrice'),
-        quantity: formData.get('quantity'),
-        stopLoss: formData.get('stopLoss') || null,
-        takeProfit: formData.get('takeProfit') || null,
-        session: formData.get('session') || null,
-        emotion: formData.get('emotion') || null,
-        confidence: formData.get('confidence') || null,
-        mistakes: mistakes.length > 0 ? mistakes.join(', ') : null,
+        quantity: parseFloat(formData.get('quantity')),
+        entryPrice: parseFloat(formData.get('entryPrice')),
+        exitPrice: parseFloat(formData.get('exitPrice')),
+        stopLoss: parseFloat(formData.get('stopLoss')) || null,
+        takeProfit: parseFloat(formData.get('takeProfit')) || null,
+        session: formData.get('session'),
+        emotion: emotions.join(','), // Store as comma-separated string
+        confidence: formData.get('confidence'),
+        mistakes: mistakes.join(','), // Store as comma-separated string
         strategy: formData.get('strategy'),
         tags: formData.get('tags'),
         notes: formData.get('notes'),
-        screenshot: screenshotName,
-        createdAt: new Date().toISOString()
+        tradeDate: new Date().toISOString()
     };
 
-    const success = await saveTradeToDb(trade);
+    // Basic Validation
+    if (!trade.symbol || !trade.quantity || !trade.entryPrice || !trade.exitPrice) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
 
-    if (success) {
-        form.reset();
-        // Reset calculator
-        document.getElementById('calcPositionSize').textContent = '0';
-        document.getElementById('calcRiskAmount').textContent = '$0.00';
+    await saveTradeToDb(trade);
 
-        showToast('Trade added successfully! 🚀', 'success');
+    form.reset();
+    // Reset range slider output
+    const rangeOutput = form.querySelector('output');
+    if (rangeOutput) rangeOutput.textContent = '5';
 
-        // Clear selected day and switch to calendar view
-        setTimeout(() => {
-            selectedTradeDate = null;
-            switchSection('calendar');
-            document.querySelector('[data-section="calendar"]').classList.add('active');
-            document.querySelector('[data-section="add-trade"]').classList.remove('active');
+    switchSection('trades');
+} document.querySelector('[data-section="calendar"]').classList.add('active');
+document.querySelector('[data-section="add-trade"]').classList.remove('active');
         }, 1000);
     }
 }

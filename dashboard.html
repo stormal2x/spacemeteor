@@ -189,167 +189,226 @@
                 <h1>Add New Trade</h1>
             </div>
 
-            <div class="form-card">
-                <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
-                    <!-- Position Size Calculator -->
-                    <div class="calculator-card">
-                        <h3>📊 Position Size Calculator</h3>
-                        <div class="calculator-grid">
-                            <div class="calc-input">
-                                <label>Account Size</label>
-                                <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
-                            </div>
-                            <div class="calc-input">
-                                <label>Risk %</label>
-                                <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10">
-                            </div>
-                            <div class="calc-input">
-                                <label>Entry Price</label>
-                                <input type="number" id="calcEntry" placeholder="0.00" step="0.01">
-                            </div>
-                            <div class="calc-input">
-                                <label>Stop Loss</label>
-                                <input type="number" id="calcSL" placeholder="0.00" step="0.01">
-                            </div>
-                            <div class="calc-result">
-                                <label>Position Size</label>
-                                <div class="calc-output" id="calcPositionSize">0</div>
-                            </div>
-                            <div class="calc-result">
-                                <label>Risk Amount</label>
-                                <div class="calc-output" id="calcRiskAmount">$0.00</div>
-                            </div>
+            <!-- Standalone Position Size Calculator -->
+            <div class="calculator-panel">
+                <div class="calculator-header">
+                    <h3>🧮 Position Size Calculator</h3>
+                    <p>Calculate your risk before you enter.</p>
+                </div>
+                <div class="calculator-grid">
+                    <div class="calc-input">
+                        <label>Account Size</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
+                        </div>
+                    </div>
+                    <div class="calc-input">
+                        <label>Risk %</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    <div class="calc-input">
+                        <label>Entry Price</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="calcEntry" placeholder="0.00" step="0.01">
+                        </div>
+                    </div>
+                    <div class="calc-input">
+                        <label>Stop Loss</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="calcSL" placeholder="0.00" step="0.01">
                         </div>
                     </div>
 
-                    <div class="form-grid">
+                    <div class="calc-results-container">
+                        <div class="calc-result-box">
+                            <span class="result-label">Position Size</span>
+                            <span class="result-value" id="calcPositionSize">0</span>
+                            <span class="result-unit">Units</span>
+                        </div>
+                        <div class="calc-result-box">
+                            <span class="result-label">Risk Amount</span>
+                            <span class="result-value" id="calcRiskAmount">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
+                <div class="trade-form-grid">
+
+                    <!-- Card 1: Trade Details -->
+                    <div class="form-section-card">
+                        <div class="card-title">
+                            <span class="card-icon">📊</span>
+                            <h3>Trade Details</h3>
+                        </div>
                         <div class="form-group">
                             <label>Symbol *</label>
                             <input type="text" name="symbol" placeholder="e.g., AAPL, BTC/USD" required>
                         </div>
-
-                        <div class="form-group">
-                            <label>Trade Type *</label>
-                            <select name="type" required>
-                                <option value="long">Long</option>
-                                <option value="short">Short</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Type *</label>
+                                <select name="type" required>
+                                    <option value="long">Long 📈</option>
+                                    <option value="short">Short 📉</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity *</label>
+                                <input type="number" name="quantity" step="0.01" placeholder="0" required
+                                    id="tradeQuantity">
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label>Quantity *</label>
-                            <input type="number" name="quantity" step="0.01" placeholder="0" required
-                                id="tradeQuantity">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Entry Price *</label>
+                                <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required
+                                    id="tradeEntry">
+                            </div>
+                            <div class="form-group">
+                                <label>Exit Price *</label>
+                                <input type="number" name="exitPrice" step="0.01" placeholder="0.00" required>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label>Entry Price *</label>
-                            <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required
-                                id="tradeEntry">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Stop Loss</label>
+                                <input type="number" name="stopLoss" step="0.01" placeholder="0.00" id="tradeSL">
+                            </div>
+                            <div class="form-group">
+                                <label>Take Profit</label>
+                                <input type="number" name="takeProfit" step="0.01" placeholder="0.00">
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label>Exit Price *</label>
-                            <input type="number" name="exitPrice" step="0.01" placeholder="0.00" required>
+                    <!-- Card 2: Psychology -->
+                    <div class="form-section-card">
+                        <div class="card-title">
+                            <span class="card-icon">🧠</span>
+                            <h3>Psychology</h3>
                         </div>
-
                         <div class="form-group">
-                            <label>Stop Loss</label>
-                            <input type="number" name="stopLoss" step="0.01" placeholder="0.00" id="tradeSL">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Take Profit</label>
-                            <input type="number" name="takeProfit" step="0.01" placeholder="0.00">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Session Time</label>
+                            <label>Session</label>
                             <select name="session">
                                 <option value="">Select Session</option>
-                                <option value="asian">🌏 Asian Session</option>
-                                <option value="london">🇬🇧 London Session</option>
-                                <option value="newyork">🗽 New York Session</option>
+                                <option value="asian">🌏 Asian</option>
+                                <option value="london">🇬🇧 London</option>
+                                <option value="newyork">🗽 New York</option>
                                 <option value="overlap">⚡ London/NY Overlap</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>How Did You Feel? 🧠</label>
-                            <select name="emotion">
-                                <option value="">Select Emotion</option>
-                                <option value="confident">😎 Confident</option>
-                                <option value="calm">😌 Calm & Focused</option>
-                                <option value="excited">🤩 Excited</option>
-                                <option value="anxious">😰 Anxious</option>
-                                <option value="fearful">😨 Fearful</option>
-                                <option value="greedy">🤑 Greedy</option>
-                                <option value="revenge">😤 Revenge Trading</option>
-                                <option value="fomo">😱 FOMO</option>
-                            </select>
+                            <label>Confidence (1-10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" name="confidence" min="1" max="10" value="5"
+                                    oninput="this.nextElementSibling.value = this.value">
+                                <output>5</output>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Confidence Level</label>
-                            <select name="confidence">
-                                <option value="">How sure were you?</option>
-                                <option value="5">⭐⭐⭐⭐⭐ Very High</option>
-                                <option value="4">⭐⭐⭐⭐ High</option>
-                                <option value="3">⭐⭐⭐ Medium</option>
-                                <option value="2">⭐⭐ Low</option>
-                                <option value="1">⭐ Very Low</option>
-                            </select>
+                            <label>Emotions (Select all that apply)</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="confident"> 😎
+                                    Confident</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="calm"> 😌
+                                    Calm</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="excited"> 🤩
+                                    Excited</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="anxious"> 😰
+                                    Anxious</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="fearful"> 😨
+                                    Fearful</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="greedy"> 🤑
+                                    Greedy</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="fomo"> 😱
+                                    FOMO</label>
+                                <label class="checkbox-pill"><input type="checkbox" name="emotion" value="revenge"> 😤
+                                    Revenge</label>
+                            </div>
                         </div>
 
+                        <div class="form-group">
+                            <label>Mistakes Made? 🚫</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake"
+                                        value="oversized"> Oversized</label>
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake" value="no-sl">
+                                    No SL</label>
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake"
+                                        value="no-plan"> No Plan</label>
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake"
+                                        value="early-exit"> Early Exit</label>
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake"
+                                        value="held-long"> Held Long</label>
+                                <label class="checkbox-pill error"><input type="checkbox" name="mistake"
+                                        value="broke-rules"> Broke Rules</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Context -->
+                    <div class="form-section-card">
+                        <div class="card-title">
+                            <span class="card-icon">📝</span>
+                            <h3>Context</h3>
+                        </div>
                         <div class="form-group">
                             <label>Strategy</label>
                             <input type="text" name="strategy" placeholder="e.g., Breakout, Trend Following">
                         </div>
-
                         <div class="form-group">
                             <label>Tags</label>
                             <input type="text" name="tags" placeholder="e.g., tech, earnings, swing">
                         </div>
+                        <div class="form-group">
+                            <label>Trade Notes</label>
+                            <textarea name="notes" rows="6"
+                                placeholder="What was your setup? What did you learn?"></textarea>
+                        </div>
+                    </div>
 
-                        <div class="form-group full-width">
-                            <label>Mistakes Made? 🚫</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_sized"
-                                        value="oversized"> Oversized Position</label>
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_sl" value="no-sl"> No
-                                    Stop Loss</label>
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_plan"
-                                        value="no-plan"> No Trade Plan</label>
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_exit"
-                                        value="early-exit"> Exited Too Early</label>
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_hold"
-                                        value="held-long"> Held Too Long</label>
-                                <label class="checkbox-label"><input type="checkbox" name="mistake_rules"
-                                        value="broke-rules"> Broke My Rules</label>
+                    <!-- Card 4: Evidence -->
+                    <div class="form-section-card">
+                        <div class="card-title">
+                            <span class="card-icon">📸</span>
+                            <h3>Evidence</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Screenshot</label>
+                            <div class="file-upload-area">
+                                <input type="file" name="screenshot" accept="image/*" id="screenshotInput"
+                                    class="file-input-hidden">
+                                <label for="screenshotInput" class="file-upload-label">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21 15 16 10 5 21" />
+                                    </svg>
+                                    <span>Click to upload chart image</span>
+                                </label>
                             </div>
                         </div>
-
-                        <div class="form-group full-width">
-                            <label>Trade Notes</label>
-                            <textarea name="notes" rows="4"
-                                placeholder="What was your setup? What did you learn? What would you do differently?"></textarea>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>Trade Screenshot (optional)</label>
-                            <input type="file" name="screenshot" accept="image/*" class="file-input">
-                            <small style="color: var(--text-secondary);">Upload a chart screenshot or trade setup
-                                image</small>
-                        </div>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">💾 Save Trade</button>
-                        <button type="button" class="btn-secondary"
-                            onclick="document.getElementById('tradeForm').reset()">Clear Form</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="form-actions-floating">
+                    <button type="button" class="btn-secondary"
+                        onclick="document.getElementById('tradeForm').reset()">Clear</button>
+                    <button type="submit" class="btn-primary-large">💾 Save Trade Journal</button>
+                </div>
+            </form>
         </section>
 
         <!-- My Trades Section -->

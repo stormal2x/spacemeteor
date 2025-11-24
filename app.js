@@ -64,7 +64,7 @@ async function saveTradeToDb(trade) {
 
     if (error) {
         console.error('Error saving trade:', error);
-        showToast('Failed to save trade', 'error');
+        showToast('Failed to save trade: ' + (error.message || JSON.stringify(error)), 'error');
         return false;
     }
 
@@ -538,7 +538,7 @@ async function handleTradeSubmit(event) {
         form.reset();
         // Reset range slider
         const rangeOutput = form.querySelector('output');
-        if (rangeOutput) rangeOutput.textContent = '5';
+        if (rangeOutput) rangeOutput.textContent = '5.0';
         const slider = form.querySelector('input[type="range"]');
         if (slider) {
             slider.value = 5;

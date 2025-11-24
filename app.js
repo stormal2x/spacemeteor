@@ -500,16 +500,21 @@ async function handleTradeSubmit(event) {
     const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
     const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
 
+    // Calculate exit price based on PnL to satisfy database schema
+    // PnL = (Exit - Entry) * Quantity
+    // Assuming Quantity = 1 for simplicity in this new layout
+    const entryPrice = parseFloat(formData.get('entryPrice'));
+    const pnl = parseFloat(formData.get('pnl')) || 0;
+    const exitPrice = entryPrice + pnl;
+
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
-        type: 'long', // Default since we don't have type selector anymore
-        quantity: 1, // Default value
-        entryPrice: parseFloat(formData.get('entryPrice')),
-        exitPrice: parseFloat(formData.get('entryPrice')) || 0, // Use entry as placeholder
+        type: 'long', // Default to long
+        quantity: 1,
+        entryPrice: entryPrice,
+        exitPrice: exitPrice,
         stopLoss: parseFloat(formData.get('stopLoss')) || null,
         takeProfit: parseFloat(formData.get('takeProfit')) || null,
-        outcome: formData.get('outcome'),
-        pnl: parseFloat(formData.get('pnl')) || 0,
         session: formData.get('session'),
         emotion: emotions.join(','),
         confidence: formData.get('confidence'),
@@ -535,7 +540,10 @@ async function handleTradeSubmit(event) {
         const rangeOutput = form.querySelector('output');
         if (rangeOutput) rangeOutput.textContent = '5';
         const slider = form.querySelector('input[type="range"]');
-        if (slider) updateSliderGradient(slider);
+        if (slider) {
+            slider.value = 5;
+            updateSliderGradient(slider);
+        }
 
         switchSection('trades');
     }
@@ -1116,34 +1124,35 @@ function updateSliderGradient(slider) {
 }
 
 // Initialize slider gradients on page load
-document.addEventListener('DOMContentLoaded', () => {
+function initSliders() {
     const sliders = document.querySelectorAll('input[type="range"]');
     sliders.forEach(slider => {
         updateSliderGradient(slider);
 
-        // Add drag animation
-        slider.addEventListener('mousedown', function () {
-            this.classList.add('slider-dragging');
+        // Update gradient on input
+        slider.addEventListener('input', function () {
+            updateSliderGradient(this);
         });
 
-        slider.addEventListener('mouseup', function () {
-            this.classList.remove('slider-dragging');
-        });
+        // Add drag animation classes
+        const startDrag = () => slider.classList.add('slider-dragging');
+        const endDrag = () => slider.classList.remove('slider-dragging');
 
-        slider.addEventListener('mouseleave', function () {
-            this.classList.remove('slider-dragging');
-        });
+        slider.addEventListener('mousedown', startDrag);
+        slider.addEventListener('touchstart', startDrag, { passive: true });
 
-        // Touch support
-        slider.addEventListener('touchstart', function () {
-            this.classList.add('slider-dragging');
-        });
-
-        slider.addEventListener('touchend', function () {
-            this.classList.remove('slider-dragging');
-        });
+        slider.addEventListener('mouseup', endDrag);
+        slider.addEventListener('mouseleave', endDrag);
+        slider.addEventListener('touchend', endDrag);
+        slider.addEventListener('touchcancel', endDrag);
     });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initSliders);
+// Also run immediately in case DOM is already ready
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initSliders();
+}
 
 // Initialization and Event Listeners
 // Initialize Supabase if available (handled in auth.js, but good to double check or wait)

@@ -1227,8 +1227,26 @@ function openImageModal(src) {
     const modalImg = document.getElementById('modalImage');
     const loader = document.getElementById('modalLoader');
 
-    modal.classList.add('active'); // Use class for flex display
+    // Reset state
+    modalImg.style.display = 'none'; // Hide image initially
     loader.style.display = 'block'; // Show loader
+    modal.classList.add('active'); // Show modal container
+
+    // Force reflow
+    void modal.offsetWidth;
+
+    // Set up onload handler BEFORE setting src
+    modalImg.onload = function () {
+        loader.style.display = 'none';
+        modalImg.style.display = 'block';
+    };
+
+    modalImg.onerror = function () {
+        loader.style.display = 'none';
+        showToast('Failed to load image', 'error');
+    };
+
+    // Set src to trigger load
     modalImg.src = src;
 }
 

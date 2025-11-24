@@ -295,7 +295,22 @@ function calculatePnLPercentage(trade) {
 }
 
 function calculateRR(trade) {
-    // Calculate Risk/Reward ratio
+    // Calculate Realized R-Multiple if PnL and Stop Loss are available
+    if (trade.pnl !== undefined && trade.pnl !== null && trade.stopLoss) {
+        const entryPrice = parseFloat(trade.entryPrice);
+        const stopLoss = parseFloat(trade.stopLoss);
+        const quantity = parseFloat(trade.quantity) || 1;
+
+        const riskPerShare = Math.abs(entryPrice - stopLoss);
+        const totalRisk = riskPerShare * quantity;
+
+        if (totalRisk === 0) return '0.00';
+
+        const rMultiple = parseFloat(trade.pnl) / totalRisk;
+        return rMultiple.toFixed(2);
+    }
+
+    // Fallback to Planned RR (Risk/Reward ratio)
     if (!trade.stopLoss || !trade.takeProfit) {
         // Calculate actual RR from entry and exit
         const pnl = calculatePnL(trade);

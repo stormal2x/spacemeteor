@@ -187,17 +187,17 @@ function calculatePerformanceStats() {
     const profitFactor = totalLosses > 0 ? (totalWins / totalLosses).toFixed(2) : '0.00';
 
     // Update DOM
-    updateElement('totalPnL', formatCurrency(totalPnL));
-    updateElement('pnlChange', `${totalPnL >= 0 ? '+' : ''}${((totalPnL / settings.startingCapital) * 100).toFixed(1)}%`);
-    updateElement('winRate', `${winRate}%`);
-    updateElement('winRateChange', `${wins}/${filteredTrades.length} trades`);
+    updateElement('perfTotalPnL', formatCurrency(totalPnL));
+    updateElement('perfPnlChange', `${totalPnL >= 0 ? '+' : ''}${((totalPnL / settings.startingCapital) * 100).toFixed(1)}%`);
+    updateElement('perfWinRate', `${winRate}%`);
+    updateElement('perfWinRateChange', `${wins}/${filteredTrades.length} trades`);
     updateElement('perfAvgRR', avgRR);
-    updateElement('profitFactor', `PF: ${profitFactor}`);
-    updateElement('totalTrades', filteredTrades.length);
-    updateElement('tradesChange', `+${filteredTrades.length} this period`);
+    updateElement('perfProfitFactor', `PF: ${profitFactor}`);
+    updateElement('perfTotalTrades', filteredTrades.length);
+    updateElement('perfTradesChange', `+${filteredTrades.length} this period`);
 
     // Update stat change classes
-    const pnlChangeEl = document.getElementById('pnlChange');
+    const pnlChangeEl = document.getElementById('perfPnlChange');
     if (pnlChangeEl) {
         pnlChangeEl.className = 'stat-change ' + (totalPnL >= 0 ? 'positive' : 'negative');
     }
@@ -674,9 +674,8 @@ function loadCalendar() {
     const wins = monthTrades.filter(trade => calculatePnL(trade) > 0).length;
     const winRate = monthTrades.length > 0 ? (wins / monthTrades.length * 100).toFixed(1) : 0;
     const avgRR = calculateAvgRR(monthTrades);
-
-    // Total Trades (requested change from Trading Days)
-    const totalTrades = monthTrades.length;
+    const tradingDaysSet = new Set(monthTrades.map(t => new Date(t.tradeDate || t.entryDate).getDate()));
+    const tradingDays = tradingDaysSet.size;
 
     // Update stats
     updateElement('monthPnL', formatCurrency(monthPnL));
@@ -684,10 +683,8 @@ function loadCalendar() {
     updateElement('calendarWinRate', `${winRate}%`);
     updateElement('calendarWins', `${wins} wins`);
     updateElement('avgRR', avgRR);
-
-    // Update Total Trades
-    updateElement('totalTrades', totalTrades);
-    updateElement('tradesChange', `${totalTrades} trades`);
+    updateElement('tradingDays', tradingDays);
+    updateElement('monthTrades', `${monthTrades.length} trades`);
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();

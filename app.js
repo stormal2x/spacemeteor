@@ -483,13 +483,7 @@ async function handleTradeSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
 
-    // Collect mistakes
-    const mistakes = [];
-    form.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-        if (cb.name.startsWith('mistake_')) {
-            mistakes.push(cb.value);
-        }
-    });
+
 
 
     // Handle Multi-selects
@@ -528,142 +522,138 @@ async function handleTradeSubmit(event) {
     if (rangeOutput) rangeOutput.textContent = '5';
 
     switchSection('trades');
-} document.querySelector('[data-section="calendar"]').classList.add('active');
-document.querySelector('[data-section="add-trade"]').classList.remove('active');
-        }, 1000);
-    }
-}
 
-// Calendar
-function loadCalendar() {
-    const grid = document.getElementById('calendarGrid');
-    const monthLabel = document.getElementById('currentMonth');
-    const monthSelect = document.getElementById('calendarMonthSelect');
-    const yearSelect = document.getElementById('calendarYearSelect');
 
-    if (!grid) return;
+    // Calendar
+    function loadCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const monthLabel = document.getElementById('currentMonth');
+        const monthSelect = document.getElementById('calendarMonthSelect');
+        const yearSelect = document.getElementById('calendarYearSelect');
 
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
+        if (!grid) return;
 
-    if (monthLabel) {
-        monthLabel.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
-    // Populate selectors
-    if (monthSelect && monthSelect.options.length === 0) {
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        monthNames.forEach((m, idx) => {
-            const opt = document.createElement('option');
-            opt.value = idx;
-            opt.textContent = m;
-            monthSelect.appendChild(opt);
-        });
-        monthSelect.addEventListener('change', (e) => {
-            currentMonth = new Date(year, parseInt(e.target.value, 10), 1);
-            loadCalendar();
-        });
-    }
-    if (yearSelect && yearSelect.options.length === 0) {
-        const start = year - 5, end = year + 5;
-        for (let y = start; y <= end; y++) {
-            const opt = document.createElement('option');
-            opt.value = y;
-            opt.textContent = y;
-            yearSelect.appendChild(opt);
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+
+        if (monthLabel) {
+            monthLabel.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         }
-        yearSelect.addEventListener('change', (e) => {
-            currentMonth = new Date(parseInt(e.target.value, 10), month, 1);
-            loadCalendar();
-        });
-    }
-    if (monthSelect) monthSelect.value = String(month);
-    if (yearSelect) yearSelect.value = String(year);
+        // Populate selectors
+        if (monthSelect && monthSelect.options.length === 0) {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            monthNames.forEach((m, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = m;
+                monthSelect.appendChild(opt);
+            });
+            monthSelect.addEventListener('change', (e) => {
+                currentMonth = new Date(year, parseInt(e.target.value, 10), 1);
+                loadCalendar();
+            });
+        }
+        if (yearSelect && yearSelect.options.length === 0) {
+            const start = year - 5, end = year + 5;
+            for (let y = start; y <= end; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
+            yearSelect.addEventListener('change', (e) => {
+                currentMonth = new Date(parseInt(e.target.value, 10), month, 1);
+                loadCalendar();
+            });
+        }
+        if (monthSelect) monthSelect.value = String(month);
+        if (yearSelect) yearSelect.value = String(year);
 
-    // Calculate month stats
-    const monthTrades = trades.filter(trade => {
-        const tradeDate = new Date(trade.tradeDate || trade.entryDate);
-        return tradeDate.getMonth() === month && tradeDate.getFullYear() === year;
-    });
-
-    const monthPnL = monthTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
-    const wins = monthTrades.filter(trade => calculatePnL(trade) > 0).length;
-    const winRate = monthTrades.length > 0 ? (wins / monthTrades.length * 100).toFixed(1) : 0;
-    const avgRR = calculateAvgRR(monthTrades);
-    const tradingDaysSet = new Set(monthTrades.map(t => new Date(t.tradeDate || t.entryDate).getDate()));
-    const tradingDays = tradingDaysSet.size;
-
-    // Update stats
-    updateElement('monthPnL', formatCurrency(monthPnL));
-    updateElement('monthPnlPercent', `${monthPnL >= 0 ? '+' : ''}${((monthPnL / settings.startingCapital) * 100).toFixed(1)}%`);
-    updateElement('calendarWinRate', `${winRate}%`);
-    updateElement('calendarWins', `${wins} wins`);
-    updateElement('avgRR', avgRR);
-    updateElement('tradingDays', tradingDays);
-    updateElement('monthTrades', `${monthTrades.length} trades`);
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // Previous month padding
-    const prevMonthDays = new Date(year, month, 0).getDate();
-
-    grid.innerHTML = '';
-
-    // Add day headers
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    days.forEach(day => {
-        const header = document.createElement('div');
-        header.style.textAlign = 'center';
-        header.style.fontWeight = '600';
-        header.style.padding = '10px';
-        header.style.color = 'var(--text-secondary)';
-        header.textContent = day;
-        grid.appendChild(header);
-    });
-
-    // Add padding days from previous month
-    for (let i = firstDay - 1; i >= 0; i--) {
-        const dayNum = prevMonthDays - i;
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day padding';
-        dayEl.innerHTML = `<div class="calendar-day-number">${dayNum}</div>`;
-        grid.appendChild(dayEl);
-    }
-
-    // Add days
-    for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dayTrades = trades.filter(trade => {
+        // Calculate month stats
+        const monthTrades = trades.filter(trade => {
             const tradeDate = new Date(trade.tradeDate || trade.entryDate);
-            return tradeDate.getDate() === day &&
-                tradeDate.getMonth() === month &&
-                tradeDate.getFullYear() === year;
+            return tradeDate.getMonth() === month && tradeDate.getFullYear() === year;
         });
 
-        const dayPnL = dayTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
+        const monthPnL = monthTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
+        const wins = monthTrades.filter(trade => calculatePnL(trade) > 0).length;
+        const winRate = monthTrades.length > 0 ? (wins / monthTrades.length * 100).toFixed(1) : 0;
+        const avgRR = calculateAvgRR(monthTrades);
+        const tradingDaysSet = new Set(monthTrades.map(t => new Date(t.tradeDate || t.entryDate).getDate()));
+        const tradingDays = tradingDaysSet.size;
 
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
+        // Update stats
+        updateElement('monthPnL', formatCurrency(monthPnL));
+        updateElement('monthPnlPercent', `${monthPnL >= 0 ? '+' : ''}${((monthPnL / settings.startingCapital) * 100).toFixed(1)}%`);
+        updateElement('calendarWinRate', `${winRate}%`);
+        updateElement('calendarWins', `${wins} wins`);
+        updateElement('avgRR', avgRR);
+        updateElement('tradingDays', tradingDays);
+        updateElement('monthTrades', `${monthTrades.length} trades`);
 
-        // Visual classes
-        if (dayTrades.length > 0) {
-            if (dayPnL > 0) dayEl.classList.add('profit');
-            else if (dayPnL < 0) dayEl.classList.add('loss');
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Previous month padding
+        const prevMonthDays = new Date(year, month, 0).getDate();
+
+        grid.innerHTML = '';
+
+        // Add day headers
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        days.forEach(day => {
+            const header = document.createElement('div');
+            header.style.textAlign = 'center';
+            header.style.fontWeight = '600';
+            header.style.padding = '10px';
+            header.style.color = 'var(--text-secondary)';
+            header.textContent = day;
+            grid.appendChild(header);
+        });
+
+        // Add padding days from previous month
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const dayNum = prevMonthDays - i;
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day padding';
+            dayEl.innerHTML = `<div class="calendar-day-number">${dayNum}</div>`;
+            grid.appendChild(dayEl);
         }
 
-        // Selected day visual
-        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        if (selectedTradeDate === iso) dayEl.classList.add('selected');
+        // Add days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dayTrades = trades.filter(trade => {
+                const tradeDate = new Date(trade.tradeDate || trade.entryDate);
+                return tradeDate.getDate() === day &&
+                    tradeDate.getMonth() === month &&
+                    tradeDate.getFullYear() === year;
+            });
 
-        // Tooltip
-        if (dayTrades.length > 0) {
-            const winsCount = dayTrades.filter(t => calculatePnL(t) > 0).length;
-            dayEl.title = `${iso}\nTrades: ${dayTrades.length} | Wins: ${winsCount}\nPnL: ${formatCurrency(dayPnL)}`;
-        } else {
-            dayEl.title = `${iso}\nNo trades`;
-        }
+            const dayPnL = dayTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
 
-        dayEl.innerHTML = `
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+
+            // Visual classes
+            if (dayTrades.length > 0) {
+                if (dayPnL > 0) dayEl.classList.add('profit');
+                else if (dayPnL < 0) dayEl.classList.add('loss');
+            }
+
+            // Selected day visual
+            const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            if (selectedTradeDate === iso) dayEl.classList.add('selected');
+
+            // Tooltip
+            if (dayTrades.length > 0) {
+                const winsCount = dayTrades.filter(t => calculatePnL(t) > 0).length;
+                dayEl.title = `${iso}\nTrades: ${dayTrades.length} | Wins: ${winsCount}\nPnL: ${formatCurrency(dayPnL)}`;
+            } else {
+                dayEl.title = `${iso}\nNo trades`;
+            }
+
+            dayEl.innerHTML = `
             <div class="calendar-day-number">${day}</div>
             <div class="calendar-day-content">
                 ${dayTrades.length > 0 ? `
@@ -672,455 +662,455 @@ function loadCalendar() {
                 ` : ''}
             </div>
         `;
-        // Click to select this date and jump to add-trade
-        dayEl.dataset.date = iso;
-        dayEl.addEventListener('click', () => {
-            selectedTradeDate = iso;
-            // Rerender selection highlight
-            document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-            dayEl.classList.add('selected');
-            // Prefill and go to add trade
-            switchSection('add-trade');
-            const qtyInput = document.getElementById('tradeQuantity');
-            if (qtyInput) qtyInput.focus();
-        });
+            // Click to select this date and jump to add-trade
+            dayEl.dataset.date = iso;
+            dayEl.addEventListener('click', () => {
+                selectedTradeDate = iso;
+                // Rerender selection highlight
+                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+                dayEl.classList.add('selected');
+                // Prefill and go to add trade
+                switchSection('add-trade');
+                const qtyInput = document.getElementById('tradeQuantity');
+                if (qtyInput) qtyInput.focus();
+            });
 
-        grid.appendChild(dayEl);
-    }
-
-    // Add padding days for next month
-    const totalCells = firstDay + daysInMonth;
-    const remainingCells = 42 - totalCells; // 6 rows * 7 days = 42
-
-    if (remainingCells > 0 && remainingCells < 14) { // Only add if we need to fill the grid reasonably
-        for (let i = 1; i <= remainingCells; i++) {
-            const dayEl = document.createElement('div');
-            dayEl.className = 'calendar-day padding';
-            dayEl.innerHTML = `<div class="calendar-day-number">${i}</div>`;
             grid.appendChild(dayEl);
         }
-    }
-}
 
-function previousMonth() {
-    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
-    loadCalendar();
-}
+        // Add padding days for next month
+        const totalCells = firstDay + daysInMonth;
+        const remainingCells = 42 - totalCells; // 6 rows * 7 days = 42
 
-function nextMonth() {
-    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
-    loadCalendar();
-}
-
-function goToToday() {
-    currentMonth = new Date();
-    selectedTradeDate = null;
-    loadCalendar();
-}
-
-// Analytics
-function loadAnalytics() {
-    calculateAdvancedMetrics();
-    initAnalyticsCharts();
-}
-
-function calculateAdvancedMetrics() {
-    if (trades.length === 0) return;
-
-    // Sharpe Ratio (simplified)
-    const returns = trades.map(trade => calculatePnLPercentage(trade));
-    const avgReturn = returns.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / returns.length;
-    const stdDev = Math.sqrt(returns.reduce((sq, n) => sq + Math.pow(parseFloat(n) - avgReturn, 2), 0) / returns.length);
-    const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev).toFixed(2) : '0.00';
-
-    // Max Drawdown
-    let peak = settings.startingCapital;
-    let maxDrawdown = 0;
-    let runningCapital = settings.startingCapital;
-
-    trades.forEach(trade => {
-        runningCapital += calculatePnL(trade);
-        if (runningCapital > peak) peak = runningCapital;
-        const drawdown = ((peak - runningCapital) / peak) * 100;
-        if (drawdown > maxDrawdown) maxDrawdown = drawdown;
-    });
-
-    // Average holding time
-    const holdingTimes = trades.map(trade => {
-        const entry = new Date(trade.entryDate);
-        const exit = new Date(trade.exitDate);
-        return (exit - entry) / (1000 * 60 * 60); // hours
-    });
-    const avgHoldingTime = holdingTimes.reduce((a, b) => a + b, 0) / holdingTimes.length;
-
-    // Best and worst trades
-    const pnls = trades.map(trade => calculatePnL(trade));
-    const bestTrade = Math.max(...pnls);
-    const worstTrade = Math.min(...pnls);
-
-    // Win/Loss streaks
-    let currentStreak = 0;
-    let longestWinStreak = 0;
-    let longestLossStreak = 0;
-    let tempWinStreak = 0;
-    let tempLossStreak = 0;
-
-    trades.forEach((trade, index) => {
-        const pnl = calculatePnL(trade);
-
-        if (pnl > 0) {
-            tempWinStreak++;
-            tempLossStreak = 0;
-            if (index === trades.length - 1) currentStreak = tempWinStreak;
-            if (tempWinStreak > longestWinStreak) longestWinStreak = tempWinStreak;
-        } else {
-            tempLossStreak++;
-            tempWinStreak = 0;
-            if (index === trades.length - 1) currentStreak = -tempLossStreak;
-            if (tempLossStreak > longestLossStreak) longestLossStreak = tempLossStreak;
-        }
-    });
-
-    // Average RR
-    const avgRR = calculateAvgRR(trades);
-
-    // Update DOM
-    updateElement('sharpeRatio', sharpeRatio);
-    updateElement('maxDrawdown', maxDrawdown.toFixed(2) + '%');
-    updateElement('avgHoldingTime', Math.round(avgHoldingTime) + 'h');
-    updateElement('bestTrade', formatCurrency(bestTrade));
-    updateElement('worstTrade', formatCurrency(worstTrade));
-    updateElement('analyticsAvgRR', avgRR);
-    updateElement('currentStreak', currentStreak > 0 ? `+${currentStreak} W` : `${currentStreak} L`);
-    updateElement('longestWinStreak', longestWinStreak);
-    updateElement('longestLossStreak', longestLossStreak);
-}
-
-// Charts (using simple canvas drawing since we're not including Chart.js)
-function initCharts() {
-    drawEquityCurve();
-    drawDistributionChart();
-}
-
-function drawEquityCurve() {
-    const canvas = document.getElementById('equityChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    if (trades.length === 0) {
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('No data to display', canvas.width / 2, canvas.height / 2);
-        return;
-    }
-
-    // Calculate equity curve
-    let equity = [settings.startingCapital];
-    trades.forEach(trade => {
-        equity.push(equity[equity.length - 1] + calculatePnL(trade));
-    });
-
-    const maxEquity = Math.max(...equity);
-    const minEquity = Math.min(...equity);
-    const range = maxEquity - minEquity || 1;
-
-    // Draw line
-    ctx.strokeStyle = '#6366f1';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-
-    equity.forEach((value, index) => {
-        const x = (index / (equity.length - 1)) * canvas.width;
-        const y = canvas.height - ((value - minEquity) / range) * canvas.height * 0.9 - canvas.height * 0.05;
-
-        if (index === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-    });
-
-    ctx.stroke();
-
-    // Draw starting line
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    const startY = canvas.height - ((settings.startingCapital - minEquity) / range) * canvas.height * 0.9 - canvas.height * 0.05;
-    ctx.beginPath();
-    ctx.moveTo(0, startY);
-    ctx.lineTo(canvas.width, startY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-}
-
-function drawDistributionChart() {
-    const canvas = document.getElementById('distributionChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    if (trades.length === 0) {
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('No data to display', canvas.width / 2, canvas.height / 2);
-        return;
-    }
-
-    const wins = trades.filter(t => calculatePnL(t) > 0).length;
-    const losses = trades.length - wins;
-
-    const total = wins + losses;
-    const winPercent = wins / total;
-    const lossPercent = losses / total;
-
-    // Draw bars
-    const barWidth = canvas.width * 0.3;
-    const spacing = canvas.width * 0.1;
-
-    // Wins bar
-    ctx.fillStyle = '#10b981';
-    const winHeight = winPercent * canvas.height * 0.8;
-    ctx.fillRect(spacing, canvas.height - winHeight - 40, barWidth, winHeight);
-
-    // Losses bar
-    ctx.fillStyle = '#ef4444';
-    const lossHeight = lossPercent * canvas.height * 0.8;
-    ctx.fillRect(spacing * 2 + barWidth, canvas.height - lossHeight - 40, barWidth, lossHeight);
-
-    // Labels
-    ctx.fillStyle = '#f1f5f9';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${wins}`, spacing + barWidth / 2, canvas.height - winHeight - 50);
-    ctx.fillText(`${losses}`, spacing * 2 + barWidth * 1.5, canvas.height - lossHeight - 50);
-
-    ctx.font = '14px sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Wins', spacing + barWidth / 2, canvas.height - 15);
-    ctx.fillText('Losses', spacing * 2 + barWidth * 1.5, canvas.height - 15);
-}
-
-function initAnalyticsCharts() {
-    drawStrategyChart();
-    drawTimeAnalysisChart();
-}
-
-function drawStrategyChart() {
-    const canvas = document.getElementById('strategyChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Strategy breakdown', canvas.width / 2, canvas.height / 2);
-}
-
-function drawTimeAnalysisChart() {
-    const canvas = document.getElementById('timeAnalysisChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Time analysis', canvas.width / 2, canvas.height / 2);
-}
-
-// Settings
-function loadSettings() {
-    document.getElementById('startingCapital').value = settings.startingCapital;
-    document.getElementById('currency').value = settings.currency;
-    document.getElementById('theme').value = settings.theme;
-    document.getElementById('dateFormat').value = settings.dateFormat;
-}
-
-function applySettings() {
-    const savedSettings = localStorage.getItem('settings');
-    if (savedSettings) {
-        settings = JSON.parse(savedSettings);
-    }
-
-    // Apply theme
-    changeTheme(settings.theme);
-}
-
-function changeTheme(theme) {
-    // For now, we only have dark mode, but this can be extended
-    settings.theme = theme;
-    saveSettings();
-}
-
-// Data Management
-function exportTrades() {
-    if (trades.length === 0) {
-        showToast('No trades to export', 'error');
-        return;
-    }
-
-    const csv = ['Date,Symbol,Type,Entry,Exit,Quantity,P&L,P&L%,Strategy,Notes'];
-
-    trades.forEach(trade => {
-        const pnl = calculatePnL(trade);
-        const pnlPercent = calculatePnLPercentage(trade);
-
-        csv.push([
-            trade.entryDate,
-            trade.symbol,
-            trade.type,
-            trade.entryPrice,
-            trade.exitPrice,
-            trade.quantity,
-            pnl,
-            pnlPercent,
-            trade.strategy || '',
-            `"${trade.notes || ''}"`
-        ].join(','));
-    });
-
-    const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `trades-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-
-    showToast('Trades exported successfully', 'success');
-}
-
-function exportAllData() {
-    const data = {
-        trades,
-        settings,
-        exportDate: new Date().toISOString()
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tradepro-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-
-    showToast('Data exported successfully', 'success');
-}
-
-function importData() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-            try {
-                const data = JSON.parse(event.target.result);
-                trades = data.trades || [];
-                settings = data.settings || settings;
-
-                saveTrades();
-                saveSettings();
-
-                loadDashboard();
-                showToast('Data imported successfully', 'success');
-            } catch (error) {
-                showToast('Invalid file format', 'error');
+        if (remainingCells > 0 && remainingCells < 14) { // Only add if we need to fill the grid reasonably
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day padding';
+                dayEl.innerHTML = `<div class="calendar-day-number">${i}</div>`;
+                grid.appendChild(dayEl);
             }
+        }
+    }
+
+    function previousMonth() {
+        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+        loadCalendar();
+    }
+
+    function nextMonth() {
+        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
+        loadCalendar();
+    }
+
+    function goToToday() {
+        currentMonth = new Date();
+        selectedTradeDate = null;
+        loadCalendar();
+    }
+
+    // Analytics
+    function loadAnalytics() {
+        calculateAdvancedMetrics();
+        initAnalyticsCharts();
+    }
+
+    function calculateAdvancedMetrics() {
+        if (trades.length === 0) return;
+
+        // Sharpe Ratio (simplified)
+        const returns = trades.map(trade => calculatePnLPercentage(trade));
+        const avgReturn = returns.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / returns.length;
+        const stdDev = Math.sqrt(returns.reduce((sq, n) => sq + Math.pow(parseFloat(n) - avgReturn, 2), 0) / returns.length);
+        const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev).toFixed(2) : '0.00';
+
+        // Max Drawdown
+        let peak = settings.startingCapital;
+        let maxDrawdown = 0;
+        let runningCapital = settings.startingCapital;
+
+        trades.forEach(trade => {
+            runningCapital += calculatePnL(trade);
+            if (runningCapital > peak) peak = runningCapital;
+            const drawdown = ((peak - runningCapital) / peak) * 100;
+            if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+        });
+
+        // Average holding time
+        const holdingTimes = trades.map(trade => {
+            const entry = new Date(trade.entryDate);
+            const exit = new Date(trade.exitDate);
+            return (exit - entry) / (1000 * 60 * 60); // hours
+        });
+        const avgHoldingTime = holdingTimes.reduce((a, b) => a + b, 0) / holdingTimes.length;
+
+        // Best and worst trades
+        const pnls = trades.map(trade => calculatePnL(trade));
+        const bestTrade = Math.max(...pnls);
+        const worstTrade = Math.min(...pnls);
+
+        // Win/Loss streaks
+        let currentStreak = 0;
+        let longestWinStreak = 0;
+        let longestLossStreak = 0;
+        let tempWinStreak = 0;
+        let tempLossStreak = 0;
+
+        trades.forEach((trade, index) => {
+            const pnl = calculatePnL(trade);
+
+            if (pnl > 0) {
+                tempWinStreak++;
+                tempLossStreak = 0;
+                if (index === trades.length - 1) currentStreak = tempWinStreak;
+                if (tempWinStreak > longestWinStreak) longestWinStreak = tempWinStreak;
+            } else {
+                tempLossStreak++;
+                tempWinStreak = 0;
+                if (index === trades.length - 1) currentStreak = -tempLossStreak;
+                if (tempLossStreak > longestLossStreak) longestLossStreak = tempLossStreak;
+            }
+        });
+
+        // Average RR
+        const avgRR = calculateAvgRR(trades);
+
+        // Update DOM
+        updateElement('sharpeRatio', sharpeRatio);
+        updateElement('maxDrawdown', maxDrawdown.toFixed(2) + '%');
+        updateElement('avgHoldingTime', Math.round(avgHoldingTime) + 'h');
+        updateElement('bestTrade', formatCurrency(bestTrade));
+        updateElement('worstTrade', formatCurrency(worstTrade));
+        updateElement('analyticsAvgRR', avgRR);
+        updateElement('currentStreak', currentStreak > 0 ? `+${currentStreak} W` : `${currentStreak} L`);
+        updateElement('longestWinStreak', longestWinStreak);
+        updateElement('longestLossStreak', longestLossStreak);
+    }
+
+    // Charts (using simple canvas drawing since we're not including Chart.js)
+    function initCharts() {
+        drawEquityCurve();
+        drawDistributionChart();
+    }
+
+    function drawEquityCurve() {
+        const canvas = document.getElementById('equityChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        if (trades.length === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('No data to display', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+
+        // Calculate equity curve
+        let equity = [settings.startingCapital];
+        trades.forEach(trade => {
+            equity.push(equity[equity.length - 1] + calculatePnL(trade));
+        });
+
+        const maxEquity = Math.max(...equity);
+        const minEquity = Math.min(...equity);
+        const range = maxEquity - minEquity || 1;
+
+        // Draw line
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        equity.forEach((value, index) => {
+            const x = (index / (equity.length - 1)) * canvas.width;
+            const y = canvas.height - ((value - minEquity) / range) * canvas.height * 0.9 - canvas.height * 0.05;
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+
+        ctx.stroke();
+
+        // Draw starting line
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        const startY = canvas.height - ((settings.startingCapital - minEquity) / range) * canvas.height * 0.9 - canvas.height * 0.05;
+        ctx.beginPath();
+        ctx.moveTo(0, startY);
+        ctx.lineTo(canvas.width, startY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawDistributionChart() {
+        const canvas = document.getElementById('distributionChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        if (trades.length === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('No data to display', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+
+        const wins = trades.filter(t => calculatePnL(t) > 0).length;
+        const losses = trades.length - wins;
+
+        const total = wins + losses;
+        const winPercent = wins / total;
+        const lossPercent = losses / total;
+
+        // Draw bars
+        const barWidth = canvas.width * 0.3;
+        const spacing = canvas.width * 0.1;
+
+        // Wins bar
+        ctx.fillStyle = '#10b981';
+        const winHeight = winPercent * canvas.height * 0.8;
+        ctx.fillRect(spacing, canvas.height - winHeight - 40, barWidth, winHeight);
+
+        // Losses bar
+        ctx.fillStyle = '#ef4444';
+        const lossHeight = lossPercent * canvas.height * 0.8;
+        ctx.fillRect(spacing * 2 + barWidth, canvas.height - lossHeight - 40, barWidth, lossHeight);
+
+        // Labels
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${wins}`, spacing + barWidth / 2, canvas.height - winHeight - 50);
+        ctx.fillText(`${losses}`, spacing * 2 + barWidth * 1.5, canvas.height - lossHeight - 50);
+
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('Wins', spacing + barWidth / 2, canvas.height - 15);
+        ctx.fillText('Losses', spacing * 2 + barWidth * 1.5, canvas.height - 15);
+    }
+
+    function initAnalyticsCharts() {
+        drawStrategyChart();
+        drawTimeAnalysisChart();
+    }
+
+    function drawStrategyChart() {
+        const canvas = document.getElementById('strategyChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Strategy breakdown', canvas.width / 2, canvas.height / 2);
+    }
+
+    function drawTimeAnalysisChart() {
+        const canvas = document.getElementById('timeAnalysisChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Time analysis', canvas.width / 2, canvas.height / 2);
+    }
+
+    // Settings
+    function loadSettings() {
+        document.getElementById('startingCapital').value = settings.startingCapital;
+        document.getElementById('currency').value = settings.currency;
+        document.getElementById('theme').value = settings.theme;
+        document.getElementById('dateFormat').value = settings.dateFormat;
+    }
+
+    function applySettings() {
+        const savedSettings = localStorage.getItem('settings');
+        if (savedSettings) {
+            settings = JSON.parse(savedSettings);
+        }
+
+        // Apply theme
+        changeTheme(settings.theme);
+    }
+
+    function changeTheme(theme) {
+        // For now, we only have dark mode, but this can be extended
+        settings.theme = theme;
+        saveSettings();
+    }
+
+    // Data Management
+    function exportTrades() {
+        if (trades.length === 0) {
+            showToast('No trades to export', 'error');
+            return;
+        }
+
+        const csv = ['Date,Symbol,Type,Entry,Exit,Quantity,P&L,P&L%,Strategy,Notes'];
+
+        trades.forEach(trade => {
+            const pnl = calculatePnL(trade);
+            const pnlPercent = calculatePnLPercentage(trade);
+
+            csv.push([
+                trade.entryDate,
+                trade.symbol,
+                trade.type,
+                trade.entryPrice,
+                trade.exitPrice,
+                trade.quantity,
+                pnl,
+                pnlPercent,
+                trade.strategy || '',
+                `"${trade.notes || ''}"`
+            ].join(','));
+        });
+
+        const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `trades-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+
+        showToast('Trades exported successfully', 'success');
+    }
+
+    function exportAllData() {
+        const data = {
+            trades,
+            settings,
+            exportDate: new Date().toISOString()
         };
 
-        reader.readAsText(file);
-    };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tradepro-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
 
-    input.click();
-}
+        showToast('Data exported successfully', 'success');
+    }
 
-function clearAllData() {
-    if (confirm('Are you sure you want to delete all trades? This action cannot be undone.')) {
-        if (confirm('Really delete everything? This is your last chance!')) {
-            trades = [];
-            localStorage.removeItem('trades');
-            loadDashboard();
-            loadAllTrades();
-            showToast('All data cleared', 'success');
+    function importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    trades = data.trades || [];
+                    settings = data.settings || settings;
+
+                    saveTrades();
+                    saveSettings();
+
+                    loadDashboard();
+                    showToast('Data imported successfully', 'success');
+                } catch (error) {
+                    showToast('Invalid file format', 'error');
+                }
+            };
+
+            reader.readAsText(file);
+        };
+
+        input.click();
+    }
+
+    function clearAllData() {
+        if (confirm('Are you sure you want to delete all trades? This action cannot be undone.')) {
+            if (confirm('Really delete everything? This is your last chance!')) {
+                trades = [];
+                localStorage.removeItem('trades');
+                loadDashboard();
+                loadAllTrades();
+                showToast('All data cleared', 'success');
+            }
         }
     }
-}
 
-// Utility Functions
-function saveTrades() {
-    localStorage.setItem('trades', JSON.stringify(trades));
-}
-
-function saveSettings() {
-    localStorage.setItem('settings', JSON.stringify(settings));
-}
-
-function formatCurrency(amount) {
-    const symbol = settings.currency === 'USD' ? '$' : settings.currency === 'EUR' ? '€' : settings.currency === 'GBP' ? '£' : '¥';
-    return symbol + parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function updateElement(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = value;
+    // Utility Functions
+    function saveTrades() {
+        localStorage.setItem('trades', JSON.stringify(trades));
     }
-}
 
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
+    function saveSettings() {
+        localStorage.setItem('settings', JSON.stringify(settings));
+    }
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
+    function formatCurrency(amount) {
+        const symbol = settings.currency === 'USD' ? '$' : settings.currency === 'EUR' ? '€' : settings.currency === 'GBP' ? '£' : '¥';
+        return symbol + parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-// Add event listener for settings changes
-setTimeout(() => {
-    const inputs = ['startingCapital', 'currency', 'dateFormat'];
-    inputs.forEach(id => {
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function updateElement(id, value) {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('change', (e) => {
-                settings[id] = e.target.value;
-                saveSettings();
-                loadDashboard();
-                showToast('Settings updated', 'success');
-            });
+            element.textContent = value;
         }
-    });
-
-    const timeframeSelect = document.getElementById('timeframe');
-    if (timeframeSelect) {
-        timeframeSelect.addEventListener('change', loadDashboard);
     }
 
-    const perfTimeframeSelect = document.getElementById('perfTimeframe');
-    if (perfTimeframeSelect) {
-        perfTimeframeSelect.addEventListener('change', loadPerformance);
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
-}, 100);
+
+    // Add event listener for settings changes
+    setTimeout(() => {
+        const inputs = ['startingCapital', 'currency', 'dateFormat'];
+        inputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', (e) => {
+                    settings[id] = e.target.value;
+                    saveSettings();
+                    loadDashboard();
+                    showToast('Settings updated', 'success');
+                });
+            }
+        });
+
+        const timeframeSelect = document.getElementById('timeframe');
+        if (timeframeSelect) {
+            timeframeSelect.addEventListener('change', loadDashboard);
+        }
+
+        const perfTimeframeSelect = document.getElementById('perfTimeframe');
+        if (perfTimeframeSelect) {
+            perfTimeframeSelect.addEventListener('change', loadPerformance);
+        }
+    }, 100);

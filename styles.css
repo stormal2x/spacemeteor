@@ -1609,12 +1609,30 @@ body {
     padding: 30px;
 }
 
-/* Hybrid Redesign (Clean Cards) */
-.trade-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+/* Specific Layout Redesign */
+.add-trade-specific-layout {
+    display: flex;
+    flex-direction: column;
     gap: 25px;
     margin-bottom: 80px;
+}
+
+.trade-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.trade-section-middle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+@media (max-width: 768px) {
+    .trade-section-middle {
+        grid-template-columns: 1fr;
+    }
 }
 
 .trade-card {

@@ -258,39 +258,23 @@
             </div>
 
             <form id="tradeForm" onsubmit="handleTradeSubmit(event)">
-                <div class="trade-cards-grid">
+                <div class="add-trade-specific-layout">
 
-                    <!-- Card 1: Trade Details -->
-                    <div class="trade-card">
+                    <!-- Top Rectangle: Trade Details -->
+                    <div class="trade-section-top trade-card">
                         <div class="card-header-clean">
                             <span class="card-icon-small">📊</span>
-                            <h3>Details</h3>
+                            <h3>Trade Details</h3>
                         </div>
-                        <div class="card-content-grid">
-                            <div class="form-group full-width">
+                        <div class="trade-details-grid">
+                            <div class="form-group">
                                 <label>Symbol</label>
                                 <input type="text" name="symbol" placeholder="AAPL" required>
                             </div>
                             <div class="form-group">
-                                <label>Type</label>
-                                <select name="type" required>
-                                    <option value="long">Long 📈</option>
-                                    <option value="short">Short 📉</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <input type="number" name="quantity" step="0.01" placeholder="0" required
-                                    id="tradeQuantity">
-                            </div>
-                            <div class="form-group">
-                                <label>Entry</label>
+                                <label>Entry Price</label>
                                 <input type="number" name="entryPrice" step="0.01" placeholder="0.00" required
                                     id="tradeEntry">
-                            </div>
-                            <div class="form-group">
-                                <label>Exit</label>
-                                <input type="number" name="exitPrice" step="0.01" placeholder="0.00" required>
                             </div>
                             <div class="form-group">
                                 <label>Stop Loss</label>
@@ -300,119 +284,138 @@
                                 <label>Take Profit</label>
                                 <input type="number" name="takeProfit" step="0.01" placeholder="0.00">
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Psychology -->
-                    <div class="trade-card">
-                        <div class="card-header-clean">
-                            <span class="card-icon-small">🧠</span>
-                            <h3>Psychology</h3>
-                        </div>
-                        <div class="card-content-stack">
                             <div class="form-group">
-                                <label>Session</label>
-                                <select name="session">
-                                    <option value="">Select Session</option>
-                                    <option value="asian">🌏 Asian</option>
-                                    <option value="london">🇬🇧 London</option>
-                                    <option value="newyork">🗽 New York</option>
-                                    <option value="overlap">⚡ Overlap</option>
+                                <label>Win or Lose</label>
+                                <select name="outcome" required>
+                                    <option value="">Select Outcome</option>
+                                    <option value="win">Win 🟢</option>
+                                    <option value="loss">Loss 🔴</option>
+                                    <option value="be">Break Even ⚪</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Confidence</label>
-                                <div class="range-slider-compact">
-                                    <input type="range" name="confidence" min="1" max="10" value="5"
-                                        oninput="this.nextElementSibling.value = this.value">
-                                    <output>5</output>
+                                <label>PnL</label>
+                                <input type="number" name="pnl" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Two Squares -->
+                    <div class="trade-section-middle">
+                        <!-- Left Square: Psychology -->
+                        <div class="trade-section-left trade-card">
+                            <div class="card-header-clean">
+                                <span class="card-icon-small">🧠</span>
+                                <h3>Psychology</h3>
+                            </div>
+                            <div class="card-content-stack">
+                                <div class="form-group">
+                                    <label>What session have you traded?</label>
+                                    <select name="session">
+                                        <option value="">Select Session</option>
+                                        <option value="london">🇬🇧 London</option>
+                                        <option value="ny_am">🗽 New York AM</option>
+                                        <option value="ny_pm">🌆 New York PM</option>
+                                        <option value="asia">🌏 Asia</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>How confident were you?</label>
+                                    <div class="range-slider-compact">
+                                        <input type="range" name="confidence" min="1" max="10" value="5"
+                                            oninput="this.nextElementSibling.value = this.value">
+                                        <output>5</output>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>What feelings did you feel?</label>
+                                    <div class="checkbox-grid-compact">
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="calm"> Calm & Relaxed 😌</label>
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="fomo"> FOMO 😱</label>
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="greedy"> Greedy 🤑</label>
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="anxious"> Anxious 😰</label>
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="confident"> Confident 😎</label>
+                                        <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
+                                                value="frustrated"> Frustrated 😤</label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Emotions</label>
-                                <div class="checkbox-grid-compact">
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="confident"> 😎</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="calm"> 😌</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="excited"> 🤩</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="anxious"> 😰</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="fearful"> 😨</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="greedy"> 🤑</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="fomo"> 😱</label>
-                                    <label class="checkbox-pill-small"><input type="checkbox" name="emotion"
-                                            value="revenge"> 😤</label>
-                                </div>
+                        </div>
+
+                        <!-- Right Square: Context -->
+                        <div class="trade-section-right trade-card">
+                            <div class="card-header-clean">
+                                <span class="card-icon-small">📝</span>
+                                <h3>Context</h3>
                             </div>
-                            <div class="form-group">
-                                <label>Mistakes</label>
-                                <div class="checkbox-grid-compact">
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="oversized"> Size</label>
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="no-sl"> No SL</label>
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="no-plan"> Plan</label>
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="early-exit"> Early</label>
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="held-long"> Held</label>
-                                    <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
-                                            value="broke-rules"> Rules</label>
+                            <div class="card-content-stack">
+                                <div class="form-group">
+                                    <label>What mistakes have you made?</label>
+                                    <div class="checkbox-grid-compact">
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="none"> None ✨</label>
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="oversized"> Oversized</label>
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="impulsive"> Impulsive</label>
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="no-plan"> No Plan</label>
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="early-exit"> Early Exit</label>
+                                        <label class="checkbox-pill-small error"><input type="checkbox" name="mistake"
+                                                value="chasing"> Chasing</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Strategy</label>
+                                    <input type="text" name="strategy" placeholder="e.g. Breakout">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tags</label>
+                                    <input type="text" name="tags" placeholder="e.g. #trend #reversal">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card 3: Context -->
-                    <div class="trade-card">
+                    <!-- Bottom Rectangle: Review -->
+                    <div class="trade-section-bottom trade-card">
                         <div class="card-header-clean">
-                            <span class="card-icon-small">📝</span>
-                            <h3>Context</h3>
+                            <span class="card-icon-small">✍️</span>
+                            <h3>Review</h3>
                         </div>
-                        <div class="card-content-stack">
-                            <div class="form-group">
-                                <label>Strategy</label>
-                                <input type="text" name="strategy" placeholder="Strategy">
-                            </div>
-                            <div class="form-group">
-                                <label>Tags</label>
-                                <input type="text" name="tags" placeholder="Tags">
-                            </div>
-                            <div class="form-group">
-                                <label>Notes</label>
-                                <textarea name="notes" rows="4" placeholder="Trade notes..."></textarea>
-                            </div>
+                        <div class="form-group">
+                            <label>What could you have done better? What should you improve?</label>
+                            <textarea name="notes" rows="4" placeholder="Write your notes here..."></textarea>
                         </div>
                     </div>
 
-                    <!-- Card 4: Evidence -->
-                    <div class="trade-card">
+                    <!-- Final Rectangle: Evidence -->
+                    <div class="trade-section-final trade-card">
                         <div class="card-header-clean">
                             <span class="card-icon-small">📸</span>
                             <h3>Evidence</h3>
                         </div>
-                        <div class="card-content-stack">
-                            <div class="form-group">
-                                <label>Screenshot</label>
-                                <div class="file-upload-area-compact">
-                                    <input type="file" name="screenshot" accept="image/*" id="screenshotInput"
-                                        class="file-input-hidden">
-                                    <label for="screenshotInput" class="file-upload-label-compact">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                            <polyline points="21 15 16 10 5 21"></polyline>
-                                        </svg>
-                                        <span>Upload Chart</span>
-                                    </label>
-                                </div>
+                        <div class="form-group">
+                            <label>Attach screenshot (optional)</label>
+                            <div class="file-upload-area-compact">
+                                <input type="file" name="screenshot" accept="image/*" id="screenshotInput"
+                                    class="file-input-hidden">
+                                <label for="screenshotInput" class="file-upload-label-compact"
+                                    style="min-height: auto; padding: 15px; flex-direction: row;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                    <span>Upload Screenshot</span>
+                                </label>
                             </div>
                         </div>
                     </div>

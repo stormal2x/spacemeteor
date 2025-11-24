@@ -204,8 +204,29 @@ function calculatePerformanceStats() {
 }
 
 function calculateStats() {
-    const timeframe = document.getElementById('timeframe')?.value || 'month';
-    const filteredTrades = filterTradesByTimeframe(trades, timeframe);
+    // This function updates the "Quick Stats" above the calendar
+    const timeframe = document.getElementById('calendarMonthSelect')?.value || 'all';
+    // Note: The calendar usually shows the current month, so we should probably filter by that
+    // But for now, let's assume we want to show stats for the currently visible month in the calendar
+
+    // Actually, let's look at how the calendar filters. 
+    // It seems the stats above the calendar are meant to reflect the "Month P&L", "Win Rate", etc.
+    // So we should filter trades by the currently selected month/year in the calendar.
+
+    const monthSelect = document.getElementById('calendarMonthSelect');
+    const yearSelect = document.getElementById('calendarYearSelect');
+
+    let filteredTrades = trades;
+
+    if (monthSelect && yearSelect) {
+        const month = parseInt(monthSelect.value);
+        const year = parseInt(yearSelect.value);
+
+        filteredTrades = trades.filter(t => {
+            const date = new Date(t.tradeDate || t.entryDate);
+            return date.getMonth() === month && date.getFullYear() === year;
+        });
+    }
 
     // Calculate total P&L
     const totalPnL = filteredTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
@@ -214,31 +235,32 @@ function calculateStats() {
     const wins = filteredTrades.filter(trade => calculatePnL(trade) > 0).length;
     const winRate = filteredTrades.length > 0 ? (wins / filteredTrades.length * 100).toFixed(1) : 0;
 
-    // Calculate average win/loss
-    const winningTrades = filteredTrades.filter(trade => calculatePnL(trade) > 0);
-    const losingTrades = filteredTrades.filter(trade => calculatePnL(trade) < 0);
+    // Calculate Average RR (Realized)
+    const avgRR = calculateAvgRR(filteredTrades);
 
-    const avgWin = winningTrades.length > 0
-        ? winningTrades.reduce((sum, t) => sum + calculatePnL(t), 0) / winningTrades.length
-        : 0;
-    const avgLoss = losingTrades.length > 0
-        ? Math.abs(losingTrades.reduce((sum, t) => sum + calculatePnL(t), 0) / losingTrades.length)
-        : 0;
+    // Update DOM elements with IDs found in dashboard.html
+    updateElement('monthPnL', formatCurrency(totalPnL));
 
-    const profitFactor = avgLoss > 0 ? (avgWin / avgLoss).toFixed(2) : '0.00';
+    // Calculate PnL % change (assuming based on starting capital or just a label)
+    // For now, let's just show the raw % return on account if possible, or just the PnL
+    // The HTML has id="monthPnlPercent"
+    const pnlPercent = settings.startingCapital > 0 ? ((totalPnL / settings.startingCapital) * 100).toFixed(1) : 0;
+    updateElement('monthPnlPercent', `${totalPnL >= 0 ? '+' : ''}${pnlPercent}%`);
 
-    // Update DOM
-    updateElement('totalPnL', formatCurrency(totalPnL));
-    updateElement('pnlChange', `${totalPnL >= 0 ? '+' : ''}${((totalPnL / settings.startingCapital) * 100).toFixed(1)}%`);
-    updateElement('winRate', `${winRate}%`);
-    updateElement('winRateChange', `${wins}/${filteredTrades.length} trades`);
-    updateElement('avgWinLoss', formatCurrency(avgWin - avgLoss));
-    updateElement('profitFactor', `PF: ${profitFactor}`);
+    // Update Win Rate
+    updateElement('calendarWinRate', `${winRate}%`);
+    updateElement('calendarWins', `${wins}/${filteredTrades.length} wins`);
+
+    // Update Avg RR
+    updateElement('avgRR', avgRR);
+    updateElement('rrDesc', 'Avg R:R'); // Keep label static or dynamic
+
+    // Update Total Trades (was Trading Days)
     updateElement('totalTrades', filteredTrades.length);
-    updateElement('tradesChange', `+${filteredTrades.length} this period`);
+    updateElement('tradesChange', `${filteredTrades.length} trades`);
 
-    // Update stat change classes
-    const pnlChangeEl = document.getElementById('pnlChange');
+    // Update stat change classes (colors)
+    const pnlChangeEl = document.getElementById('monthPnlPercent');
     if (pnlChangeEl) {
         pnlChangeEl.className = 'stat-change ' + (totalPnL >= 0 ? 'positive' : 'negative');
     }
@@ -652,8 +674,9 @@ function loadCalendar() {
     const wins = monthTrades.filter(trade => calculatePnL(trade) > 0).length;
     const winRate = monthTrades.length > 0 ? (wins / monthTrades.length * 100).toFixed(1) : 0;
     const avgRR = calculateAvgRR(monthTrades);
-    const tradingDaysSet = new Set(monthTrades.map(t => new Date(t.tradeDate || t.entryDate).getDate()));
-    const tradingDays = tradingDaysSet.size;
+
+    // Total Trades (requested change from Trading Days)
+    const totalTrades = monthTrades.length;
 
     // Update stats
     updateElement('monthPnL', formatCurrency(monthPnL));
@@ -661,8 +684,10 @@ function loadCalendar() {
     updateElement('calendarWinRate', `${winRate}%`);
     updateElement('calendarWins', `${wins} wins`);
     updateElement('avgRR', avgRR);
-    updateElement('tradingDays', tradingDays);
-    updateElement('monthTrades', `${monthTrades.length} trades`);
+
+    // Update Total Trades
+    updateElement('totalTrades', totalTrades);
+    updateElement('tradesChange', `${totalTrades} trades`);
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();

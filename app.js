@@ -1098,10 +1098,24 @@ function showToast(message, type = 'success') {
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+    setTimeout(() => toast.remove(), 3000);
 }
+
+// Slider Gradient Animation
+function updateSliderGradient(slider) {
+    const value = slider.value;
+    const min = slider.min || 0;
+    const max = slider.max || 10;
+    const percentage = ((value - min) / (max - min)) * 100;
+
+    slider.style.background = `linear-gradient(90deg, var(--primary) 0%, var(--primary) ${percentage}%, var(--bg-tertiary) ${percentage}%, var(--bg-tertiary) 100%)`;
+}
+
+// Initialize slider gradients on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const sliders = document.querySelectorAll('input[type="range"]');
+    sliders.forEach(slider => updateSliderGradient(slider));
+});
 
 // Initialization and Event Listeners
 // Initialize Supabase if available (handled in auth.js, but good to double check or wait)

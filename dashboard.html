@@ -323,7 +323,8 @@
                                     <label>How confident were you?</label>
                                     <div class="range-slider-compact">
                                         <input type="range" name="confidence" min="0" max="10" value="5"
-                                            oninput="this.nextElementSibling.value = this.value">
+                                            oninput="this.nextElementSibling.value = this.value; updateSliderGradient(this);"
+                                            onload="updateSliderGradient(this);">
                                         <output>5</output>
                                     </div>
                                 </div>

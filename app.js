@@ -268,9 +268,15 @@ function filterTradesByTimeframe(trades, timeframe) {
 }
 
 function calculatePnL(trade) {
+    // If PnL is explicitly stored (new format), use it
+    if (trade.pnl !== undefined && trade.pnl !== null) {
+        return parseFloat(trade.pnl);
+    }
+
+    // Fallback to calculation (old format)
     const entryPrice = parseFloat(trade.entryPrice);
     const exitPrice = parseFloat(trade.exitPrice);
-    const quantity = parseFloat(trade.quantity);
+    const quantity = parseFloat(trade.quantity) || 1;
 
     if (trade.type === 'long') {
         return (exitPrice - entryPrice) * quantity;
@@ -359,19 +365,21 @@ function loadRecentTrades() {
 }
 
 // All Trades Section
+// All Trades Section
 function loadAllTrades() {
     const tbody = document.getElementById('allTradesBody');
     if (!tbody) return;
 
     if (trades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">No trades found. Start by adding your first trade!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No trades found. Start by adding your first trade!</td></tr>';
         return;
     }
 
     const filteredTrades = applyFilters(trades);
 
     tbody.innerHTML = filteredTrades.reverse().map((trade, index) => {
-        const pnl = calculatePnL(trade);
+        // Use stored PnL if available, otherwise calculate
+        const pnl = trade.pnl !== undefined ? parseFloat(trade.pnl) : calculatePnL(trade);
         const pnlPercent = calculatePnLPercentage(trade);
         const rr = calculateRR(trade);
 
@@ -380,15 +388,15 @@ function loadAllTrades() {
                 <td>${formatDate(trade.tradeDate || trade.entryDate)}</td>
                 <td><strong>${trade.symbol}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
-                <td>${formatCurrency(trade.entryPrice)}</td>
-                <td>${formatCurrency(trade.exitPrice)}</td>
-                <td>${trade.quantity}</td>
+                <td>${parseFloat(trade.entryPrice).toFixed(2)}</td>
+                <td>${parseFloat(trade.exitPrice).toFixed(2)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${pnlPercent}%</td>
                 <td><strong>${rr}</strong></td>
                 <td>${trade.strategy || '-'}</td>
                 <td>
                     <button class="action-btn" onclick="viewTrade(${trades.indexOf(trade)})">View</button>
+                    ${trade.screenshot_url ? `<button class="action-btn" onclick="window.open('${trade.screenshot_url}', '_blank')">📷</button>` : ''}
                     <button class="action-btn delete" onclick="deleteTrade(${trade.id})">Delete</button>
                 </td>
             </tr>
@@ -507,9 +515,38 @@ async function handleTradeSubmit(event) {
     const pnl = parseFloat(formData.get('pnl')) || 0;
     const exitPrice = entryPrice + pnl;
 
+    // Handle Screenshot Upload
+    let screenshotUrl = null;
+    const screenshotFile = form.querySelector('input[name="screenshot"]').files[0];
+
+    if (screenshotFile) {
+        try {
+            const fileExt = screenshotFile.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { data, error } = await supabase.storage
+                .from('trade-screenshots')
+                .upload(filePath, screenshotFile);
+
+            if (error) throw error;
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('trade-screenshots')
+                .getPublicUrl(filePath);
+
+            screenshotUrl = publicUrl;
+        } catch (error) {
+            console.error('Error uploading screenshot:', error);
+            showToast('Failed to upload screenshot: ' + error.message, 'error');
+            return; // Stop submission if upload fails
+        }
+    }
+
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
-        type: 'long', // Default to long
+        type: formData.get('type'), // Use the new type selector
         quantity: 1,
         entryPrice: entryPrice,
         exitPrice: exitPrice,
@@ -522,6 +559,7 @@ async function handleTradeSubmit(event) {
         strategy: formData.get('strategy'),
         tags: formData.get('tags'),
         notes: formData.get('notes'),
+        screenshot_url: screenshotUrl, // Add screenshot URL to trade object
         tradeDate: new Date().toISOString()
     };
 

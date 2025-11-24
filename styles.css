@@ -1609,71 +1609,37 @@ body {
     padding: 30px;
 }
 
-/* New Form Layout - Cards */
-.trade-form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 25px;
-    margin-bottom: 80px;
-    /* Space for floating actions */
-}
-
-.form-section-card {
+/* Add Trade Redesign (Calendar Style) */
+.add-trade-container {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    transition: var(--transition);
+    border-radius: 15px;
+    padding: 20px;
 }
 
-.form-section-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px var(--shadow);
+.add-trade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-.card-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.card-icon {
-    font-size: 24px;
-}
-
-.card-title h3 {
-    font-size: 18px;
-    color: var(--text-primary);
-}
-
-.form-row {
-    display: flex;
-    gap: 20px;
-}
-
-.form-row .form-group {
-    flex: 1;
-    min-width: 0;
-    /* Prevent overflow in flex items */
-}
-
-.form-group {
-    margin-bottom: 5px;
+.add-trade-grid-secondary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
+    margin-bottom: 6px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
@@ -1681,12 +1647,12 @@ body {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 12px 16px;
+    padding: 8px 12px;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 8px;
     color: var(--text-primary);
-    font-size: 15px;
+    font-size: 14px;
     transition: var(--transition);
 }
 
@@ -1694,171 +1660,102 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
     outline: none;
     background: var(--bg-primary);
 }
 
-/* Multi-select Checkbox Pills */
-.checkbox-grid {
+/* Compact Components */
+.range-slider-compact {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 10px;
 }
 
-.checkbox-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: var(--transition);
-    user-select: none;
-}
-
-.checkbox-pill:hover {
-    background: var(--bg-primary);
-    border-color: var(--text-secondary);
-}
-
-.checkbox-pill input {
-    display: none;
-}
-
-.checkbox-pill:has(input:checked) {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: var(--primary);
-    color: var(--primary-light);
-}
-
-.checkbox-pill.error:has(input:checked) {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: var(--danger);
-    color: #fca5a5;
-}
-
-/* Range Slider */
-.range-slider-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 10px 0;
-}
-
-.range-slider-container input[type=range] {
+.range-slider-compact input[type=range] {
     flex: 1;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    height: 6px;
+    height: 4px;
     background: var(--bg-tertiary);
-    border-radius: 3px;
+    border-radius: 2px;
     outline: none;
+    padding: 0;
+    border: none;
 }
 
-.range-slider-container input[type=range]::-webkit-slider-thumb {
+.range-slider-compact input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background: var(--primary);
     border-radius: 50%;
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.range-slider-container input[type=range]::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    background: var(--primary-light);
-}
-
-.range-slider-container output {
-    font-size: 18px;
+.range-slider-compact output {
+    font-size: 14px;
     font-weight: 700;
     color: var(--primary);
-    min-width: 30px;
+    min-width: 20px;
     text-align: center;
-    font-feature-settings: "tnum";
 }
 
-/* File Upload */
-.file-upload-area {
-    width: 100%;
+.checkbox-grid-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.file-input-hidden {
+.checkbox-pill-small {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.checkbox-pill-small:hover {
+    border-color: var(--text-secondary);
+}
+
+.checkbox-pill-small input {
     display: none;
 }
 
-.file-upload-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 40px;
-    background: var(--bg-tertiary);
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.file-upload-label:hover {
+.checkbox-pill-small:has(input:checked) {
+    background: rgba(99, 102, 241, 0.15);
     border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
-    color: var(--primary);
+    color: var(--primary-light);
 }
 
-.file-upload-label svg {
-    color: var(--text-secondary);
-    transition: var(--transition);
+.checkbox-pill-small.error:has(input:checked) {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: var(--danger);
+    color: #fca5a5;
 }
 
-.file-upload-label:hover svg {
-    color: var(--primary);
-    transform: scale(1.1);
+.file-input-compact {
+    padding: 6px;
+    font-size: 12px;
 }
 
-/* Floating Actions */
-.form-actions-floating {
-    position: sticky;
-    bottom: 20px;
-    background: rgba(30, 41, 59, 0.9);
-    backdrop-filter: blur(10px);
-    padding: 15px 25px;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+.form-actions-simple {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    z-index: 50;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.btn-primary-large {
-    padding: 12px 30px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
 
-.btn-primary-large:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-}
 
 /* Responsive Landing Page */
 @media (max-width: 1024px) {

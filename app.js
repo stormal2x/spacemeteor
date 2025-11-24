@@ -496,25 +496,24 @@ async function handleTradeSubmit(event) {
         return;
     }
 
-
-
-
     // Handle Multi-selects
     const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
     const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
 
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
-        type: formData.get('type'),
-        quantity: parseFloat(formData.get('quantity')),
+        type: 'long', // Default since we don't have type selector anymore
+        quantity: 1, // Default value
         entryPrice: parseFloat(formData.get('entryPrice')),
-        exitPrice: parseFloat(formData.get('exitPrice')),
+        exitPrice: parseFloat(formData.get('entryPrice')) || 0, // Use entry as placeholder
         stopLoss: parseFloat(formData.get('stopLoss')) || null,
         takeProfit: parseFloat(formData.get('takeProfit')) || null,
+        outcome: formData.get('outcome'),
+        pnl: parseFloat(formData.get('pnl')) || 0,
         session: formData.get('session'),
-        emotion: emotions.join(','), // Store as comma-separated string
+        emotion: emotions.join(','),
         confidence: formData.get('confidence'),
-        mistakes: mistakes.join(','), // Store as comma-separated string
+        mistakes: mistakes.join(','),
         strategy: formData.get('strategy'),
         tags: formData.get('tags'),
         notes: formData.get('notes'),
@@ -522,19 +521,24 @@ async function handleTradeSubmit(event) {
     };
 
     // Basic Validation
-    if (!trade.symbol || !trade.quantity || !trade.entryPrice || !trade.exitPrice) {
+    if (!trade.symbol || !trade.entryPrice) {
         showToast('Please fill in all required fields', 'error');
         return;
     }
 
-    await saveTradeToDb(trade);
+    const success = await saveTradeToDb(trade);
 
-    form.reset();
-    // Reset range slider output
-    const rangeOutput = form.querySelector('output');
-    if (rangeOutput) rangeOutput.textContent = '5';
+    if (success) {
+        showToast('Trade saved successfully!', 'success');
+        form.reset();
+        // Reset range slider
+        const rangeOutput = form.querySelector('output');
+        if (rangeOutput) rangeOutput.textContent = '5';
+        const slider = form.querySelector('input[type="range"]');
+        if (slider) updateSliderGradient(slider);
 
-    switchSection('trades');
+        switchSection('trades');
+    }
 }
 
 
@@ -1114,7 +1118,31 @@ function updateSliderGradient(slider) {
 // Initialize slider gradients on page load
 document.addEventListener('DOMContentLoaded', () => {
     const sliders = document.querySelectorAll('input[type="range"]');
-    sliders.forEach(slider => updateSliderGradient(slider));
+    sliders.forEach(slider => {
+        updateSliderGradient(slider);
+
+        // Add drag animation
+        slider.addEventListener('mousedown', function () {
+            this.classList.add('slider-dragging');
+        });
+
+        slider.addEventListener('mouseup', function () {
+            this.classList.remove('slider-dragging');
+        });
+
+        slider.addEventListener('mouseleave', function () {
+            this.classList.remove('slider-dragging');
+        });
+
+        // Touch support
+        slider.addEventListener('touchstart', function () {
+            this.classList.add('slider-dragging');
+        });
+
+        slider.addEventListener('touchend', function () {
+            this.classList.remove('slider-dragging');
+        });
+    });
 });
 
 // Initialization and Event Listeners

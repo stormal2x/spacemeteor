@@ -40,6 +40,7 @@ async function fetchTrades() {
         // Refresh views
         if (document.getElementById('calendar')) loadCalendar();
         if (document.getElementById('trades')) loadAllTrades();
+        if (document.getElementById('performance')) loadPerformance();
     }
 }
 
@@ -1332,6 +1333,14 @@ const themeSelect = document.getElementById('theme');
 if (themeSelect) {
     themeSelect.value = settings.theme || 'dark';
     themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
+}
+
+// Performance Timeframe Selector
+const perfTimeframe = document.getElementById('perfTimeframe');
+if (perfTimeframe) {
+    perfTimeframe.addEventListener('change', () => {
+        calculatePerformanceStats();
+    });
 }
 
 // Dashboard Timeframe

@@ -435,13 +435,7 @@
 
                 </div>
 
-                <!-- Image Modal -->
-                <div id="imageModal" class="image-modal" onclick="closeImageModal()">
-                    <span class="close-modal">&times;</span>
-                    <div class="modal-loader" id="modalLoader"></div>
-                    <img class="modal-content" id="modalImage"
-                        onload="document.getElementById('modalLoader').style.display='none'">
-                </div>
+
 
                 <div class="form-actions-floating">
                     <button type="submit" class="btn-primary-large">Save Trade</button>
@@ -763,6 +757,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
+    <!-- Image Modal (Moved to body level for global visibility) -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <span class="close-modal">&times;</span>
+        <div class="modal-loader" id="modalLoader"></div>
+        <img class="modal-content" id="modalImage" onload="document.getElementById('modalLoader').style.display='none'">
+    </div>
+
     <script src="app.js"></script>
 </body>
 

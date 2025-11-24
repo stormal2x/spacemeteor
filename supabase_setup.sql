@@ -27,3 +27,6 @@ create policy "User Delete"
 
 -- Add the screenshot_url column to the trades table
 alter table trades add column if not exists screenshot_url text;
+
+-- Add the pnl column to the trades table
+alter table trades add column if not exists pnl numeric;

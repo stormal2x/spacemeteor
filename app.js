@@ -542,7 +542,7 @@ async function handleTradeSubmit(event) {
         type: formData.get('type'), // Use the new type selector
         quantity: 1,
         entryPrice: parseFloat(formData.get('entryPrice')),
-        exitPrice: parseFloat(formData.get('exitPrice')),
+        exitPrice: parseFloat(formData.get('takeProfit')), // User requested Take Profit to be the Exit Price
         stopLoss: parseFloat(formData.get('stopLoss')) || null,
         takeProfit: parseFloat(formData.get('takeProfit')) || null,
         session: formData.get('session'),

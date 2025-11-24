@@ -187,6 +187,13 @@ function calculatePerformanceStats() {
 
     const profitFactor = totalLosses > 0 ? (totalWins / totalLosses).toFixed(2) : '0.00';
 
+    // Calculate Trading Days (unique days)
+    const tradingDaysSet = new Set(filteredTrades.map(t => {
+        const d = new Date(t.tradeDate || t.entryDate);
+        return d.toDateString(); // Use date string to identify unique days
+    }));
+    const tradingDays = tradingDaysSet.size;
+
     // Update DOM
     updateElement('perfTotalPnL', formatCurrency(totalPnL));
     updateElement('perfPnlChange', `${totalPnL >= 0 ? '+' : ''}${((totalPnL / settings.startingCapital) * 100).toFixed(1)}%`);
@@ -194,8 +201,10 @@ function calculatePerformanceStats() {
     updateElement('perfWinRateChange', `${wins}/${filteredTrades.length} trades`);
     updateElement('perfAvgRR', avgRR);
     updateElement('perfProfitFactor', `PF: ${profitFactor}`);
-    updateElement('perfTotalTrades', filteredTrades.length);
-    updateElement('perfTradesChange', `+${filteredTrades.length} this period`);
+
+    // Update Trading Days (reverted from Total Trades)
+    updateElement('perfTotalTrades', tradingDays); // Keeping ID as perfTotalTrades but showing days
+    updateElement('perfTradesChange', `${filteredTrades.length} trades total`);
 
     // Update stat change classes
     const pnlChangeEl = document.getElementById('perfPnlChange');
@@ -271,7 +280,11 @@ function filterTradesByTimeframe(trades, timeframe) {
     const now = new Date();
 
     return trades.filter(trade => {
-        const tradeDate = new Date(trade.entryDate);
+        const dateStr = trade.tradeDate || trade.entryDate;
+        if (!dateStr) return false;
+
+        const tradeDate = new Date(dateStr);
+        if (isNaN(tradeDate.getTime())) return false; // Invalid date
 
         switch (timeframe) {
             case 'week':

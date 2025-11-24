@@ -1089,28 +1089,69 @@ async function handleTradeSubmit(event) {
         }, 3000);
     }
 
-    // Add event listener for settings changes
-    setTimeout(() => {
-        const inputs = ['startingCapital', 'currency', 'dateFormat'];
-        inputs.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('change', (e) => {
-                    settings[id] = e.target.value;
-                    saveSettings();
-                    loadDashboard();
-                    showToast('Settings updated', 'success');
-                });
-            }
+    // Initialization and Event Listeners
+    // Initialize Supabase if available (handled in auth.js, but good to double check or wait)
+
+    // Load initial data
+    loadCalendar();
+    loadAllTrades();
+    updateStats();
+    initCalculator();
+
+    // Setup Global Event Listeners
+
+    // Settings Inputs
+    const settingInputs = ['startingCapital', 'currency', 'dateFormat'];
+    settingInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            // Pre-fill with current settings
+            element.value = settings[id] || '';
+
+            element.addEventListener('change', (e) => {
+                settings[id] = e.target.value;
+                saveSettings();
+                // Reload views that depend on settings
+                loadCalendar();
+                loadAllTrades();
+                updateStats();
+                showToast('Settings updated', 'success');
+            });
+        }
+    });
+
+    // Theme Switcher
+    const themeSelect = document.getElementById('theme');
+    if (themeSelect) {
+        themeSelect.value = settings.theme || 'dark';
+        themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
+    }
+
+    // Dashboard Timeframe
+    const timeframeSelect = document.getElementById('timeframe');
+    if (timeframeSelect) {
+        timeframeSelect.addEventListener('change', () => {
+            // If we had a loadDashboard function, we'd call it.
+            // For now, just update stats as that's the main dashboard view
+            updateStats();
         });
+    }
 
-        const timeframeSelect = document.getElementById('timeframe');
-        if (timeframeSelect) {
-            timeframeSelect.addEventListener('change', loadDashboard);
-        }
+    // Performance Timeframe
+    const perfTimeframeSelect = document.getElementById('perfTimeframe');
+    if (perfTimeframeSelect) {
+        perfTimeframeSelect.addEventListener('change', updateStats);
+    }
 
-        const perfTimeframeSelect = document.getElementById('perfTimeframe');
-        if (perfTimeframeSelect) {
-            perfTimeframeSelect.addEventListener('change', loadPerformance);
-        }
-    }, 100);
+    // Trade Filters
+    const filterType = document.getElementById('filterType');
+    if (filterType) filterType.addEventListener('change', loadAllTrades);
+
+    const filterOutcome = document.getElementById('filterOutcome');
+    if (filterOutcome) filterOutcome.addEventListener('change', loadAllTrades);
+
+    const searchTrades = document.getElementById('searchTrades');
+    if (searchTrades) searchTrades.addEventListener('input', loadAllTrades);
+
+    // Initial Theme Apply
+    changeTheme(settings.theme || 'dark');

@@ -509,11 +509,22 @@ async function handleTradeSubmit(event) {
     const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
 
     // Calculate exit price based on PnL to satisfy database schema
-    // PnL = (Exit - Entry) * Quantity
-    // Assuming Quantity = 1 for simplicity in this new layout
+    // PnL = (Exit - Entry) * Quantity (Long)
+    // PnL = (Entry - Exit) * Quantity (Short)
+    // Assuming Quantity = 1
+
     const entryPrice = parseFloat(formData.get('entryPrice'));
     const pnl = parseFloat(formData.get('pnl')) || 0;
-    const exitPrice = entryPrice + pnl;
+    const type = formData.get('type');
+    let exitPrice;
+
+    if (type === 'long') {
+        // Exit = Entry + PnL
+        exitPrice = entryPrice + pnl;
+    } else {
+        // Exit = Entry - PnL
+        exitPrice = entryPrice - pnl;
+    }
 
     // Handle Screenshot Upload
     let screenshotUrl = null;
@@ -1228,13 +1239,13 @@ function removeScreenshot() {
 function openImageModal(src) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    modal.style.display = "block";
+    modal.classList.add('active'); // Use class for flex display
     modalImg.src = src;
 }
 
 function closeImageModal() {
     const modal = document.getElementById('imageModal');
-    modal.style.display = "none";
+    modal.classList.remove('active');
 }
 
 // Close modal with Escape key

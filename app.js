@@ -508,24 +508,6 @@ async function handleTradeSubmit(event) {
     const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
     const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
 
-    // Calculate exit price based on PnL to satisfy database schema
-    // PnL = (Exit - Entry) * Quantity (Long)
-    // PnL = (Entry - Exit) * Quantity (Short)
-    // Assuming Quantity = 1
-
-    const entryPrice = parseFloat(formData.get('entryPrice'));
-    const pnl = parseFloat(formData.get('pnl')) || 0;
-    const type = formData.get('type');
-    let exitPrice;
-
-    if (type === 'long') {
-        // Exit = Entry + PnL
-        exitPrice = entryPrice + pnl;
-    } else {
-        // Exit = Entry - PnL
-        exitPrice = entryPrice - pnl;
-    }
-
     // Handle Screenshot Upload
     let screenshotUrl = null;
     const screenshotFile = form.querySelector('input[name="screenshot"]').files[0];
@@ -559,8 +541,8 @@ async function handleTradeSubmit(event) {
         symbol: formData.get('symbol').toUpperCase(),
         type: formData.get('type'), // Use the new type selector
         quantity: 1,
-        entryPrice: entryPrice,
-        exitPrice: exitPrice,
+        entryPrice: parseFloat(formData.get('entryPrice')),
+        exitPrice: parseFloat(formData.get('exitPrice')),
         stopLoss: parseFloat(formData.get('stopLoss')) || null,
         takeProfit: parseFloat(formData.get('takeProfit')) || null,
         session: formData.get('session'),
@@ -570,6 +552,7 @@ async function handleTradeSubmit(event) {
         strategy: formData.get('strategy'),
         tags: formData.get('tags'),
         notes: formData.get('notes'),
+        pnl: parseFloat(formData.get('pnl')), // Store the calculated PnL
         screenshot_url: screenshotUrl, // Add screenshot URL to trade object
         tradeDate: new Date().toISOString()
     };
@@ -1207,6 +1190,51 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     initSliders();
 }
 
+// Auto-calculate PnL and Exit Price
+const tradeEntry = document.getElementById('tradeEntry');
+const tradeExit = document.getElementById('tradeExit');
+const tradePnL = document.getElementById('tradePnL');
+const tradeType = document.querySelector('select[name="type"]');
+
+function calculateTradeValues(source) {
+    if (!tradeEntry || !tradeExit || !tradePnL || !tradeType) return;
+
+    const entry = parseFloat(tradeEntry.value) || 0;
+    const exit = parseFloat(tradeExit.value) || 0;
+    const pnl = parseFloat(tradePnL.value) || 0;
+    const isLong = tradeType.value === 'long';
+
+    if (source === 'exit' && entry) {
+        // Calculate PnL from Exit
+        const newPnL = isLong ? (exit - entry) : (entry - exit);
+        tradePnL.value = newPnL.toFixed(2);
+    } else if (source === 'pnl' && entry) {
+        // Calculate Exit from PnL
+        const newExit = isLong ? (entry + pnl) : (entry - pnl);
+        tradeExit.value = newExit.toFixed(2);
+    } else if (source === 'entry') {
+        // If we have Exit, update PnL. If we have PnL but no Exit, update Exit.
+        if (tradeExit.value) {
+            const newPnL = isLong ? (exit - entry) : (entry - exit);
+            tradePnL.value = newPnL.toFixed(2);
+        } else if (tradePnL.value) {
+            const newExit = isLong ? (entry + pnl) : (entry - pnl);
+            tradeExit.value = newExit.toFixed(2);
+        }
+    } else if (source === 'type') {
+        // Re-run calculation based on what we have
+        if (entry && exit) {
+            const newPnL = isLong ? (exit - entry) : (entry - exit);
+            tradePnL.value = newPnL.toFixed(2);
+        }
+    }
+}
+
+if (tradeEntry) tradeEntry.addEventListener('input', () => calculateTradeValues('entry'));
+if (tradeExit) tradeExit.addEventListener('input', () => calculateTradeValues('exit'));
+if (tradePnL) tradePnL.addEventListener('input', () => calculateTradeValues('pnl'));
+if (tradeType) tradeType.addEventListener('change', () => calculateTradeValues('type'));
+
 // Initialization and Event Listeners
 // Initialize Supabase if available (handled in auth.js, but good to double check or wait)
 
@@ -1239,7 +1267,10 @@ function removeScreenshot() {
 function openImageModal(src) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
+    const loader = document.getElementById('modalLoader');
+
     modal.classList.add('active'); // Use class for flex display
+    loader.style.display = 'block'; // Show loader
     modalImg.src = src;
 }
 

@@ -2206,19 +2206,46 @@ body {
     }
 }
 
+/* Modal Loader */
+.modal-loader {
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top: 5px solid var(--primary);
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -25px;
+    margin-left: -25px;
+    z-index: 1002;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .btn-secondary {
     padding: 12px 28px;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     color: var(--text-secondary);
-    font-size: 15px;
+    font-size: 1rem;
     flex: 1;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    width: 50%;
 }
 
 .btn-secondary::before {

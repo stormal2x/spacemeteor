@@ -1190,50 +1190,8 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     initSliders();
 }
 
-// Auto-calculate PnL and Exit Price
-const tradeEntry = document.getElementById('tradeEntry');
-const tradeExit = document.getElementById('tradeExit');
-const tradePnL = document.getElementById('tradePnL');
-const tradeType = document.querySelector('select[name="type"]');
-
-function calculateTradeValues(source) {
-    if (!tradeEntry || !tradeExit || !tradePnL || !tradeType) return;
-
-    const entry = parseFloat(tradeEntry.value) || 0;
-    const exit = parseFloat(tradeExit.value) || 0;
-    const pnl = parseFloat(tradePnL.value) || 0;
-    const isLong = tradeType.value === 'long';
-
-    if (source === 'exit' && entry) {
-        // Calculate PnL from Exit
-        const newPnL = isLong ? (exit - entry) : (entry - exit);
-        tradePnL.value = newPnL.toFixed(2);
-    } else if (source === 'pnl' && entry) {
-        // Calculate Exit from PnL
-        const newExit = isLong ? (entry + pnl) : (entry - pnl);
-        tradeExit.value = newExit.toFixed(2);
-    } else if (source === 'entry') {
-        // If we have Exit, update PnL. If we have PnL but no Exit, update Exit.
-        if (tradeExit.value) {
-            const newPnL = isLong ? (exit - entry) : (entry - exit);
-            tradePnL.value = newPnL.toFixed(2);
-        } else if (tradePnL.value) {
-            const newExit = isLong ? (entry + pnl) : (entry - pnl);
-            tradeExit.value = newExit.toFixed(2);
-        }
-    } else if (source === 'type') {
-        // Re-run calculation based on what we have
-        if (entry && exit) {
-            const newPnL = isLong ? (exit - entry) : (entry - exit);
-            tradePnL.value = newPnL.toFixed(2);
-        }
-    }
-}
-
-if (tradeEntry) tradeEntry.addEventListener('input', () => calculateTradeValues('entry'));
-if (tradeExit) tradeExit.addEventListener('input', () => calculateTradeValues('exit'));
-if (tradePnL) tradePnL.addEventListener('input', () => calculateTradeValues('pnl'));
-if (tradeType) tradeType.addEventListener('change', () => calculateTradeValues('type'));
+// Auto-calculation logic removed as per user request
+// Users will enter Entry, Exit, and PnL manually
 
 // Initialization and Event Listeners
 // Initialize Supabase if available (handled in auth.js, but good to double check or wait)

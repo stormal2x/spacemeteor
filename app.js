@@ -491,42 +491,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filterOutcome').addEventListener('change', loadAllTrades);
     document.getElementById('searchTrades').addEventListener('input', loadAllTrades);
     document.getElementById('perfTimeframe').addEventListener('change', updateStats);
-
-    // Auto-fill Exit Price based on Outcome
-    const outcomeSelect = document.querySelector('select[name="outcome"]');
-    const entryInput = document.querySelector('input[name="entryPrice"]');
-    const slInput = document.querySelector('input[name="stopLoss"]');
-    const tpInput = document.querySelector('input[name="takeProfit"]');
-    const exitInput = document.querySelector('input[name="exitPrice"]');
-
-    function updateExitPrice() {
-        if (!outcomeSelect || !exitInput) return;
-
-        const outcome = outcomeSelect.value;
-        const entry = entryInput?.value;
-        const sl = slInput?.value;
-        const tp = tpInput?.value;
-
-        if (outcome === 'win' && tp) {
-            exitInput.value = tp;
-        } else if (outcome === 'loss' && sl) {
-            exitInput.value = sl;
-        } else if (outcome === 'be' && entry) {
-            exitInput.value = entry;
-        } else if (outcome === 'open') {
-            exitInput.value = '';
-        }
-    }
-
-    if (outcomeSelect) {
-        outcomeSelect.addEventListener('change', updateExitPrice);
-    }
-
-    // Also update if inputs change while an outcome is selected
-    const inputs = [entryInput, slInput, tpInput];
-    inputs.forEach(input => {
-        if (input) input.addEventListener('input', updateExitPrice);
-    });
 });
 
 function viewTrade(index) {
@@ -631,14 +595,29 @@ async function handleTradeSubmit(event) {
         }
     }
 
+    // Determine Exit Price based on Outcome
+    const outcome = formData.get('outcome');
+    const entryPrice = parseFloat(formData.get('entryPrice'));
+    const stopLoss = parseFloat(formData.get('stopLoss'));
+    const takeProfit = parseFloat(formData.get('takeProfit'));
+
+    let exitPrice = null;
+    if (outcome === 'win' && takeProfit) {
+        exitPrice = takeProfit;
+    } else if (outcome === 'loss' && stopLoss) {
+        exitPrice = stopLoss;
+    } else if (outcome === 'be' && entryPrice) {
+        exitPrice = entryPrice;
+    }
+
     const trade = {
         symbol: formData.get('symbol').toUpperCase(),
-        type: formData.get('type'), // Use the new type selector
+        type: formData.get('type'),
         quantity: 1,
-        entryPrice: parseFloat(formData.get('entryPrice')),
-        exitPrice: parseFloat(formData.get('exitPrice')) || null, // Use explicit Exit Price or null
-        stopLoss: parseFloat(formData.get('stopLoss')) || null,
-        takeProfit: parseFloat(formData.get('takeProfit')) || null,
+        entryPrice: entryPrice,
+        exitPrice: exitPrice,
+        stopLoss: stopLoss,
+        takeProfit: takeProfit,
         session: formData.get('session'),
         emotion: emotions.join(','),
         confidence: formData.get('confidence'),

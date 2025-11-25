@@ -242,8 +242,12 @@ function calculateStats() {
     const totalPnL = filteredTrades.reduce((sum, trade) => sum + calculatePnL(trade), 0);
 
     // Calculate win rate
-    const wins = filteredTrades.filter(trade => calculatePnL(trade) > 0).length;
-    const winRate = filteredTrades.length > 0 ? (wins / filteredTrades.length * 100).toFixed(1) : 0;
+    const wins = filteredTrades.filter(trade => {
+        const pnl = calculatePnL(trade);
+        return pnl !== null && pnl > 0;
+    }).length;
+    const closedTrades = filteredTrades.filter(trade => calculatePnL(trade) !== null).length;
+    const winRate = closedTrades > 0 ? (wins / closedTrades * 100).toFixed(1) : 0;
 
     // Calculate Average RR (Realized)
     const avgRR = calculateAvgRR(filteredTrades);
@@ -305,7 +309,7 @@ function filterTradesByTimeframe(trades, timeframe) {
 
 function calculatePnL(trade) {
     // If PnL is explicitly stored (new format), use it
-    if (trade.pnl !== undefined && trade.pnl !== null) {
+    if (trade.pnl !== undefined && trade.pnl !== null && !isNaN(parseFloat(trade.pnl))) {
         return parseFloat(trade.pnl);
     }
 
@@ -313,6 +317,9 @@ function calculatePnL(trade) {
     const entryPrice = parseFloat(trade.entryPrice);
     const exitPrice = parseFloat(trade.exitPrice);
     const quantity = parseFloat(trade.quantity) || 1;
+
+    // If no exit price, it's an open trade
+    if (isNaN(exitPrice)) return null;
 
     if (trade.type === 'long') {
         return (exitPrice - entryPrice) * quantity;
@@ -332,7 +339,9 @@ function calculatePnLPercentage(trade) {
 
 function calculateRR(trade) {
     // Calculate Realized R-Multiple if PnL and Stop Loss are available
-    if (trade.pnl !== undefined && trade.pnl !== null && trade.stopLoss) {
+    const pnl = calculatePnL(trade);
+
+    if (pnl !== null && trade.stopLoss) {
         const entryPrice = parseFloat(trade.entryPrice);
         const stopLoss = parseFloat(trade.stopLoss);
         const quantity = parseFloat(trade.quantity) || 1;
@@ -342,54 +351,43 @@ function calculateRR(trade) {
 
         if (totalRisk === 0) return '0.00';
 
-        const rMultiple = parseFloat(trade.pnl) / totalRisk;
+        const rMultiple = pnl / totalRisk;
         return rMultiple.toFixed(2);
     }
 
     // Fallback to Planned RR (Risk/Reward ratio)
-    if (!trade.stopLoss || !trade.takeProfit) {
-        // Calculate actual RR from entry and exit
-        const pnl = calculatePnL(trade);
+    // This is for open trades or trades without explicit PnL yet
+    if (trade.takeProfit && trade.stopLoss) {
         const entryPrice = parseFloat(trade.entryPrice);
-        const exitPrice = parseFloat(trade.exitPrice);
+        const stopLoss = parseFloat(trade.stopLoss);
+        const takeProfit = parseFloat(trade.takeProfit);
 
+        const risk = Math.abs(entryPrice - stopLoss);
+
+        // Calculate reward based on trade direction
+        let reward;
         if (trade.type === 'long') {
-            const reward = Math.abs(exitPrice - entryPrice);
-            const risk = Math.abs(entryPrice - (entryPrice * 0.98)); // Assume 2% risk if no SL
-            return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+            reward = Math.abs(takeProfit - entryPrice);
         } else {
-            const reward = Math.abs(entryPrice - exitPrice);
-            const risk = Math.abs((entryPrice * 1.02) - entryPrice); // Assume 2% risk if no SL
-            return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+            reward = Math.abs(entryPrice - takeProfit);
         }
+
+        return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
     }
 
-    const entryPrice = parseFloat(trade.entryPrice);
-    const stopLoss = parseFloat(trade.stopLoss);
-    const takeProfit = parseFloat(trade.takeProfit);
-
-    const risk = Math.abs(entryPrice - stopLoss);
-
-    // Calculate reward based on trade direction
-    let reward;
-    if (trade.type === 'long') {
-        reward = Math.abs(takeProfit - entryPrice);
-    } else {
-        // For short trades, reward is entry - takeProfit
-        reward = Math.abs(entryPrice - takeProfit);
-    }
-
-    return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+    return '0.00';
 }
 
 function calculateAvgRR(tradesList) {
-    if (tradesList.length === 0) return '0.00';
+    const closedTrades = tradesList.filter(trade => calculatePnL(trade) !== null);
 
-    const totalRR = tradesList.reduce((sum, trade) => {
+    if (closedTrades.length === 0) return '0.00';
+
+    const totalRR = closedTrades.reduce((sum, trade) => {
         return sum + parseFloat(calculateRR(trade));
     }, 0);
 
-    return (totalRR / tradesList.length).toFixed(2);
+    return (totalRR / closedTrades.length).toFixed(2);
 }
 
 function loadRecentTrades() {
@@ -406,6 +404,7 @@ function loadRecentTrades() {
     tbody.innerHTML = recentTrades.map(trade => {
         const pnl = calculatePnL(trade);
         const rr = calculateRR(trade);
+        const isClosed = pnl !== null;
 
         return `
             <tr>
@@ -413,8 +412,10 @@ function loadRecentTrades() {
                 <td><strong>${trade.symbol}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${formatCurrency(trade.entryPrice)}</td>
-                <td>${formatCurrency(trade.exitPrice)}</td>
-                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
+                <td>${trade.exitPrice ? formatCurrency(trade.exitPrice) : '-'}</td>
+                <td class="${isClosed ? (pnl >= 0 ? 'pnl-positive' : 'pnl-negative') : ''}">
+                    ${isClosed ? formatCurrency(pnl) : 'Open'}
+                </td>
                 <td><strong>${rr}</strong></td>
             </tr>
         `;
@@ -436,8 +437,9 @@ function loadAllTrades() {
 
     tbody.innerHTML = filteredTrades.reverse().map((trade, index) => {
         // Use stored PnL if available, otherwise calculate
-        const pnl = trade.pnl !== undefined ? parseFloat(trade.pnl) : calculatePnL(trade);
+        const pnl = calculatePnL(trade);
         const rr = calculateRR(trade);
+        const isClosed = pnl !== null;
 
         return `
             <tr>
@@ -445,8 +447,10 @@ function loadAllTrades() {
                 <td><strong>${trade.symbol}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${parseFloat(trade.entryPrice).toFixed(2)}</td>
-                <td>${parseFloat(trade.exitPrice).toFixed(2)}</td>
-                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
+                <td>${trade.exitPrice ? parseFloat(trade.exitPrice).toFixed(2) : '-'}</td>
+                <td class="${isClosed ? (pnl >= 0 ? 'pnl-positive' : 'pnl-negative') : ''}">
+                    ${isClosed ? formatCurrency(pnl) : 'Open'}
+                </td>
                 <td><strong>${rr}</strong></td>
                 <td>${trade.strategy || '-'}</td>
                 <td>
@@ -597,7 +601,7 @@ async function handleTradeSubmit(event) {
         type: formData.get('type'), // Use the new type selector
         quantity: 1,
         entryPrice: parseFloat(formData.get('entryPrice')),
-        exitPrice: parseFloat(formData.get('takeProfit')), // User requested Take Profit to be the Exit Price
+        exitPrice: parseFloat(formData.get('exitPrice')) || null, // Use explicit Exit Price or null
         stopLoss: parseFloat(formData.get('stopLoss')) || null,
         takeProfit: parseFloat(formData.get('takeProfit')) || null,
         session: formData.get('session'),

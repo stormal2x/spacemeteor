@@ -338,41 +338,40 @@ function calculatePnLPercentage(trade) {
 }
 
 function calculateRR(trade) {
-    // Calculate Realized R-Multiple if PnL and Stop Loss are available
-    const pnl = calculatePnL(trade);
+    const entryPrice = parseFloat(trade.entryPrice);
+    const exitPrice = parseFloat(trade.exitPrice);
+    const stopLoss = parseFloat(trade.stopLoss);
 
-    if (pnl !== null && trade.stopLoss) {
-        const entryPrice = parseFloat(trade.entryPrice);
-        const stopLoss = parseFloat(trade.stopLoss);
-        const quantity = parseFloat(trade.quantity) || 1;
-
+    // If we have Entry, Exit, and Stop Loss, we can calculate Realized RR based on price action
+    if (!isNaN(entryPrice) && !isNaN(exitPrice) && !isNaN(stopLoss)) {
         const riskPerShare = Math.abs(entryPrice - stopLoss);
-        const totalRisk = riskPerShare * quantity;
 
-        if (totalRisk === 0) return '0.00';
+        if (riskPerShare === 0) return '0.00';
 
-        const rMultiple = pnl / totalRisk;
-        return rMultiple.toFixed(2);
+        let rewardPerShare;
+        if (trade.type === 'long') {
+            rewardPerShare = exitPrice - entryPrice;
+        } else {
+            // Short: Profit if Entry > Exit
+            rewardPerShare = entryPrice - exitPrice;
+        }
+
+        return (rewardPerShare / riskPerShare).toFixed(2);
     }
 
-    // Fallback to Planned RR (Risk/Reward ratio)
-    // This is for open trades or trades without explicit PnL yet
-    if (trade.takeProfit && trade.stopLoss) {
-        const entryPrice = parseFloat(trade.entryPrice);
-        const stopLoss = parseFloat(trade.stopLoss);
-        const takeProfit = parseFloat(trade.takeProfit);
-
+    // Fallback: Planned RR (if Exit Price is not set, use Take Profit)
+    const takeProfit = parseFloat(trade.takeProfit);
+    if (!isNaN(entryPrice) && !isNaN(stopLoss) && !isNaN(takeProfit)) {
         const risk = Math.abs(entryPrice - stopLoss);
+        if (risk === 0) return '0.00';
 
-        // Calculate reward based on trade direction
         let reward;
         if (trade.type === 'long') {
             reward = Math.abs(takeProfit - entryPrice);
         } else {
             reward = Math.abs(entryPrice - takeProfit);
         }
-
-        return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
+        return (reward / risk).toFixed(2);
     }
 
     return '0.00';

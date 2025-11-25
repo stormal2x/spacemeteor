@@ -369,7 +369,15 @@ function calculateRR(trade) {
     const takeProfit = parseFloat(trade.takeProfit);
 
     const risk = Math.abs(entryPrice - stopLoss);
-    const reward = Math.abs(takeProfit - entryPrice);
+
+    // Calculate reward based on trade direction
+    let reward;
+    if (trade.type === 'long') {
+        reward = Math.abs(takeProfit - entryPrice);
+    } else {
+        // For short trades, reward is entry - takeProfit
+        reward = Math.abs(entryPrice - takeProfit);
+    }
 
     return risk > 0 ? (reward / risk).toFixed(2) : '0.00';
 }
@@ -397,7 +405,6 @@ function loadRecentTrades() {
 
     tbody.innerHTML = recentTrades.map(trade => {
         const pnl = calculatePnL(trade);
-        const pnlPercent = calculatePnLPercentage(trade);
         const rr = calculateRR(trade);
 
         return `
@@ -408,7 +415,6 @@ function loadRecentTrades() {
                 <td>${formatCurrency(trade.entryPrice)}</td>
                 <td>${formatCurrency(trade.exitPrice)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
-                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${pnlPercent}%</td>
                 <td><strong>${rr}</strong></td>
             </tr>
         `;
@@ -431,7 +437,6 @@ function loadAllTrades() {
     tbody.innerHTML = filteredTrades.reverse().map((trade, index) => {
         // Use stored PnL if available, otherwise calculate
         const pnl = trade.pnl !== undefined ? parseFloat(trade.pnl) : calculatePnL(trade);
-        const pnlPercent = calculatePnLPercentage(trade);
         const rr = calculateRR(trade);
 
         return `
@@ -442,7 +447,6 @@ function loadAllTrades() {
                 <td>${parseFloat(trade.entryPrice).toFixed(2)}</td>
                 <td>${parseFloat(trade.exitPrice).toFixed(2)}</td>
                 <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${formatCurrency(pnl)}</td>
-                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">${pnlPercent}%</td>
                 <td><strong>${rr}</strong></td>
                 <td>${trade.strategy || '-'}</td>
                 <td>

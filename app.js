@@ -491,6 +491,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filterOutcome').addEventListener('change', loadAllTrades);
     document.getElementById('searchTrades').addEventListener('input', loadAllTrades);
     document.getElementById('perfTimeframe').addEventListener('change', updateStats);
+
+    // Auto-fill Exit Price based on Outcome
+    const outcomeSelect = document.querySelector('select[name="outcome"]');
+    const entryInput = document.querySelector('input[name="entryPrice"]');
+    const slInput = document.querySelector('input[name="stopLoss"]');
+    const tpInput = document.querySelector('input[name="takeProfit"]');
+    const exitInput = document.querySelector('input[name="exitPrice"]');
+
+    function updateExitPrice() {
+        if (!outcomeSelect || !exitInput) return;
+
+        const outcome = outcomeSelect.value;
+        const entry = entryInput?.value;
+        const sl = slInput?.value;
+        const tp = tpInput?.value;
+
+        if (outcome === 'win' && tp) {
+            exitInput.value = tp;
+        } else if (outcome === 'loss' && sl) {
+            exitInput.value = sl;
+        } else if (outcome === 'be' && entry) {
+            exitInput.value = entry;
+        } else if (outcome === 'open') {
+            exitInput.value = '';
+        }
+    }
+
+    if (outcomeSelect) {
+        outcomeSelect.addEventListener('change', updateExitPrice);
+    }
+
+    // Also update if inputs change while an outcome is selected
+    const inputs = [entryInput, slInput, tpInput];
+    inputs.forEach(input => {
+        if (input) input.addEventListener('input', updateExitPrice);
+    });
 });
 
 function viewTrade(index) {

@@ -1434,5 +1434,10 @@ if (searchTrades) searchTrades.addEventListener('input', loadAllTrades);
 // Initial Theme Apply
 changeTheme(settings.theme || 'dark');
 
-// Initialize Position Size Calculator
-initCalculator();
+// Initialize Position Size Calculator when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCalculator);
+} else {
+    // DOM already loaded
+    initCalculator();
+}

@@ -211,57 +211,63 @@
         <section id="calculator" class="content-section">
             <div class="section-header">
                 <h1>Position Size Calculator</h1>
+                <p>Calculate your exact position size based on risk management principles</p>
             </div>
 
-            <div class="calculator-container-centered">
-                <div class="calculator-panel large">
-                    <div class="calculator-header">
-                        <h3>🧮 Risk Management Calculator</h3>
-                        <p>Calculate your exact position size based on your risk tolerance and stop loss.</p>
+            <div class="calculator-full-width">
+                <div class="calculator-inputs-grid">
+                    <div class="calc-input-modern">
+                        <label>Account Balance</label>
+                        <div class="input-wrapper-modern">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="calcAccountSize" placeholder="10,000" step="100" value="10000">
+                        </div>
                     </div>
-                    <div class="calculator-grid">
-                        <div class="calc-input">
-                            <label>Account Size</label>
-                            <div class="input-wrapper">
-                                <span>$</span>
-                                <input type="number" id="calcAccountSize" placeholder="10000" step="100" value="10000">
-                            </div>
-                        </div>
-                        <div class="calc-input">
-                            <label>Risk Per Trade</label>
-                            <div class="input-wrapper">
-                                <input type="number" id="calcRiskPercent" placeholder="1" step="0.1" value="1" max="10"
-                                    min="0.1">
-                                <span>%</span>
-                            </div>
-                        </div>
-                        <div class="calc-input">
-                            <label>Entry Price</label>
-                            <div class="input-wrapper">
-                                <span>$</span>
-                                <input type="number" id="calcEntry" placeholder="50.00" step="0.01">
-                            </div>
-                        </div>
-                        <div class="calc-input">
-                            <label>Stop Loss Price</label>
-                            <div class="input-wrapper">
-                                <span>$</span>
-                                <input type="number" id="calcSL" placeholder="48.00" step="0.01">
-                            </div>
-                        </div>
 
-                        <div class="calc-results-container">
-                            <div class="calc-result-box primary">
-                                <span class="result-label">Position Size</span>
-                                <span class="result-value" id="calcPositionSize"
-                                    style="transition: transform 0.2s ease;">0</span>
-                                <span class="result-unit">Shares/Units</span>
-                            </div>
-                            <div class="calc-result-box">
-                                <span class="result-label">Risk Amount</span>
-                                <span class="result-value" id="calcRiskAmount"
-                                    style="transition: transform 0.2s ease;">$0.00</span>
-                            </div>
+                    <div class="calc-input-modern">
+                        <label>Risk Per Trade</label>
+                        <div class="input-wrapper-modern">
+                            <input type="number" id="calcRiskPercent" placeholder="1.0" step="0.1" value="1" max="10"
+                                min="0.1">
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-input-modern">
+                        <label>Entry Price</label>
+                        <div class="input-wrapper-modern">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="calcEntry" placeholder="50.00" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="calc-input-modern">
+                        <label>Stop Loss</label>
+                        <div class="input-wrapper-modern">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="calcSL" placeholder="48.00" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-results-grid">
+                    <div class="calc-result-card primary-result">
+                        <div class="result-icon">📊</div>
+                        <div class="result-content">
+                            <span class="result-label">Position Size</span>
+                            <span class="result-value-large" id="calcPositionSize"
+                                style="transition: transform 0.2s ease;">0</span>
+                            <span class="result-unit">shares/units</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-result-card">
+                        <div class="result-icon">💰</div>
+                        <div class="result-content">
+                            <span class="result-label">Risk Amount</span>
+                            <span class="result-value-large" id="calcRiskAmount"
+                                style="transition: transform 0.2s ease;">$0.00</span>
+                            <span class="result-unit">at risk</span>
                         </div>
                     </div>
                 </div>

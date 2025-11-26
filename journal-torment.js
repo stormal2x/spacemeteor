@@ -576,16 +576,50 @@ function toggleComments(postId) {
 }
 
 async function incrementViewCount(postId) {
-    const post = tormentPosts.find(p => p.id === postId);
-    if (!post) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-    await supabase
-        .from('torment_posts')
-        .update({ view_count: post.view_count + 1 })
-        .eq('id', postId);
+    // Check if view exists
+    const { data: existingView } = await supabase
+        .from('torment_views')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    // Update local state
-    post.view_count += 1;
+    if (existingView) return; // Already viewed
+
+    // Insert view
+    const { error: insertError } = await supabase
+        .from('torment_views')
+        .insert([{ post_id: postId, user_id: user.id }]);
+
+    if (!insertError) {
+        const post = tormentPosts.find(p => p.id === postId);
+        if (!post) return;
+
+        // Increment count on post
+        await supabase
+            .from('torment_posts')
+            .update({ view_count: post.view_count + 1 })
+            .eq('id', postId);
+
+        // Update local state
+        post.view_count += 1;
+
+        // Update UI count if visible
+        // We don't want to re-render the whole feed as it would close the comments
+        // But we can try to find the element
+        // Since the current implementation didn't update UI dynamically (except maybe on next render), 
+        // we can leave it or try to update the span.
+        // Let's try to update the span if we can find it easily, but the current structure makes it hard without IDs.
+        // Actually, renderTormentFeed re-creates HTML strings.
+        // So the user only sees the new count on refresh? 
+        // The previous code: post.view_count += 1; 
+        // This only updates the memory object. It doesn't update the DOM.
+        // So the user wouldn't see the increment anyway until reload!
+        // So this is fine.
+    }
 }
 
 async function addComment(postId) {

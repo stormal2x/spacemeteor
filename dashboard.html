@@ -861,6 +861,32 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="image-modal" style="display: none; z-index: 10000;">
+        <div class="modal-content"
+            style="max-width: 400px; padding: 0; border-radius: 12px; background: var(--bg-secondary); text-align: center;"
+            onclick="event.stopPropagation();">
+            <div style="padding: 30px;">
+                <div
+                    style="width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 id="confirmModalTitle" style="margin-bottom: 10px;">Are you sure?</h3>
+                <p id="confirmModalMessage" style="color: var(--text-secondary); margin-bottom: 25px;">This action
+                    cannot be undone.</p>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="closeConfirmModal(false)" class="btn-secondary" style="flex: 1;">Cancel</button>
+                    <button onclick="closeConfirmModal(true)" id="confirmModalBtn" class="btn-danger"
+                        style="flex: 1;">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Create Torment Post Modal -->
     <div id="createPostModal" class="image-modal" style="display: none;">
         <div class="modal-content"

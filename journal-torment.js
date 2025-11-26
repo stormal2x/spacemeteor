@@ -179,7 +179,12 @@ async function saveJournalEntry() {
 async function deleteJournalEntry() {
     if (!selectedJournalDate) return;
 
-    if (!confirm('Are you sure you want to delete this entry?')) return;
+    const confirmed = await showConfirmModal(
+        'Delete Entry?',
+        'Are you sure you want to delete this journal entry?'
+    );
+
+    if (!confirmed) return;
 
     const entry = journalEntries.find(e => e.entry_date === selectedJournalDate);
     if (!entry) return;
@@ -355,8 +360,36 @@ function createPostCard(post, userId) {
     `;
 }
 
+let confirmResolve = null;
+
+function showConfirmModal(title, message, actionText = 'Delete') {
+    return new Promise((resolve) => {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+
+        const confirmBtn = document.getElementById('confirmModalBtn');
+        confirmBtn.textContent = actionText;
+
+        document.getElementById('confirmationModal').style.display = 'flex';
+        confirmResolve = resolve;
+    });
+}
+
+function closeConfirmModal(confirmed) {
+    document.getElementById('confirmationModal').style.display = 'none';
+    if (confirmResolve) {
+        confirmResolve(confirmed);
+        confirmResolve = null;
+    }
+}
+
 async function deleteTormentPost(postId) {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+    const confirmed = await showConfirmModal(
+        'Delete Post?',
+        'Are you sure you want to delete this post? This action cannot be undone.'
+    );
+
+    if (!confirmed) return;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;

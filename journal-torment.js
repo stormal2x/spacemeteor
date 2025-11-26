@@ -363,17 +363,17 @@ function createPostCard(post, userId) {
                         <button onclick="removeCommentImage(${post.id})" style="position: absolute; top: -8px; right: -8px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;">&times;</button>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <div style="position: relative; flex: 1;">
-                            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." style="width: 100%; padding: 10px 12px; padding-right: 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary); height: 42px; box-sizing: border-box;" />
-                            <label for="comment-file-${post.id}" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary); display: flex; align-items: center;">
+                    <div style="display: flex; gap: 10px; align-items: stretch;">
+                        <div style="position: relative; flex: 1; display: flex;">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." style="width: 100%; padding: 10px 12px; padding-right: 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary); color: var(--text-primary); font-size: 14px;" />
+                            <label for="comment-file-${post.id}" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; padding: 5px;">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                                 </svg>
                             </label>
                             <input type="file" id="comment-file-${post.id}" accept="image/*" style="display: none;" onchange="previewCommentImage(${post.id}, event)" />
                         </div>
-                        <button onclick="addComment(${post.id})" class="btn-primary" style="padding: 0 20px; height: 42px; display: flex; align-items: center; justify-content: center; font-weight: 600;">Post</button>
+                        <button onclick="addComment(${post.id})" class="btn-primary" style="padding: 0 20px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; border-radius: 8px;">Post</button>
                     </div>
                 </div>
             </div>

@@ -273,7 +273,7 @@ async function fetchTormentPosts() {
         .select(`
             *,
             torment_likes (id, user_id),
-            torment_comments (id, username, content, created_at, screenshot_url)
+            torment_comments (id, user_id, username, content, created_at, screenshot_url)
         `)
         .order('created_at', { ascending: false });
 

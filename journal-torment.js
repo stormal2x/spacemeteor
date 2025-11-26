@@ -276,7 +276,7 @@ async function fetchTormentPosts() {
     }
 }
 
-function renderTormentFeed() {
+async function renderTormentFeed() {
     const feed = document.getElementById('tormentFeed');
     if (!feed) return;
 
@@ -292,13 +292,13 @@ function renderTormentFeed() {
         return;
     }
 
-    feed.innerHTML = tormentPosts.map(post => createPostCard(post)).join('');
-}
-
-async function createPostCard(post) {
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
 
+    feed.innerHTML = tormentPosts.map(post => createPostCard(post, userId)).join('');
+}
+
+function createPostCard(post, userId) {
     const likeCount = post.torment_likes?.length || 0;
     const commentCount = post.torment_comments?.length || 0;
     const hasLiked = post.torment_likes?.some(like => like.user_id === userId) || false;

@@ -352,11 +352,29 @@ function createPostCard(post, userId) {
                     <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
                         <div style="font-weight: 600; font-size: 13px;">${comment.username}</div>
                         <div style="font-size: 14px; margin-top: 5px;">${comment.content}</div>
+                        ${comment.screenshot_url ? `<img src="${comment.screenshot_url}" style="max-width: 200px; border-radius: 6px; margin-top: 10px; cursor: pointer;" onclick="openImageModal('${comment.screenshot_url}')" />` : ''}
                     </div>
                 `).join('')}
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." style="flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary);" />
-                    <button onclick="addComment(${post.id})" class="btn-primary" style="padding: 8px 16px;">Post</button>
+                
+                <!-- Comment Input Area -->
+                <div style="margin-top: 10px;">
+                    <div id="comment-preview-${post.id}" style="display: none; margin-bottom: 10px; position: relative; width: fit-content;">
+                        <img id="comment-preview-img-${post.id}" style="max-height: 100px; border-radius: 6px; border: 1px solid var(--border);" />
+                        <button onclick="removeCommentImage(${post.id})" style="position: absolute; top: -8px; right: -8px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;">&times;</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." style="width: 100%; padding: 10px 12px; padding-right: 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary); height: 42px; box-sizing: border-box;" />
+                            <label for="comment-file-${post.id}" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary); display: flex; align-items: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                                </svg>
+                            </label>
+                            <input type="file" id="comment-file-${post.id}" accept="image/*" style="display: none;" onchange="previewCommentImage(${post.id}, event)" />
+                        </div>
+                        <button onclick="addComment(${post.id})" class="btn-primary" style="padding: 0 20px; height: 42px; display: flex; align-items: center; justify-content: center; font-weight: 600;">Post</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -564,8 +582,10 @@ function toggleComments(postId) {
 async function addComment(postId) {
     const input = document.getElementById(`comment-input-${postId}`);
     const content = input.value.trim();
+    const fileInput = document.getElementById(`comment-file-${postId}`);
+    const file = fileInput?.files[0];
 
-    if (!content) return;
+    if (!content && !file) return;
 
     if (content.length > 280) {
         showToast('Comment is too long (max 280 characters)', 'error');
@@ -575,16 +595,68 @@ async function addComment(postId) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    let screenshotUrl = null;
+
+    if (file) {
+        const fileName = `comments/${user.id}/${Date.now()}_${file.name}`;
+        const { data, error: uploadError } = await supabase.storage
+            .from('trade-screenshots')
+            .upload(fileName, file);
+
+        if (uploadError) {
+            console.error('Error uploading comment image:', uploadError);
+            showToast('Failed to upload image', 'error');
+            return;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('trade-screenshots')
+            .getPublicUrl(fileName);
+
+        screenshotUrl = publicUrl;
+    }
+
+    const commentData = {
+        post_id: postId,
+        user_id: user.id,
+        username: currentUsername,
+        content: content
+    };
+
+    if (screenshotUrl) {
+        commentData.screenshot_url = screenshotUrl;
+    }
+
     const { error } = await supabase
         .from('torment_comments')
-        .insert([{ post_id: postId, user_id: user.id, username: currentUsername, content }]);
+        .insert([commentData]);
 
     if (error) {
         showToast('Failed to add comment', 'error');
     } else {
         input.value = '';
+        if (fileInput) fileInput.value = '';
+        removeCommentImage(postId); // Clear preview
+
         await fetchTormentPosts();
         renderTormentFeed();
         document.getElementById(`comments-${postId}`).style.display = 'block';
     }
+}
+
+function previewCommentImage(postId, event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById(`comment-preview-img-${postId}`).src = e.target.result;
+        document.getElementById(`comment-preview-${postId}`).style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeCommentImage(postId) {
+    document.getElementById(`comment-preview-${postId}`).style.display = 'none';
+    document.getElementById(`comment-file-${postId}`).value = '';
 }

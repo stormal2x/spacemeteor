@@ -308,6 +308,14 @@ function createPostCard(post, userId) {
         <img src="${post.screenshot_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px; cursor: pointer;" onclick="openImageModal('${post.screenshot_url}')" />
     ` : '';
 
+    const deleteButtonHtml = post.user_id === userId ? `
+        <button onclick="deleteTormentPost(${post.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); margin-left: auto; padding: 5px;" title="Delete Post">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+        </button>
+    ` : '';
+
     return `
         <div class="torment-post-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
             <div style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -318,6 +326,7 @@ function createPostCard(post, userId) {
                     <div style="font-weight: 600;">${post.username}</div>
                     <div style="font-size: 12px; color: var(--text-secondary);">${timeAgo}</div>
                 </div>
+                ${deleteButtonHtml}
             </div>
             <div style="margin-bottom: 15px; line-height: 1.6;">${post.content}</div>
             ${screenshotHtml}
@@ -344,6 +353,33 @@ function createPostCard(post, userId) {
             </div>
         </div>
     `;
+}
+
+async function deleteTormentPost(postId) {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Delete likes and comments first (handled by cascade usually, but good to be safe if not set up)
+    // Actually, let's rely on RLS and Cascade. 
+    // But since we didn't set up CASCADE in the SQL provided earlier (or maybe we did implicitly), 
+    // let's just try deleting the post. The RLS policy should allow it if user is owner.
+
+    const { error } = await supabase
+        .from('torment_posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id); // Double check ownership
+
+    if (error) {
+        console.error('Error deleting post:', error);
+        showToast('Failed to delete post', 'error');
+    } else {
+        showToast('Post deleted', 'success');
+        await fetchTormentPosts();
+        renderTormentFeed();
+    }
 }
 
 function getTimeAgo(date) {

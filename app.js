@@ -146,6 +146,12 @@ function switchSection(sectionName) {
             case 'settings':
                 loadSettings();
                 break;
+            case 'journal':
+                loadPersonalJournal();
+                break;
+            case 'torment':
+                loadTorment();
+                break;
         }
     }
 }

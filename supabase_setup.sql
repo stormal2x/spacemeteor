@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS torment_posts (
   user_id UUID REFERENCES auth.users NOT NULL,
   username TEXT NOT NULL,
   content TEXT NOT NULL CHECK (char_length(content) <= 280),
+  screenshot_url TEXT,
   view_count INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

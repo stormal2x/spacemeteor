@@ -207,19 +207,34 @@ async function deleteJournalEntry() {
 
 let tormentPosts = [];
 let currentUsername = '';
+let postScreenshotFile = null;
 
 async function loadTorment() {
-    await fetchCurrentUsername();
+    await checkAndSetUsername();
     await fetchTormentPosts();
     renderTormentFeed();
 }
 
-async function fetchCurrentUsername() {
+async function checkAndSetUsername() {
     if (!supabase) return;
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        currentUsername = user.email.split('@')[0]; // Use email prefix as username
+    if (!user) return;
+
+    // Check localStorage first
+    currentUsername = localStorage.getItem('torment_username');
+
+    if (!currentUsername) {
+        // Prompt for username
+        currentUsername = prompt('Welcome to Torment! Choose a username (this will be displayed publicly):');
+
+        if (!currentUsername || currentUsername.trim() === '') {
+            currentUsername = user.email.split('@')[0]; // Fallback to email prefix
+        }
+
+        currentUsername = currentUsername.trim();
+        localStorage.setItem('torment_username', currentUsername);
+        showToast(`Welcome, ${currentUsername}!`, 'success');
     }
 }
 
@@ -262,14 +277,18 @@ function renderTormentFeed() {
     feed.innerHTML = tormentPosts.map(post => createPostCard(post)).join('');
 }
 
-function createPostCard(post) {
-    const { data: { user } } = supabase?.auth.getSession() || { data: { user: null } };
+async function createPostCard(post) {
+    const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
 
     const likeCount = post.torment_likes?.length || 0;
     const commentCount = post.torment_comments?.length || 0;
     const hasLiked = post.torment_likes?.some(like => like.user_id === userId) || false;
     const timeAgo = getTimeAgo(new Date(post.created_at));
+
+    const screenshotHtml = post.screenshot_url ? `
+        <img src="${post.screenshot_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px; cursor: pointer;" onclick="openImageModal('${post.screenshot_url}')" />
+    ` : '';
 
     return `
         <div class="torment-post-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
@@ -283,6 +302,7 @@ function createPostCard(post) {
                 </div>
             </div>
             <div style="margin-bottom: 15px; line-height: 1.6;">${post.content}</div>
+            ${screenshotHtml}
             <div style="display: flex; gap: 20px; color: var(--text-secondary); font-size: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
                 <button onclick="toggleLike(${post.id})" style="background: none; border: none; cursor: pointer; color: ${hasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 5px;">
                     ${hasLiked ? '❤️' : '🤍'} ${likeCount}
@@ -332,6 +352,8 @@ function openCreatePostModal() {
     document.getElementById('createPostModal').style.display = 'flex';
     document.getElementById('postContent').value = '';
     document.getElementById('charCount').textContent = '0 / 280';
+    postScreenshotFile = null;
+    document.getElementById('postScreenshotPreview').style.display = 'none';
 
     // Add char counter
     const textarea = document.getElementById('postContent');
@@ -344,6 +366,25 @@ function openCreatePostModal() {
 
 function closeCreatePostModal() {
     document.getElementById('createPostModal').style.display = 'none';
+}
+
+function previewPostScreenshot(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    postScreenshotFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('postPreviewImage').src = e.target.result;
+        document.getElementById('postScreenshotPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePostScreenshot() {
+    postScreenshotFile = null;
+    document.getElementById('postScreenshotPreview').style.display = 'none';
+    document.getElementById('postScreenshotInput').value = '';
 }
 
 async function createTormentPost() {
@@ -362,9 +403,31 @@ async function createTormentPost() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    let screenshotUrl = null;
+
+    // Upload screenshot if exists
+    if (postScreenshotFile) {
+        const fileName = `torment/${user.id}/${Date.now()}_${postScreenshotFile.name}`;
+        const { data, error: uploadError } = await supabase.storage
+            .from('trade-screenshots')
+            .upload(fileName, postScreenshotFile);
+
+        if (uploadError) {
+            console.error('Error uploading screenshot:', uploadError);
+            showToast('Failed to upload screenshot', 'error');
+            return;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('trade-screenshots')
+            .getPublicUrl(fileName);
+
+        screenshotUrl = publicUrl;
+    }
+
     const { error } = await supabase
         .from('torment_posts')
-        .insert([{ user_id: user.id, username: currentUsername, content }]);
+        .insert([{ user_id: user.id, username: currentUsername, content, screenshot_url: screenshotUrl }]);
 
     if (error) {
         console.error('Error creating post:', error);

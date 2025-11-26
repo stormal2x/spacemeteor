@@ -540,19 +540,40 @@ function calculatePosition() {
     const entryPrice = parseFloat(document.getElementById('calcEntry')?.value) || 0;
     const stopLoss = parseFloat(document.getElementById('calcSL')?.value) || 0;
 
+    const positionSizeEl = document.getElementById('calcPositionSize');
+    const riskAmountEl = document.getElementById('calcRiskAmount');
+
     if (accountSize && riskPercent && entryPrice && stopLoss && entryPrice !== stopLoss) {
         const riskAmount = (accountSize * riskPercent) / 100;
         const riskPerShare = Math.abs(entryPrice - stopLoss);
         const positionSize = Math.floor(riskAmount / riskPerShare);
 
-        document.getElementById('calcPositionSize').textContent = positionSize.toLocaleString();
-        document.getElementById('calcRiskAmount').textContent = formatCurrency(riskAmount);
+        // Animate result update
+        if (positionSizeEl) {
+            positionSizeEl.style.transform = 'scale(1.05)';
+            positionSizeEl.textContent = positionSize.toLocaleString();
+            setTimeout(() => {
+                positionSizeEl.style.transform = 'scale(1)';
+            }, 200);
+        }
 
-        // Auto-fill quantity
+        if (riskAmountEl) {
+            riskAmountEl.style.transform = 'scale(1.05)';
+            riskAmountEl.textContent = formatCurrency(riskAmount);
+            setTimeout(() => {
+                riskAmountEl.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Auto-fill quantity in add trade form
         const qtyInput = document.getElementById('tradeQuantity');
         if (qtyInput && positionSize > 0) {
             qtyInput.value = positionSize;
         }
+    } else {
+        // Reset if inputs are invalid
+        if (positionSizeEl) positionSizeEl.textContent = '0';
+        if (riskAmountEl) riskAmountEl.textContent = '$0.00';
     }
 }
 
@@ -1412,3 +1433,6 @@ if (searchTrades) searchTrades.addEventListener('input', loadAllTrades);
 
 // Initial Theme Apply
 changeTheme(settings.theme || 'dark');
+
+// Initialize Position Size Calculator
+initCalculator();

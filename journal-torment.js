@@ -301,10 +301,31 @@ async function renderTormentFeed() {
         return;
     }
 
+    // Track which comment sections are open before re-rendering
+    const openCommentSections = [];
+    tormentPosts.forEach(post => {
+        const commentsDiv = document.getElementById(`comments-${post.id}`);
+        if (commentsDiv && commentsDiv.style.display !== 'none') {
+            openCommentSections.push(post.id);
+        }
+    });
+
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
 
     feed.innerHTML = tormentPosts.map(post => createPostCard(post, userId)).join('');
+
+    // Restore open comment sections
+    openCommentSections.forEach(postId => {
+        const commentsDiv = document.getElementById(`comments-${postId}`);
+        if (commentsDiv) {
+            commentsDiv.style.display = 'block';
+            commentsDiv.style.maxHeight = '2000px';
+            commentsDiv.style.opacity = '1';
+            commentsDiv.style.marginTop = '15px';
+            commentsDiv.style.paddingTop = '15px';
+        }
+    });
 }
 
 function createPostCard(post, userId) {
@@ -354,13 +375,27 @@ function createPostCard(post, userId) {
                 </button>
             </div>
             <div id="comments-${post.id}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;">
-                ${(post.torment_comments || []).map(comment => `
-                    <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
-                        <div style="font-weight: 600; font-size: 13px;">${comment.username}</div>
-                        <div style="font-size: 14px; margin-top: 5px;">${comment.content}</div>
-                        ${comment.screenshot_url ? `<img src="${comment.screenshot_url}" style="max-width: 200px; border-radius: 6px; margin-top: 10px; cursor: pointer;" onclick="openImageModal('${comment.screenshot_url}')" />` : ''}
-                    </div>
-                `).join('')}
+                ${(post.torment_comments || []).map(comment => {
+        const isCommentOwner = comment.user_id === userId;
+        const deleteCommentBtn = isCommentOwner ? `
+                        <button onclick="deleteComment(${post.id}, ${comment.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 2px; margin-left: auto;" title="Delete Comment">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    ` : '';
+
+        return `
+                        <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="font-weight: 600; font-size: 13px;">${comment.username}</div>
+                                ${deleteCommentBtn}
+                            </div>
+                            <div style="font-size: 14px; margin-top: 5px;">${comment.content}</div>
+                            ${comment.screenshot_url ? `<img src="${comment.screenshot_url}" style="max-width: 200px; border-radius: 6px; margin-top: 10px; cursor: pointer;" onclick="openImageModal('${comment.screenshot_url}')" />` : ''}
+                        </div>
+                    `;
+    }).join('')}
                 
                 <!-- Comment Input Area -->
                 <div style="margin-top: 10px;">
@@ -736,4 +771,41 @@ function previewCommentImage(postId, event) {
 function removeCommentImage(postId) {
     document.getElementById(`comment-preview-${postId}`).style.display = 'none';
     document.getElementById(`comment-file-${postId}`).value = '';
+}
+
+async function deleteComment(postId, commentId) {
+    const confirmed = await showConfirmModal(
+        'Delete Comment?',
+        'Are you sure you want to delete this comment?'
+    );
+
+    if (!confirmed) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+        .from('torment_comments')
+        .delete()
+        .eq('id', commentId)
+        .eq('user_id', user.id); // Ensure ownership
+
+    if (error) {
+        console.error('Error deleting comment:', error);
+        showToast('Failed to delete comment', 'error');
+    } else {
+        showToast('Comment deleted', 'success');
+        await fetchTormentPosts();
+        renderTormentFeed();
+
+        // Keep the comment section open
+        const commentsDiv = document.getElementById(`comments-${postId}`);
+        if (commentsDiv) {
+            commentsDiv.style.display = 'block';
+            commentsDiv.style.maxHeight = '2000px';
+            commentsDiv.style.opacity = '1';
+            commentsDiv.style.marginTop = '15px';
+            commentsDiv.style.paddingTop = '15px';
+        }
+    }
 }

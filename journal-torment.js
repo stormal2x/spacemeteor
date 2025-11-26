@@ -225,16 +225,34 @@ async function checkAndSetUsername() {
     currentUsername = localStorage.getItem('torment_username');
 
     if (!currentUsername) {
-        // Prompt for username
-        currentUsername = prompt('Welcome to Torment! Choose a username (this will be displayed publicly):');
+        // Show custom modal instead of prompt
+        return new Promise((resolve) => {
+            document.getElementById('usernameSetupModal').style.display = 'flex';
 
-        if (!currentUsername || currentUsername.trim() === '') {
-            currentUsername = user.email.split('@')[0]; // Fallback to email prefix
-        }
+            // Store resolve function globally so saveUsername can call it
+            window._usernameResolve = resolve;
+        });
+    }
+}
 
-        currentUsername = currentUsername.trim();
-        localStorage.setItem('torment_username', currentUsername);
-        showToast(`Welcome, ${currentUsername}!`, 'success');
+function saveUsername() {
+    const input = document.getElementById('usernameInput');
+    const username = input.value.trim();
+
+    if (!username) {
+        showToast('Please enter a username', 'error');
+        return;
+    }
+
+    currentUsername = username;
+    localStorage.setItem('torment_username', currentUsername);
+    document.getElementById('usernameSetupModal').style.display = 'none';
+    showToast(`Welcome, ${currentUsername}!`, 'success');
+
+    // Resolve the promise if it exists
+    if (window._usernameResolve) {
+        window._usernameResolve();
+        window._usernameResolve = null;
     }
 }
 
@@ -425,13 +443,26 @@ async function createTormentPost() {
         screenshotUrl = publicUrl;
     }
 
+    // Create post object, only include screenshot_url if it exists
+    const postData = {
+        user_id: user.id,
+        username: currentUsername,
+        content: content
+    };
+
+    // Only add screenshot_url if we have one
+    if (screenshotUrl) {
+        postData.screenshot_url = screenshotUrl;
+    }
+
     const { error } = await supabase
         .from('torment_posts')
-        .insert([{ user_id: user.id, username: currentUsername, content, screenshot_url: screenshotUrl }]);
+        .insert([postData]);
 
     if (error) {
         console.error('Error creating post:', error);
-        showToast('Failed to create post', 'error');
+        console.error('Post data:', postData);
+        showToast(`Failed to create post: ${error.message}`, 'error');
     } else {
         showToast('Post created!', 'success');
         closeCreatePostModal();

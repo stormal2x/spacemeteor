@@ -560,9 +560,18 @@ async function createTormentPost() {
     }
 }
 
+let likeInProgress = {};
+
 async function toggleLike(postId) {
+    // Prevent spam clicks
+    if (likeInProgress[postId]) return;
+    likeInProgress[postId] = true;
+
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+        likeInProgress[postId] = false;
+        return;
+    }
 
     const post = tormentPosts.find(p => p.id === postId);
     const hasLiked = post.torment_likes?.some(like => like.user_id === user.id);
@@ -570,7 +579,12 @@ async function toggleLike(postId) {
     // Optimistic UI update
     const likeBtn = document.getElementById(`like-btn-${postId}`);
     const likeCountSpan = document.getElementById(`like-count-${postId}`);
-    const svg = likeBtn.querySelector('svg');
+    const svg = likeBtn?.querySelector('svg');
+
+    if (!likeBtn || !likeCountSpan || !svg) {
+        likeInProgress[postId] = false;
+        return;
+    }
 
     if (hasLiked) {
         // Unlike animation
@@ -605,6 +619,7 @@ async function toggleLike(postId) {
 
     // Refresh data in background
     await fetchTormentPosts();
+    likeInProgress[postId] = false;
 }
 
 function toggleComments(postId) {
@@ -693,7 +708,16 @@ async function addComment(postId) {
 
         await fetchTormentPosts();
         renderTormentFeed();
-        document.getElementById(`comments-${postId}`).style.display = 'block';
+
+        // Keep comments section open after posting
+        const commentsDiv = document.getElementById(`comments-${postId}`);
+        if (commentsDiv) {
+            commentsDiv.style.display = 'block';
+            commentsDiv.style.maxHeight = '2000px';
+            commentsDiv.style.opacity = '1';
+            commentsDiv.style.marginTop = '15px';
+            commentsDiv.style.paddingTop = '15px';
+        }
     }
 }
 

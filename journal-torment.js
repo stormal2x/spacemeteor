@@ -273,7 +273,7 @@ async function fetchTormentPosts() {
         .select(`
             *,
             torment_likes (id, user_id),
-            torment_comments (id, username, content, created_at)
+            torment_comments (id, username, content, created_at, screenshot_url)
         `)
         .order('created_at', { ascending: false });
 
@@ -340,14 +340,20 @@ function createPostCard(post, userId) {
             <div style="margin-bottom: 15px; line-height: 1.6;">${post.content}</div>
             ${screenshotHtml}
             <div style="display: flex; gap: 20px; color: var(--text-secondary); font-size: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
-                <button onclick="toggleLike(${post.id})" style="background: none; border: none; cursor: pointer; color: ${hasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 5px;">
-                    ${hasLiked ? '❤️' : '🤍'} ${likeCount}
+                <button onclick="toggleLike(${post.id})" id="like-btn-${post.id}" style="background: none; border: none; cursor: pointer; color: ${hasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 5px; transition: transform 0.2s ease;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="${hasLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" style="transition: all 0.3s ease;">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span id="like-count-${post.id}">${likeCount}</span>
                 </button>
-                <button onclick="toggleComments(${post.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
-                    💬 ${commentCount}
+                <button onclick="toggleComments(${post.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; transition: color 0.2s ease;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    ${commentCount}
                 </button>
             </div>
-            <div id="comments-${post.id}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+            <div id="comments-${post.id}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;">
                 ${(post.torment_comments || []).map(comment => `
                     <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
                         <div style="font-weight: 600; font-size: 13px;">${comment.username}</div>
@@ -561,6 +567,30 @@ async function toggleLike(postId) {
     const post = tormentPosts.find(p => p.id === postId);
     const hasLiked = post.torment_likes?.some(like => like.user_id === user.id);
 
+    // Optimistic UI update
+    const likeBtn = document.getElementById(`like-btn-${postId}`);
+    const likeCountSpan = document.getElementById(`like-count-${postId}`);
+    const svg = likeBtn.querySelector('svg');
+
+    if (hasLiked) {
+        // Unlike animation
+        likeBtn.style.color = 'var(--text-secondary)';
+        svg.setAttribute('fill', 'none');
+        likeCountSpan.textContent = parseInt(likeCountSpan.textContent) - 1;
+    } else {
+        // Like animation
+        likeBtn.style.color = 'var(--primary)';
+        svg.setAttribute('fill', 'currentColor');
+        likeCountSpan.textContent = parseInt(likeCountSpan.textContent) + 1;
+
+        // Bounce animation
+        likeBtn.style.transform = 'scale(1.3)';
+        setTimeout(() => {
+            likeBtn.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    // Actual database update
     if (hasLiked) {
         await supabase
             .from('torment_likes')
@@ -573,13 +603,33 @@ async function toggleLike(postId) {
             .insert([{ post_id: postId, user_id: user.id }]);
     }
 
+    // Refresh data in background
     await fetchTormentPosts();
-    renderTormentFeed();
 }
 
 function toggleComments(postId) {
     const commentsDiv = document.getElementById(`comments-${postId}`);
-    commentsDiv.style.display = commentsDiv.style.display === 'none' ? 'block' : 'none';
+    const isVisible = commentsDiv.style.display !== 'none';
+
+    if (isVisible) {
+        // Close animation
+        commentsDiv.style.maxHeight = '0';
+        commentsDiv.style.opacity = '0';
+        commentsDiv.style.marginTop = '0';
+        commentsDiv.style.paddingTop = '0';
+        setTimeout(() => {
+            commentsDiv.style.display = 'none';
+        }, 300);
+    } else {
+        // Open animation
+        commentsDiv.style.display = 'block';
+        setTimeout(() => {
+            commentsDiv.style.maxHeight = '2000px';
+            commentsDiv.style.opacity = '1';
+            commentsDiv.style.marginTop = '15px';
+            commentsDiv.style.paddingTop = '15px';
+        }, 10);
+    }
 }
 
 async function addComment(postId) {

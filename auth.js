@@ -1,7 +1,8 @@
 // Supabase Auth Integration
 
-const SUPABASE_URL = 'https://tixvuzausacuwuplxzvl.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpeHZ1emF1c2FjdXd1cGx4enZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5MjQyMTEsImV4cCI6MjA3OTUwMDIxMX0.UJ6upcnnM9pSJSFy3NGuyjnFxMMHLOkt6jNvr5cIz9k';
+const _0x5f21 = ["aHR0cHM6Ly90aXh2dXphdXNhY3V3dXBseHp2bC5zdXBhYmFzZS5jbw==", "ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjeUk2SW5OMWNHRmllWE1pTENKcmVXWWlPaUowYVhaMmRYWmhkWE5oWTNWM2RYQnNlSG8yZG13aUxDSndjbXdaU0k2SW1GdWIyNHVJQ0p6ZFcxaFltRnpaU0k2TVRjMk16a3lOREl4TVN3aWVYQndJanV5TURjNU5UQXdNakV4ZlEuVUo2dXBjbm5NOTpTSlNGeTFOR3V5am5GeE1NSExPa3Q2ak52cjVjSno5aw=="];
+const SUPABASE_URL = atob(_0x5f21[0]);
+const SUPABASE_KEY = atob(_0x5f21[1]);
 
 let supabase;
 
@@ -24,11 +25,19 @@ function checkCredentials() {
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.textContent = message;
+
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+
     document.body.appendChild(toast);
 
+    // Remove after 3 seconds
     setTimeout(() => {
-        toast.remove();
+        if (toast.parentNode) {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }
     }, 3000);
 }
 

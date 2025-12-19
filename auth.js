@@ -46,8 +46,7 @@ async function handleLogin(event) {
     const submitBtn = form.querySelector('button[type="submit"]');
 
     try {
-        submitBtn.textContent = '🚀 Signing in...';
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.classList.add('btn-loading');
 
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
@@ -56,11 +55,10 @@ async function handleLogin(event) {
 
         if (error) throw error;
 
-        window.location.href = '/dashboard';
+        window.location.href = 'dashboard.html';
     } catch (error) {
+        if (submitBtn) submitBtn.classList.remove('btn-loading');
         showToast('Login failed: ' + error.message, 'error');
-        submitBtn.innerHTML = `Sign In <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`;
-        submitBtn.disabled = false;
     }
 }
 
@@ -74,7 +72,6 @@ async function handleVerify(event) {
 
     const form = event.target;
     const email = form.querySelector('input[type="email"]').value;
-    // Collect token from all digit inputs
     const otpInputs = form.querySelectorAll('.otp-digit');
     let token = '';
     otpInputs.forEach(input => token += input.value);
@@ -87,8 +84,7 @@ async function handleVerify(event) {
     }
 
     try {
-        submitBtn.textContent = 'Verifying...';
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.classList.add('btn-loading');
 
         const { data, error } = await supabase.auth.verifyOtp({
             email: email,
@@ -99,11 +95,10 @@ async function handleVerify(event) {
         if (error) throw error;
 
         showToast('Verification successful! Logging you in...', 'success');
-        window.location.href = '/dashboard';
+        window.location.href = 'dashboard.html';
     } catch (error) {
+        if (submitBtn) submitBtn.classList.remove('btn-loading');
         showToast('Verification failed: ' + error.message, 'error');
-        submitBtn.innerHTML = `Verify Code <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
-        submitBtn.disabled = false;
     }
 }
 
@@ -118,8 +113,11 @@ async function handleSignup(event) {
     const form = event.target;
     const email = form.querySelector('input[type="email"]').value;
     const password = form.querySelector('input[type="password"]').value;
+    const submitBtn = form.querySelector('button[type="submit"]');
 
     try {
+        if (submitBtn) submitBtn.classList.add('btn-loading');
+
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -139,6 +137,7 @@ async function handleSignup(event) {
         }
 
     } catch (error) {
+        if (submitBtn) submitBtn.classList.remove('btn-loading');
         showToast('Signup failed: ' + error.message, 'error');
     }
 }
@@ -176,7 +175,7 @@ async function logout() {
     }
     localStorage.removeItem('sb-access-token');
     localStorage.removeItem('sb-refresh-token');
-    window.location.href = '/';
+    window.location.href = 'index.html';
 }
 
 async function checkAuth() {
@@ -194,9 +193,9 @@ async function checkAuth() {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session && window.location.pathname.includes('dashboard')) {
-        window.location.href = '/login';
+        window.location.href = 'login.html';
     } else if (session && (window.location.pathname === '/' || window.location.pathname.includes('index') || window.location.pathname.includes('login'))) {
-        window.location.href = '/dashboard';
+        window.location.href = 'dashboard.html';
     }
 }
 

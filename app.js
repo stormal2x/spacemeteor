@@ -11,15 +11,71 @@ let settings = JSON.parse(localStorage.getItem('settings')) || {
 
 let currentMonth = new Date();
 let selectedTradeDate = null;
+let lastDeletedTrade = null;
+
+// Helper to escape HTML and prevent XSS
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// Helper to validate file uploads
+function validateFile(file, maxSizeMB = 5) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        showToast('Invalid file type. Please upload an image.', 'error');
+        return false;
+    }
+    if (file.size > maxSizeMB * 1024 * 1024) {
+        showToast(`File too large. Maximum size is ${maxSizeMB}MB.`, 'error');
+        return false;
+    }
+    return true;
+}
+
+// Debounce helper
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Confirmation helper
+async function confirmAction(title, message) {
+    // If showConfirmModal from journal-torment.js is available, use it
+    if (window.showConfirmModal) {
+        return await window.showConfirmModal(title, message);
+    }
+    // Fallback to native confirm
+    return confirm(`${title}\n\n${message}`);
+}
 
 // Initialize the app
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+async function initializeApp() {
     initNavigation();
     await fetchTrades(); // Load from DB
-    loadCalendar();
     applySettings();
-    initPositionCalculator();
-});
+    initCalculator();
+    setupEventListeners();
+
+    // Initial view loads
+    loadCalendar();
+    loadAllTrades();
+    updateStats();
+
+    // Initial theme apply
+    changeTheme(settings.theme || 'dark');
+}
 
 async function fetchTrades() {
     if (!supabase) return;
@@ -73,36 +129,7 @@ async function saveTradeToDb(trade) {
     return true;
 }
 
-function initPositionCalculator() {
-    const calcInputs = ['calcAccountSize', 'calcRiskPercent', 'calcEntry', 'calcSL'];
-
-    calcInputs.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', calculatePositionSize);
-        }
-    });
-
-    // Sync calculator with trade form
-    const tradeEntry = document.getElementById('tradeEntry');
-    const tradeSL = document.getElementById('tradeSL');
-    const calcEntry = document.getElementById('calcEntry');
-    const calcSL = document.getElementById('calcSL');
-
-    if (tradeEntry && calcEntry) {
-        tradeEntry.addEventListener('input', () => {
-            calcEntry.value = tradeEntry.value;
-            calculatePositionSize();
-        });
-    }
-
-    if (tradeSL && calcSL) {
-        tradeSL.addEventListener('input', () => {
-            calcSL.value = tradeSL.value;
-            calculatePositionSize();
-        });
-    }
-}
+// Calculator initialization merged into initCalculator below
 
 // Navigation
 function initNavigation() {
@@ -264,7 +291,8 @@ function calculateStats() {
     // Calculate PnL % change (assuming based on starting capital or just a label)
     // For now, let's just show the raw % return on account if possible, or just the PnL
     // The HTML has id="monthPnlPercent"
-    const pnlPercent = settings.startingCapital > 0 ? ((totalPnL / settings.startingCapital) * 100).toFixed(1) : 0;
+    const startingCap = parseFloat(settings.startingCapital) || 1; // Default to 1 to avoid div by zero
+    const pnlPercent = ((totalPnL / startingCap) * 100).toFixed(1);
     updateElement('monthPnlPercent', `${totalPnL >= 0 ? '+' : ''}${pnlPercent}%`);
 
     // Update Win Rate
@@ -284,6 +312,11 @@ function calculateStats() {
     if (pnlChangeEl) {
         pnlChangeEl.className = 'stat-change ' + (totalPnL >= 0 ? 'positive' : 'negative');
     }
+}
+
+function updateStats() {
+    calculateStats();
+    calculatePerformanceStats();
 }
 
 function filterTradesByTimeframe(trades, timeframe) {
@@ -414,14 +447,14 @@ function loadRecentTrades() {
         return `
             <tr>
                 <td>${formatDate(trade.tradeDate || trade.entryDate)}</td>
-                <td><strong>${trade.symbol}</strong></td>
+                <td><strong>${escapeHTML(trade.symbol)}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${formatCurrency(trade.entryPrice)}</td>
                 <td>${trade.exitPrice ? formatCurrency(trade.exitPrice) : '-'}</td>
                 <td class="${isClosed ? (pnl >= 0 ? 'pnl-positive' : 'pnl-negative') : ''}">
                     ${isClosed ? formatCurrency(pnl) : 'Open'}
                 </td>
-                <td><strong>${rr}</strong></td>
+                <td><strong>${escapeHTML(rr)}</strong></td>
             </tr>
         `;
     }).join('');
@@ -449,19 +482,19 @@ function loadAllTrades() {
         return `
             <tr>
                 <td>${formatDate(trade.tradeDate || trade.entryDate)}</td>
-                <td><strong>${trade.symbol}</strong></td>
+                <td><strong>${escapeHTML(trade.symbol)}</strong></td>
                 <td><span class="trade-type-${trade.type}">${trade.type.toUpperCase()}</span></td>
                 <td>${parseFloat(trade.entryPrice).toFixed(2)}</td>
                 <td>${trade.exitPrice ? parseFloat(trade.exitPrice).toFixed(2) : '-'}</td>
                 <td class="${isClosed ? (pnl >= 0 ? 'pnl-positive' : 'pnl-negative') : ''}">
                     ${isClosed ? formatCurrency(pnl) : 'Open'}
                 </td>
-                <td><strong>${rr}</strong></td>
-                <td>${trade.strategy || '-'}</td>
+                <td><strong>${escapeHTML(rr)}</strong></td>
+                <td>${escapeHTML(trade.strategy) || '-'}</td>
                 <td>
-                    <button class="action-btn" onclick="viewTrade(${trades.indexOf(trade)})">View</button>
-                    ${trade.screenshot_url ? `<button class="action-btn" onclick="openImageModal('${trade.screenshot_url}')">📷</button>` : ''}
-                    <button class="action-btn delete" onclick="deleteTrade(${trade.id})">Delete</button>
+                    <button class="action-btn" onclick="viewTrade(${trades.indexOf(trade)})" aria-label="View trade details">View</button>
+                    ${trade.screenshot_url ? `<button class="action-btn" onclick="openImageModal('${trade.screenshot_url}')" aria-label="View screenshot">📷</button>` : ''}
+                    <button class="action-btn delete" onclick="deleteTrade(${trade.id})" aria-label="Delete trade">Delete</button>
                 </td>
             </tr>
         `;
@@ -485,19 +518,7 @@ function applyFilters(trades) {
     });
 }
 
-// Add event listeners for filters
-document.addEventListener('DOMContentLoaded', () => {
-    loadCalendar();
-    loadAllTrades();
-    updateStats();
-    initCalculator(); // Initialize calculator
-
-    // Setup filters
-    document.getElementById('filterType').addEventListener('change', loadAllTrades);
-    document.getElementById('filterOutcome').addEventListener('change', loadAllTrades);
-    document.getElementById('searchTrades').addEventListener('input', loadAllTrades);
-    document.getElementById('perfTimeframe').addEventListener('change', updateStats);
-});
+// Duplicates removed, merged into setupEventListeners below
 
 function viewTrade(index) {
     const trade = trades[index];
@@ -507,7 +528,8 @@ function viewTrade(index) {
 }
 
 async function deleteTrade(id) {
-    if (confirm('Are you sure you want to delete this trade?')) {
+    const confirmed = await confirmAction('Delete Trade?', 'Are you sure you want to delete this trade? This action cannot be undone.');
+    if (confirmed) {
         if (!supabase) return;
 
         const { error } = await supabase
@@ -520,18 +542,64 @@ async function deleteTrade(id) {
             return;
         }
 
+        // Store for undo
+        lastDeletedTrade = trades.find(t => t.id === id);
+
         await fetchTrades();
-        showToast('Trade deleted successfully', 'success');
+        showToast('Trade deleted. ', 'success', true); // true for undo button
     }
+}
+
+async function undoDelete() {
+    if (!lastDeletedTrade || !supabase) return;
+
+    const tradeToRestore = { ...lastDeletedTrade };
+    delete tradeToRestore.id; // Let DB generate new ID
+
+    const { error } = await supabase.from('trades').insert([tradeToRestore]);
+    if (error) {
+        showToast('Failed to restore trade', 'error');
+        return;
+    }
+
+    lastDeletedTrade = null;
+    await fetchTrades();
+    showToast('Trade restored!', 'success');
 }
 
 // Position Size Calculator
 function initCalculator() {
     const inputs = ['calcAccountSize', 'calcRiskPercent', 'calcEntry', 'calcSL'];
+    const debouncedCalc = debounce(calculatePosition, 300);
+
     inputs.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('input', calculatePosition);
+        if (el) {
+            el.addEventListener('input', debouncedCalc);
+        }
     });
+
+    // Sync calculator with trade form
+    const tradeEntry = document.getElementById('tradeEntry');
+    const tradeSL = document.getElementById('tradeSL');
+    const calcEntry = document.getElementById('calcEntry');
+    const calcSL = document.getElementById('calcSL');
+
+    if (tradeEntry && calcEntry) {
+        tradeEntry.addEventListener('input', () => {
+            calcEntry.value = tradeEntry.value;
+            debouncedCalc();
+        });
+    }
+
+    if (tradeSL && calcSL) {
+        tradeSL.addEventListener('input', () => {
+            calcSL.value = tradeSL.value;
+            debouncedCalc();
+        });
+    }
+
+    calculatePosition();
 }
 
 function calculatePosition() {
@@ -582,102 +650,119 @@ async function handleTradeSubmit(event) {
     event.preventDefault();
 
     const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
     const formData = new FormData(form);
 
-    if (typeof supabase === 'undefined' || !supabase) {
-        showToast('Database not connected', 'error');
-        return;
-    }
+    if (submitBtn) submitBtn.classList.add('btn-loading');
 
-    // Handle Multi-selects
-    const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
-    const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
-
-    // Handle Screenshot Upload
-    let screenshotUrl = null;
-    const screenshotFile = form.querySelector('input[name="screenshot"]').files[0];
-
-    if (screenshotFile) {
-        try {
-            const fileExt = screenshotFile.name.split('.').pop();
-            const fileName = `${Date.now()}.${fileExt}`;
-            const filePath = `${fileName}`;
-
-            const { data, error } = await supabase.storage
-                .from('trade-screenshots')
-                .upload(filePath, screenshotFile);
-
-            if (error) throw error;
-
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('trade-screenshots')
-                .getPublicUrl(filePath);
-
-            screenshotUrl = publicUrl;
-        } catch (error) {
-            console.error('Error uploading screenshot:', error);
-            showToast('Failed to upload screenshot: ' + error.message, 'error');
-            return; // Stop submission if upload fails
-        }
-    }
-
-    // Determine Exit Price based on Outcome
-    const outcome = formData.get('outcome');
-    const entryPrice = parseFloat(formData.get('entryPrice'));
-    const stopLoss = parseFloat(formData.get('stopLoss'));
-    const takeProfit = parseFloat(formData.get('takeProfit'));
-
-    let exitPrice = null;
-    if (outcome === 'win' && takeProfit) {
-        exitPrice = takeProfit;
-    } else if (outcome === 'loss' && stopLoss) {
-        exitPrice = stopLoss;
-    } else if (outcome === 'be' && entryPrice) {
-        exitPrice = entryPrice;
-    }
-
-    const trade = {
-        symbol: formData.get('symbol').toUpperCase(),
-        type: formData.get('type'),
-        quantity: 1,
-        entryPrice: entryPrice,
-        exitPrice: exitPrice,
-        stopLoss: stopLoss,
-        takeProfit: takeProfit,
-        session: formData.get('session'),
-        emotion: emotions.join(','),
-        confidence: formData.get('confidence'),
-        mistakes: mistakes.join(','),
-        strategy: formData.get('strategy'),
-        tags: formData.get('tags'),
-        notes: formData.get('notes'),
-        pnl: parseFloat(formData.get('pnl')), // Store the calculated PnL
-        screenshot_url: screenshotUrl, // Add screenshot URL to trade object
-        tradeDate: new Date().toISOString()
-    };
-
-    // Basic Validation
-    if (!trade.symbol || !trade.entryPrice) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-    }
-
-    const success = await saveTradeToDb(trade);
-
-    if (success) {
-        showToast('Trade saved successfully!', 'success');
-        form.reset();
-        // Reset range slider
-        const rangeOutput = form.querySelector('output');
-        if (rangeOutput) rangeOutput.textContent = '5.0';
-        const slider = form.querySelector('input[type="range"]');
-        if (slider) {
-            slider.value = 5;
-            updateSliderGradient(slider);
+    try {
+        if (typeof supabase === 'undefined' || !supabase) {
+            showToast('Database not connected', 'error');
+            return;
         }
 
-        switchSection('trades');
+        // Handle Multi-selects
+        const emotions = Array.from(form.querySelectorAll('input[name="emotion"]:checked')).map(cb => cb.value);
+        const mistakes = Array.from(form.querySelectorAll('input[name="mistake"]:checked')).map(cb => cb.value);
+
+        // Handle Screenshot Upload
+        let screenshotUrl = null;
+        const screenshotFile = form.querySelector('input[name="screenshot"]').files[0];
+
+        if (screenshotFile) {
+            if (!validateFile(screenshotFile)) return;
+            try {
+                const fileExt = screenshotFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { data, error } = await supabase.storage
+                    .from('trade-screenshots')
+                    .upload(filePath, screenshotFile);
+
+                if (error) throw error;
+
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('trade-screenshots')
+                    .getPublicUrl(filePath);
+
+                screenshotUrl = publicUrl;
+            } catch (error) {
+                console.error('Error uploading screenshot:', error);
+                showToast('Failed to upload screenshot: ' + error.message, 'error');
+                return; // Stop submission if upload fails
+            }
+        }
+
+        // Determine Exit Price based on Outcome
+        const outcome = formData.get('outcome');
+        const entryPrice = parseFloat(formData.get('entryPrice'));
+        const stopLoss = parseFloat(formData.get('stopLoss'));
+        const takeProfit = parseFloat(formData.get('takeProfit'));
+
+        let exitPrice = null;
+        if (outcome === 'win' && takeProfit) {
+            exitPrice = takeProfit;
+        } else if (outcome === 'loss' && stopLoss) {
+            exitPrice = stopLoss;
+        } else if (outcome === 'be' && entryPrice) {
+            exitPrice = entryPrice;
+        }
+
+        const trade = {
+            symbol: formData.get('symbol').toUpperCase(),
+            type: formData.get('type'),
+            quantity: 1,
+            entryPrice: entryPrice,
+            exitPrice: exitPrice,
+            stopLoss: stopLoss,
+            takeProfit: takeProfit,
+            session: formData.get('session'),
+            emotion: emotions.join(','),
+            confidence: formData.get('confidence'),
+            mistakes: mistakes.join(','),
+            strategy: formData.get('strategy'),
+            tags: formData.get('tags'),
+            notes: formData.get('notes'),
+            pnl: parseFloat(formData.get('pnl')), // Store the calculated PnL
+            screenshot_url: screenshotUrl, // Add screenshot URL to trade object
+            tradeDate: new Date().toISOString()
+        };
+
+        // Basic Validation
+        if (!trade.symbol || isNaN(trade.entryPrice)) {
+            showToast('Please fill in all required fields with valid numbers', 'error');
+            return;
+        }
+
+        if (trade.entryPrice <= 0) {
+            showToast('Entry price must be greater than 0', 'error');
+            return;
+        }
+
+        const success = await saveTradeToDb(trade);
+
+        if (submitBtn) submitBtn.classList.remove('btn-loading');
+
+        if (success) {
+            showToast('Trade saved successfully!', 'success');
+            form.reset();
+            // Reset range slider
+            const rangeOutput = form.querySelector('output');
+            if (rangeOutput) rangeOutput.textContent = '5.0';
+            const slider = form.querySelector('input[type="range"]');
+            if (slider) {
+                slider.value = 5;
+                updateSliderGradient(slider);
+            }
+
+            switchSection('trades');
+        }
+    } catch (error) {
+        if (submitBtn) submitBtn.classList.remove('btn-loading');
+        console.error('Submit error:', error);
+        showToast('Failed to save trade', 'error');
     }
 }
 
@@ -1236,17 +1321,98 @@ function updateElement(id, value) {
     }
 }
 
-function showToast(message, type = 'success') {
+// Auto-save draft logic
+function saveTradeDraft() {
+    const form = document.querySelector('#add-trade form');
+    if (!form) return;
+
+    const formData = new FormData(form);
+    const draft = {};
+    formData.forEach((value, key) => {
+        if (key !== 'screenshot') draft[key] = value;
+    });
+
+    localStorage.setItem('trade_draft', JSON.stringify(draft));
+}
+
+function loadTradeDraft() {
+    const draftStr = localStorage.getItem('trade_draft');
+    if (!draftStr) return;
+
+    try {
+        const draft = JSON.parse(draftStr);
+        const form = document.querySelector('#add-trade form');
+        if (!form) return;
+
+        Object.keys(draft).forEach(key => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) {
+                if (input.type === 'checkbox') {
+                    // Handle multi-selects or single checkboxes
+                    const checkboxes = form.querySelectorAll(`input[name="${key}"]`);
+                    checkboxes.forEach(cb => {
+                        if (draft[key].includes(cb.value)) cb.checked = true;
+                    });
+                } else if (input.type === 'radio') {
+                    const radio = form.querySelector(`input[name="${key}"][value="${draft[key]}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    input.value = draft[key];
+                }
+            }
+        });
+
+        // Update slider and calculator if needed
+        const slider = form.querySelector('input[type="range"]');
+        if (slider) updateSliderGradient(slider);
+
+        calculatePosition();
+    } catch (e) {
+        console.error('Failed to load draft:', e);
+    }
+}
+
+function clearTradeDraft() {
+    localStorage.removeItem('trade_draft');
+}
+
+function showToast(message, type = 'success', showUndo = false) {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.textContent = message;
+
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+
+    if (showUndo) {
+        const undoBtn = document.createElement('button');
+        undoBtn.textContent = 'Undo';
+        undoBtn.style.marginLeft = '10px';
+        undoBtn.style.background = 'white';
+        undoBtn.style.color = 'var(--primary)';
+        undoBtn.style.border = 'none';
+        undoBtn.style.borderRadius = '4px';
+        undoBtn.style.padding = '2px 8px';
+        undoBtn.style.cursor = 'pointer';
+        undoBtn.style.fontWeight = 'bold';
+        undoBtn.onclick = (e) => {
+            e.stopPropagation();
+            undoDelete();
+            toast.remove();
+        };
+        toast.appendChild(undoBtn);
+    }
+
     document.body.appendChild(toast);
 
-    // Remove after 3 seconds
+    // Remove after 4 seconds if it has undo, else 3
+    const duration = showUndo ? 5000 : 3000;
     setTimeout(() => {
-        toast.style.animation = 'slideOut 0.5s ease forwards';
-        setTimeout(() => toast.remove(), 500); // Wait for animation to finish
-    }, 3000);
+        if (toast.parentNode) {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, duration);
 }
 
 // Slider Gradient Animation
@@ -1284,160 +1450,90 @@ function initSliders() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initSliders);
-// Also run immediately in case DOM is already ready
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    initSliders();
-}
-
-// Auto-calculation logic removed as per user request
-// Users will enter Entry, Exit, and PnL manually
-
-// Initialization and Event Listeners
-// Initialize Supabase if available (handled in auth.js, but good to double check or wait)
-
-// Screenshot Preview Logic
-const screenshotInput = document.getElementById('screenshotInput');
-if (screenshotInput) {
-    screenshotInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = document.getElementById('previewImage');
-                const container = document.getElementById('screenshotPreview');
-                preview.src = e.target.result;
-                container.style.display = 'block';
+function setupEventListeners() {
+    // Screenshot Preview
+    const screenshotInput = document.getElementById('screenshotInput');
+    if (screenshotInput) {
+        screenshotInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('previewImage');
+                    const container = document.getElementById('screenshotPreview');
+                    preview.src = e.target.result;
+                    container.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(file);
-        }
-    });
-}
-
-function removeScreenshot() {
-    const input = document.getElementById('screenshotInput');
-    const container = document.getElementById('screenshotPreview');
-    input.value = '';
-    container.style.display = 'none';
-}
-
-// Image Modal Logic
-function openImageModal(src) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const loader = document.getElementById('modalLoader');
-
-    // Reset state
-    modalImg.style.display = 'none'; // Hide image initially
-    loader.style.display = 'block'; // Show loader
-    modal.classList.add('active'); // Show modal container
-
-    // Force reflow
-    void modal.offsetWidth;
-
-    // Set up onload handler BEFORE setting src
-    modalImg.onload = function () {
-        loader.style.display = 'none';
-        modalImg.style.display = 'block';
-    };
-
-    modalImg.onerror = function () {
-        loader.style.display = 'none';
-        showToast('Failed to load image', 'error');
-    };
-
-    // Set src to trigger load
-    modalImg.src = src;
-}
-
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.remove('active');
-}
-
-// Close modal with Escape key
-document.addEventListener('keydown', function (event) {
-    if (event.key === "Escape") {
-        closeImageModal();
-    }
-});
-
-// Load initial data
-loadCalendar();
-loadAllTrades();
-updateStats();
-initCalculator();
-
-// Setup Global Event Listeners
-
-// Settings Inputs
-const settingInputs = ['startingCapital', 'currency', 'dateFormat'];
-settingInputs.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-        // Pre-fill with current settings
-        element.value = settings[id] || '';
-
-        element.addEventListener('change', (e) => {
-            settings[id] = e.target.value;
-            saveSettings();
-            // Reload views that depend on settings
-            loadCalendar();
-            loadAllTrades();
-            updateStats();
-            showToast('Settings updated', 'success');
         });
     }
-});
 
-// Theme Switcher
-const themeSelect = document.getElementById('theme');
-if (themeSelect) {
-    themeSelect.value = settings.theme || 'dark';
-    themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
-}
+    // Modal Close & Shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeImageModal();
 
-// Performance Timeframe Selector
-const perfTimeframe = document.getElementById('perfTimeframe');
-if (perfTimeframe) {
-    perfTimeframe.addEventListener('change', () => {
-        calculatePerformanceStats();
+        // Ctrl+S to save trade
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            const addTradeSection = document.getElementById('add-trade');
+            if (addTradeSection && addTradeSection.classList.contains('active')) {
+                e.preventDefault();
+                const form = addTradeSection.querySelector('form');
+                if (form) handleTradeSubmit({ preventDefault: () => { }, target: form });
+            }
+        }
     });
-}
 
-// Dashboard Timeframe
-const timeframeSelect = document.getElementById('timeframe');
-if (timeframeSelect) {
-    timeframeSelect.addEventListener('change', () => {
-        // If we had a loadDashboard function, we'd call it.
-        // For now, just update stats as that's the main dashboard view
-        updateStats();
+    // Settings
+    const settingInputs = ['startingCapital', 'currency', 'dateFormat'];
+    settingInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = settings[id] || '';
+            element.addEventListener('change', (e) => {
+                settings[id] = e.target.value;
+                saveSettings();
+                loadCalendar();
+                loadAllTrades();
+                updateStats();
+                showToast('Settings updated', 'success');
+            });
+        }
     });
-}
 
-// Performance Timeframe
-const perfTimeframeSelect = document.getElementById('perfTimeframe');
-if (perfTimeframeSelect) {
-    perfTimeframeSelect.addEventListener('change', updateStats);
-}
+    // Theme Selector
+    const themeSelect = document.getElementById('theme');
+    if (themeSelect) {
+        themeSelect.value = settings.theme || 'dark';
+        themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
+    }
 
-// Trade Filters
-const filterType = document.getElementById('filterType');
-if (filterType) filterType.addEventListener('change', loadAllTrades);
+    // Performance Timeframe
+    const perfTimeframe = document.getElementById('perfTimeframe');
+    if (perfTimeframe) {
+        perfTimeframe.addEventListener('change', updateStats);
+    }
 
-const filterOutcome = document.getElementById('filterOutcome');
-if (filterOutcome) filterOutcome.addEventListener('change', loadAllTrades);
+    // Dashboard Timeframe
+    const timeframeSelect = document.getElementById('timeframe');
+    if (timeframeSelect) {
+        timeframeSelect.addEventListener('change', updateStats);
+    }
 
-const searchTrades = document.getElementById('searchTrades');
-if (searchTrades) searchTrades.addEventListener('input', loadAllTrades);
+    // Trade Filters
+    const filters = ['filterType', 'filterOutcome'];
+    filters.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', loadAllTrades);
+    });
 
-// Initial Theme Apply
-changeTheme(settings.theme || 'dark');
+    const searchTrades = document.getElementById('searchTrades');
+    if (searchTrades) searchTrades.addEventListener('input', loadAllTrades);
 
-// Initialize Position Size Calculator when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCalculator);
-} else {
-    // DOM already loaded
-    initCalculator();
+    // Auto-save draft event
+    const tradeForm = document.querySelector('#add-trade form');
+    if (tradeForm) {
+        tradeForm.addEventListener('input', debounce(saveTradeDraft, 500));
+        loadTradeDraft();
+    }
 }

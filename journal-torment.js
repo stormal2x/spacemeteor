@@ -334,51 +334,61 @@ function createPostCard(post, userId) {
     const hasLiked = post.torment_likes?.some(like => like.user_id === userId) || false;
     const timeAgo = getTimeAgo(new Date(post.created_at));
 
-    const screenshotHtml = post.screenshot_url ? `
-        <img src="${post.screenshot_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px; cursor: pointer;" onclick="openImageModal('${post.screenshot_url}')" />
-    ` : '';
-
     const deleteButtonHtml = post.user_id === userId ? `
-        <button onclick="deleteTormentPost(${post.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); margin-left: auto; padding: 5px;" title="Delete Post">
+        <button onclick="deleteTormentPost(${post.id})" 
+            style="background: none; border: none; cursor: pointer; color: var(--text-secondary); margin-left: auto; padding: 5px;" 
+            aria-label="Delete post" title="Delete post">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
         </button>
     ` : '';
 
+    const screenshotHtml = post.screenshot_url ? `
+        <div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); cursor: pointer;" onclick="openImageModal('${post.screenshot_url}')">
+            <img src="${post.screenshot_url}" alt="Post screenshot" style="width: 100%; height: auto; display: block; max-height: 400px; object-fit: cover;">
+        </div>
+    ` : '';
+
     return `
         <div class="torment-post-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
             <div style="display: flex; align-items: center; margin-bottom: 15px;">
                 <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px;">
-                    ${post.username.charAt(0).toUpperCase()}
+                    ${escapeHTML(post.username.charAt(0).toUpperCase())}
                 </div>
                 <div>
-                    <div style="font-weight: 600;">${post.username}</div>
+                    <div style="font-weight: 600;">${escapeHTML(post.username)}</div>
                     <div style="font-size: 12px; color: var(--text-secondary);">${timeAgo}</div>
                 </div>
                 ${deleteButtonHtml}
             </div>
-            <div style="margin-bottom: 15px; line-height: 1.6;">${post.content}</div>
+            <div style="margin-bottom: 15px; line-height: 1.6;">${escapeHTML(post.content)}</div>
             ${screenshotHtml}
             <div style="display: flex; gap: 20px; color: var(--text-secondary); font-size: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
-                <button onclick="toggleLike(${post.id})" id="like-btn-${post.id}" style="background: none; border: none; cursor: pointer; color: ${hasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 5px; transition: transform 0.2s ease;">
+                <button onclick="toggleLike(${post.id})" id="like-btn-${post.id}" 
+                    style="background: none; border: none; cursor: pointer; color: ${hasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 5px; transition: transform 0.2s ease;"
+                    aria-label="${hasLiked ? 'Unlike' : 'Like'} post">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="${hasLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" style="transition: all 0.3s ease;">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                     <span id="like-count-${post.id}">${likeCount}</span>
                 </button>
-                <button onclick="toggleComments(${post.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; transition: color 0.2s ease;">
+                <button onclick="toggleComments(${post.id})" 
+                    style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; transition: color 0.2s ease;"
+                    aria-label="View comments">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    ${commentCount}
+                    <span>${commentCount}</span>
                 </button>
             </div>
             <div id="comments-${post.id}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;">
                 ${(post.torment_comments || []).map(comment => {
         const isCommentOwner = comment.user_id === userId;
         const deleteCommentBtn = isCommentOwner ? `
-                        <button onclick="deleteComment(${post.id}, ${comment.id})" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 2px; margin-left: auto;" title="Delete Comment">
+                        <button onclick="deleteComment(${post.id}, ${comment.id})" 
+                            style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 2px; margin-left: auto;" 
+                            aria-label="Delete comment" title="Delete comment">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
@@ -388,10 +398,10 @@ function createPostCard(post, userId) {
         return `
                         <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
                             <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <div style="font-weight: 600; font-size: 13px;">${comment.username}</div>
+                                <div style="font-weight: 600; font-size: 13px;">${escapeHTML(comment.username)}</div>
                                 ${deleteCommentBtn}
                             </div>
-                            <div style="font-size: 14px; margin-top: 5px;">${comment.content}</div>
+                            <div style="font-size: 14px; margin-top: 5px;">${escapeHTML(comment.content)}</div>
                             ${comment.screenshot_url ? `<img src="${comment.screenshot_url}" style="max-width: 200px; border-radius: 6px; margin-top: 10px; cursor: pointer;" onclick="openImageModal('${comment.screenshot_url}')" />` : ''}
                         </div>
                     `;
@@ -411,7 +421,9 @@ function createPostCard(post, userId) {
                     <!-- Buttons Row -->
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="file" id="comment-file-${post.id}" accept="image/*" style="display: none;" onchange="previewCommentImage(${post.id}, event)" />
-                        <label for="comment-file-${post.id}" style="cursor: pointer; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; font-size: 14px; transition: var(--transition);">
+                        <label for="comment-file-${post.id}" 
+                            style="cursor: pointer; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-tertiary); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; font-size: 14px; transition: var(--transition);"
+                            aria-label="Upload image" title="Upload image">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                             </svg>
@@ -552,6 +564,7 @@ async function createTormentPost() {
     let screenshotUrl = null;
 
     if (postScreenshotFile) {
+        if (!validateFile(postScreenshotFile)) return;
         const fileName = `torment/${user.id}/${Date.now()}_${postScreenshotFile.name}`;
         const { data, error: uploadError } = await supabase.storage
             .from('trade-screenshots')
@@ -701,6 +714,7 @@ async function addComment(postId) {
     let screenshotUrl = null;
 
     if (file) {
+        if (!validateFile(file)) return;
         const fileName = `comments/${user.id}/${Date.now()}_${file.name}`;
         const { data, error: uploadError } = await supabase.storage
             .from('trade-screenshots')
